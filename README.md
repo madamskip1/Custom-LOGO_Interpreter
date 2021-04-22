@@ -1,1 +1,2 @@
 # Custom-LOGO_Interpreter
+Celem projektu jest napisanie aplikacji okienkowej, która będzie podobna doznanego programuLogomocja. Na ekranie będą poruszać się żółwie wykonująceokreślone przez użytkownika w formie kodu zadania. Względem tradycyjnegoLogo, ta wersja będzie działała na konstrukcjach obiektowych oraz równoległych.
