@@ -1,4 +1,11 @@
 #include "SourceReader.h"
+#include <fstream>
+#include <sstream>
+
+
+SourceReader::SourceReader() : lineNumber(0), charNumber(0)
+{
+}
 
 const void SourceReader::setSourceString(std::string sourceString)
 {
@@ -6,14 +13,26 @@ const void SourceReader::setSourceString(std::string sourceString)
     resetCounters();
 }
 
+const void SourceReader::setSourceFile(std::string path)
+{
+    std::fstream file;
+    file.open(path, std::ios::in);
+
+    if (file.good())
+    {
+        source = std::make_unique < std::fstream>(std::move(file));
+        resetCounters();
+    }
+}
+
 const char SourceReader::getCharacter()
 {
     char character;
     character = source.get()->get();
 
-    if (isEndOfLine(character))
+    if (checkIfCharIsEndOfLine(character))
     {
-        while (isEndOfLine(character))
+        while (checkIfCharIsEndOfLine(character))
         {
             character = source.get()->get();
         }
@@ -22,9 +41,6 @@ const char SourceReader::getCharacter()
         charNumber = 0;
     }
     
-
-    
-    lastCharacter = character;
     charNumber++;
 
     return character;
@@ -33,7 +49,6 @@ const char SourceReader::getCharacter()
 const char SourceReader::peek() const
 {
     return source.get()->peek();
-    
 }
 
 const bool SourceReader::isEof() const
@@ -63,7 +78,7 @@ const void SourceReader::resetCounters()
     charNumber = 0;
 }
 
-const bool SourceReader::isEndOfLine(const char& character) const
+const bool SourceReader::checkIfCharIsEndOfLine(const char& character) const
 {
     return (character == '\n' || character == '\r');
 }

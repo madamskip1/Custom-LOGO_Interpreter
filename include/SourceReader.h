@@ -1,12 +1,13 @@
 #pragma once
 #include <istream>
-#include <sstream>
 #include <string>
 
 class SourceReader
 {
 public:
+	SourceReader();
 	const void setSourceString(std::string sourceString);
+	const void setSourceFile(std::string path);
 	const char getCharacter();
 	const char peek() const;
 	const bool isEof() const;
@@ -17,11 +18,10 @@ public:
 
 private:
 	std::unique_ptr<std::istream> source;
-	char lastCharacter;
 	int lineNumber;
 	int charNumber;
 
 	const void resetCounters();
-	const bool isEndOfLine(const char& character) const;
+	const bool checkIfCharIsEndOfLine(const char& character) const;
 };
 
