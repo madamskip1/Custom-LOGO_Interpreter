@@ -5,22 +5,22 @@ Lexer::Lexer(SourceReader* reader) : source(reader)
 {
 }
 
-Token Lexer::nextToken()
+Token Lexer::getNextToken()
 {
-	token.type = TokenType::INVALID;
+	curToken.type = TokenType::INVALID;
 	char character;
 	character = source->getCharacter();
 
 	while (std::isspace(character))
 		character = source->getCharacter();
 
-	token.line = source->getLineNumber();
-	token.firstCharPos = source->getCharNumber();
+	curToken.line = source->getLineNumber();
+	curToken.firstCharPos = source->getCharNumber();
 
 	if (source->isEof())
 	{
-		token.type = TokenType::EndOfFile;
-		return token;
+		curToken.type = TokenType::EndOfFile;
+		return curToken;
 	}
 
 	tryToMakeDigit(character);
@@ -28,12 +28,12 @@ Token Lexer::nextToken()
 	tryToMakeIDorKeywordOrDatatypes(character);
 	tryToMakeMathOperator(character);
 	tryToMakeConditionOperator(character);
-	tryToRelationOperator(character);
+	tryToMakeRelationOperator(character);
 	tryToMakeBracket(character);
 	tryToMakeSymbols(character);
 	tryToMakeComment(character);
 
-	return token;
+	return curToken;
 }
 
 const void Lexer::tryToMakeDigit(const char& character)
@@ -48,19 +48,19 @@ const void Lexer::tryToMakeDigit(const char& character)
 		val = val * 10 + (source->getCharacter() - '0');
 	}
 
-	token.value = val;
-	token.type = TokenType::Digit;
+	curToken.type = TokenType::Digit;
+	curToken.value = val;
 }
 
 const void Lexer::tryToMakeString(const char& character)
 {
-	if (character != '"') // string zaczyna siê cudzys³owiem
+	if (character != '"')
 		return;
 
 	char nextChar = source->peek();
 	std::string string = "";
 
-	while (nextChar != '"' && !source->isEof() && std::isprint(nextChar))
+	while (std::isprint(nextChar) && nextChar != '"' && !source->isEof())
 	{
 		string += source->getCharacter();
 		nextChar = source->peek();
@@ -68,18 +68,18 @@ const void Lexer::tryToMakeString(const char& character)
 
 	if (nextChar != '"')
 	{
-		token.type = TokenType::INVALID;
+		curToken.type = TokenType::INVALID;
 		return;
 	}
 
 	source->getCharacter();
-	token.type = TokenType::StringVal;
-	token.value = string;
+
+	curToken.type = TokenType::StringVal;
+	curToken.value = string;
 }
 
-const void Lexer::tryToMakeIDorKeywordOrDatatypes(const char character)
+const void Lexer::tryToMakeIDorKeywordOrDatatypes(const char& character)
 {
-
 	if (!std::isalpha(character))
 		return;
 	
@@ -97,13 +97,12 @@ const void Lexer::tryToMakeIDorKeywordOrDatatypes(const char character)
 
 	if (keywordIterator != KeywordToTokenType.end())
 	{
-		//token.type = KeywordToTokenType.at(name);
-		token.type = std::get<1>(*keywordIterator);
+		curToken.type = std::get<1>(*keywordIterator);
 	}
 	else
 	{
-		token.type = TokenType::Identifier;
-		token.value = name;
+		curToken.type = TokenType::Identifier;
+		curToken.value = name;
 	}
 }
 
@@ -118,12 +117,12 @@ const void Lexer::tryToMakeMathOperator(const char& character)
 
 	if (source->peek() == '/')
 	{
-		// to komentarz
 		return;
 	}
 
 	std::map<char, TokenType>::const_iterator operatorType = MathOperatorsToTokenType.find(character);
-	token.type = std::get<1>(*operatorType);
+
+	curToken.type = std::get<1>(*operatorType);
 }
 
 const void Lexer::tryToMakeConditionOperator(const char& character)
@@ -134,7 +133,7 @@ const void Lexer::tryToMakeConditionOperator(const char& character)
 			return;
 
 		source->getCharacter();
-		token.type = TokenType::And;
+		curToken.type = TokenType::And;
 	}
 	else if (character == '|')
 	{
@@ -142,33 +141,33 @@ const void Lexer::tryToMakeConditionOperator(const char& character)
 			return;
 
 		source->getCharacter();
-		token.type = TokenType::Or;
+		curToken.type = TokenType::Or;
 	}
 }
 
-const void Lexer::tryToRelationOperator(const char& character)
+const void Lexer::tryToMakeRelationOperator(const char& character)
 {
 	if (character == '<')
 	{
 		if (source->peek() == '=')
 		{
 			source->getCharacter();
-			token.type = TokenType::LessOrEqual;
+			curToken.type = TokenType::LessOrEqual;
 			return;
 		}
 
-		token.type = TokenType::Less;
+		curToken.type = TokenType::Less;
 	}
 	else if (character == '>')
 	{
 		if (source->peek() == '=')
 		{
 			source->getCharacter();
-			token.type = TokenType::GreaterOrEqual;
+			curToken.type = TokenType::GreaterOrEqual;
 			return;
 		}
 
-		token.type = TokenType::Greater;
+		curToken.type = TokenType::Greater;
 
 	}
 	else if (character == '=')
@@ -176,22 +175,22 @@ const void Lexer::tryToRelationOperator(const char& character)
 		if (source->peek() == '=')
 		{
 			source->getCharacter();
-			token.type = TokenType::Equal;
+			curToken.type = TokenType::Equal;
 			return;
 		}
 
-		token.type = TokenType::AssignOperator;
+		curToken.type = TokenType::AssignOperator;
 	}
 	else if (character == '!')
 	{
 		if (source->peek() == '=')
 		{
 			source->getCharacter();
-			token.type = TokenType::NotEqual;
+			curToken.type = TokenType::NotEqual;
 			return;
 		}
 
-		token.type = TokenType::NotOperator;
+		curToken.type = TokenType::NotOperator;
 	}
 
 }
@@ -200,19 +199,19 @@ const void Lexer::tryToMakeBracket(const char& character)
 {
 	if (character == '{')
 	{
-		token.type = TokenType::CurlyBracketOpen;
+		curToken.type = TokenType::CurlyBracketOpen;
 	} 
 	else if (character == '}')
 	{
-		token.type = TokenType::CurlyBracketClose;
+		curToken.type = TokenType::CurlyBracketClose;
 	}
 	else if (character == '(')
 	{
-		token.type = TokenType::RoundBracketOpen;
+		curToken.type = TokenType::RoundBracketOpen;
 	}
 	else if (character == ')')
 	{
-		token.type = TokenType::RoundBracketClose;
+		curToken.type = TokenType::RoundBracketClose;
 	}
 
 }
@@ -221,15 +220,15 @@ const void Lexer::tryToMakeSymbols(const char& character)
 {
 	if (character == '.')
 	{
-		token.type = TokenType::Dot;
+		curToken.type = TokenType::Dot;
 	}
 	else if (character == ';')
 	{
-		token.type = TokenType::Semicolon;
+		curToken.type = TokenType::Semicolon;
 	}
 	else if (character == ',')
 	{
-		token.type = TokenType::Comma;
+		curToken.type = TokenType::Comma;
 	}
 }
 
@@ -238,6 +237,6 @@ const void Lexer::tryToMakeComment(const char& character)
 	if (character != '/' || source->peek() != '/')
 		return;
 
-	token.type = TokenType::Comment;
+	curToken.type = TokenType::Comment;
 	source->skipLine();
 }
