@@ -3,7 +3,7 @@
 #include <sstream>
 
 
-SourceReader::SourceReader() : lineNumber(0), charNumber(0), eof(false)
+SourceReader::SourceReader() : lineNumber(0), charNumber(0), eof(false), streamPos(0);
 {
 }
 
@@ -45,6 +45,7 @@ const char SourceReader::getCharacter()
     }
     
     charNumber++;
+    streamPos = source.get()->tellg();
 
     if (isEof())
     {
