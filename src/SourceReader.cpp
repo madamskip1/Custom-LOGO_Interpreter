@@ -3,7 +3,7 @@
 #include <sstream>
 
 
-SourceReader::SourceReader() : lineNumber(0), charNumber(0), eof(false), streamPos(0);
+SourceReader::SourceReader() : lineNumber(0), charNumber(0), eof(false), streamPos(0)
 {
 }
 
@@ -30,19 +30,11 @@ const char SourceReader::getCharacter()
     if (eof)
         return '\0';
 
+    if (checkIfCharIsEndOfLine(peek()))
+        skipLine();
+
     char character;
     character = getSingleCharFromSource();
-
-    if (checkIfCharIsEndOfLine(character))
-    {
-        while (checkIfCharIsEndOfLine(character))
-        {
-            character = getSingleCharFromSource();
-        }
-
-        lineNumber++;
-        charNumber = 0;
-    }
     
     charNumber++;
     streamPos = source.get()->tellg();
