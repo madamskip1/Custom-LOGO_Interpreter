@@ -17,7 +17,7 @@ private:
 	Token curToken;
 
 	const bool tryToMakeDigit(const char& character);
-	const bool tryToMakeString(const char& character);
+	const bool tryToMakeColor(const char& character);
 	const bool tryToMakeIDorKeywordOrDatatypes(const char& character);
 	const bool tryToMakeMathOperator(const char& character);
 	const bool tryToMakeConditionOperator(const char& character);

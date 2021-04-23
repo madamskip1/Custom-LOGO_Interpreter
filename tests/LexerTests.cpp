@@ -62,35 +62,52 @@ TEST_CASE("Digit Token", "[digit]")
 	REQUIRE(token.type == TokenType::True);
 }
 
-TEST_CASE("String Token", "[stringToken]")
+TEST_CASE("ColorValue Token", "[colorValueToken]")
 {
 	SourceReader* reader = new SourceReader();
 	Lexer lexer(reader);
 	Token token;
 
 	// Simple string
-	reader->setSourceString("\"Test String\"");
+	reader->setSourceString("\"#123456\"");
 	token = lexer.getNextToken();
-	REQUIRE(token.type == TokenType::StringVal);
-	REQUIRE(token.getStringValue() == "Test String");
-
-	// Empty string
-	reader->setSourceString("\"\"");
-	token = lexer.getNextToken();
-	REQUIRE(token.type == TokenType::StringVal);
-	REQUIRE(token.getStringValue() == "");
+	REQUIRE(token.type == TokenType::ColorValue);
+	REQUIRE(token.getStringValue() == "#123456");
 
 	// Not terminated string
 	reader->setSourceString("\""); 
 	token = lexer.getNextToken();
-	REQUIRE(token.type == TokenType::INVALID);
+	REQUIRE(token.type == TokenType::ColorValNotTerminated);
 
-	// digit then string
-	reader->setSourceString(" 2323\"TestString\"");
-	lexer.getNextToken();
+	// Hash missing
+	reader->setSourceString("\"1234567\"");
 	token = lexer.getNextToken();
-	REQUIRE(token.type == TokenType::StringVal);
-	REQUIRE(token.getStringValue() == "TestString");
+	REQUIRE(token.type == TokenType::ColorValMissHash);
+
+	// Bad syntax 
+	reader->setSourceString("\"#1234GG\"");
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::ColorValBadSyntax);
+
+	// hash missing and bad syntax
+	reader->setSourceString("\"11234GG\"");
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::ColorValMissHash);
+
+	// To short
+	reader->setSourceString("\"#12345\"");
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::ColorValTooShort);
+
+	// To long
+	reader->setSourceString("\"#1234567\"");
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::ColorValTooLong);
+
+	// Empty string
+	reader->setSourceString("\"\"");
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::ColorValTooShort);
 }
 
 TEST_CASE("Keywords", "[keywords]")
@@ -380,7 +397,7 @@ Point point(1, 0);
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::RoundBracketOpen);
 	token = lexer.getNextToken();
-	REQUIRE(token.type == TokenType::StringVal);
+	REQUIRE(token.type == TokenType::ColorValue);
 	REQUIRE(token.getStringValue() == "#000000");
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::RoundBracketClose);

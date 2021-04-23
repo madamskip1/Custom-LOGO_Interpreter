@@ -35,7 +35,7 @@ Token Lexer::getNextToken()
 	if (tryToMakeDigit(character))
 		return curToken;
 
-	if (tryToMakeString(character))
+	if (tryToMakeColor(character))
 		return curToken;
 
 	if (tryToMakeIDorKeywordOrDatatypes(character))
@@ -110,30 +110,71 @@ const bool Lexer::tryToMakeDigit(const char& character)
 	return true;
 }
 
-const bool Lexer::tryToMakeString(const char& character)
+const bool Lexer::tryToMakeColor(const char& character)
 {
 	if (character != '"')
 		return false;
 
+
 	char nextChar = source->peek();
+	char curCharacter;
 	std::string string = "";
 
+	int counter = 0;
+	int expectedSize = 7;
+	bool badSyntax = false;
+	
 	while (std::isprint(nextChar) && nextChar != '"' && !source->isEof())
 	{
-		string += source->getCharacter();
+		counter++;
+		curCharacter = source->getCharacter();
+
+		if (badSyntax || 
+			(counter != 1 && (curCharacter < '0' || curCharacter > 'F' || (curCharacter > '59' && curCharacter < '65'))) ||
+			(counter == 1 && curCharacter != '#'))
+		{
+			badSyntax = true;
+		}
+		else
+		{
+			string += curCharacter;
+		}
+
 		nextChar = source->peek();
 	}
 
 	if (nextChar != '"')
 	{
-		curToken.type = TokenType::INVALID;
+		curToken.type = TokenType::ColorValNotTerminated;
 		return true;
 	}
 
 	source->getCharacter();
 
-	curToken.type = TokenType::StringVal;
-	curToken.value = string;
+	if (counter != expectedSize)
+	{
+		if (counter < expectedSize)
+		{
+			curToken.type = TokenType::ColorValTooShort;
+		}
+		else
+		{
+			curToken.type = TokenType::ColorValTooLong;
+		}
+	}
+	else if (string.length() < 1 || string.at(0) != '#')
+	{
+		curToken.type = TokenType::ColorValMissHash;
+	}
+	else if (badSyntax)
+	{
+		curToken.type = TokenType::ColorValBadSyntax;
+	}
+	else
+	{
+		curToken.type = TokenType::ColorValue;
+		curToken.value = string;
+	}
 
 	return true;
 }
