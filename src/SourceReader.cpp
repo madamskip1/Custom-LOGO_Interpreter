@@ -3,14 +3,14 @@
 #include <sstream>
 
 
-SourceReader::SourceReader() : lineNumber(0), charNumber(0)
+SourceReader::SourceReader() : lineNumber(0), charNumber(0), eof(false)
 {
 }
 
 const void SourceReader::setSourceString(std::string sourceString)
 {
     source = std::make_unique<std::istringstream>(std::istringstream(sourceString));
-    resetCounters();
+    reset();
 }
 
 const void SourceReader::setSourceFile(std::string path)
@@ -21,20 +21,23 @@ const void SourceReader::setSourceFile(std::string path)
     if (file.good())
     {
         source = std::make_unique < std::fstream>(std::move(file));
-        resetCounters();
+        reset();
     }
 }
 
 const char SourceReader::getCharacter()
 {
+    if (eof)
+        return '\0';
+
     char character;
-    character = source.get()->get();
+    character = getSingleCharFromSource();
 
     if (checkIfCharIsEndOfLine(character))
     {
         while (checkIfCharIsEndOfLine(character))
         {
-            character = source.get()->get();
+            character = getSingleCharFromSource();
         }
 
         lineNumber++;
@@ -42,6 +45,12 @@ const char SourceReader::getCharacter()
     }
     
     charNumber++;
+
+    if (isEof())
+    {
+        eof = true;
+        return '\0';
+    }
 
     return character;
 }
@@ -58,8 +67,63 @@ const bool SourceReader::isEof() const
 
 const void SourceReader::skipLine()
 {
-    std::string temp;
-    std::getline(*(source.get()), temp);
+    bool newNotEmptyLine = false;
+    char character;
+
+    character = getSingleCharFromSource();
+
+    while (!checkIfCharIsEndOfLine(character) && !isEof())
+    {
+        character = getSingleCharFromSource();
+        charNumber++;
+    }
+
+    if (isEof())
+    {
+        charNumber++;
+        eof = true;
+        return;
+    }
+
+    lineNumber++;
+    charNumber = 0;
+
+    char nextChar;
+    nextChar = peek();
+
+    if (checkIfCharIsEndOfLine(nextChar))
+    {
+        if (nextChar == '\r')
+        {
+            character = getSingleCharFromSource();
+            nextChar = peek();
+        }
+
+        while (!newNotEmptyLine)
+        {
+            if (nextChar == '\n')
+            {
+                getSingleCharFromSource();
+                lineNumber++;
+                charNumber = 0;
+
+                if (peek() == '\r')
+                    getSingleCharFromSource();
+
+                nextChar = peek();
+            }
+            else if (std::isspace(nextChar))
+            {
+                charNumber++;
+                getSingleCharFromSource();
+                nextChar = peek();
+            }
+            else
+            {
+                newNotEmptyLine = true;
+            }
+        }
+    }
 }
 
 const int SourceReader::getLineNumber() const
@@ -72,13 +136,20 @@ const int SourceReader::getCharNumber() const
     return charNumber;
 }
 
-const void SourceReader::resetCounters()
+const void SourceReader::reset()
 {
     lineNumber = 1;
     charNumber = 0;
+    streamPos = 0;
+    eof = false;
 }
 
 const bool SourceReader::checkIfCharIsEndOfLine(const char& character) const
 {
     return (character == '\n' || character == '\r');
+}
+
+const char SourceReader::getSingleCharFromSource()
+{
+    return source.get()->get();
 }

@@ -20,8 +20,11 @@ private:
 	std::unique_ptr<std::istream> source;
 	int lineNumber;
 	int charNumber;
+	bool eof;
+	std::streampos streamPos;
 
-	const void resetCounters();
+	const void reset();
 	const bool checkIfCharIsEndOfLine(const char& character) const;
+	const char getSingleCharFromSource();
 };
 
