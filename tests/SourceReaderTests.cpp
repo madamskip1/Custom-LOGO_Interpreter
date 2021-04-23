@@ -148,16 +148,16 @@ TEST_CASE("Skip lines", "[skipLine]")
 	SourceReader reader;
 
 	// simple skip line
-	reader.setSourceString("Test\nString");
+	reader.setSourceString("Test \n   String");
 	REQUIRE(reader.getCharacter() == 'T');
 	REQUIRE(reader.getLineNumber() == 1);
 	REQUIRE(reader.getCharNumber() == 1);
 	reader.skipLine();
 	REQUIRE(reader.getLineNumber() == 2);
-	REQUIRE(reader.getCharNumber() == 0);
+	REQUIRE(reader.getCharNumber() == 3);
 	REQUIRE(reader.getCharacter() == 'S');
 	REQUIRE(reader.getLineNumber() == 2);
-	REQUIRE(reader.getCharNumber() == 1);
+	REQUIRE(reader.getCharNumber() == 4);
 
 
 	// Multi empty lines

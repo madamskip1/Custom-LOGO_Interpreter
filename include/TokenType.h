@@ -62,7 +62,6 @@ enum class TokenType : unsigned int
 	AssignOperator,
 	NotOperator,
 	Identifier,
-	Comment,
 	EndOfFile,
 	UNKNOWN,
 	INVALID

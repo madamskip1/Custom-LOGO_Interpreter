@@ -14,6 +14,9 @@ Token Lexer::getNextToken()
 	while (std::isspace(character))
 		character = source->getCharacter();
 
+	while (isComment(character))
+		character = source->getCharacter();
+
 	curToken.line = source->getLineNumber();
 	curToken.firstCharPos = source->getCharNumber();
 
@@ -46,8 +49,6 @@ Token Lexer::getNextToken()
 
 	if (tryToMakeSymbols(character))
 		return curToken;
-
-	tryToMakeComment(character);
 
 	return curToken;
 }
@@ -274,12 +275,11 @@ const bool Lexer::tryToMakeSymbols(const char& character)
 	return false;
 }
 
-const bool Lexer::tryToMakeComment(const char& character)
+const bool Lexer::isComment(const char& character)
 {
 	if (character != '/' || source->peek() != '/')
 		return false;
 
-	curToken.type = TokenType::Comment;
 	source->skipLine();
 	return true;
 }

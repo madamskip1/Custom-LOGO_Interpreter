@@ -23,6 +23,7 @@ private:
 	const bool tryToMakeRelationOperator(const char& character);
 	const bool tryToMakeBracket(const char& character);
 	const bool tryToMakeSymbols(const char& character);
-	const bool tryToMakeComment(const char& character);
+
+	const bool isComment(const char& character);
 
 };

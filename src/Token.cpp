@@ -10,3 +10,8 @@ std::string Token::getStringValue() const
     return std::get<1>(value);
 }
 
+const bool Token::isInvalidOrUnknown()
+{
+    return (type == TokenType::INVALID || type == TokenType::UNKNOWN);
+}
+

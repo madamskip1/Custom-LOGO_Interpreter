@@ -154,7 +154,7 @@ TEST_CASE("MathOperators", "[mathOP]")
 	token = lexer.getNextToken();
 	token = lexer.getNextToken();
 	REQUIRE(token.type != TokenType::Divide);
-	REQUIRE(token.type == TokenType::Comment);
+	REQUIRE(token.type == TokenType::EndOfFile);
 }
 
 TEST_CASE("ConditionOperators", "[conditionOP]")
@@ -264,12 +264,33 @@ TEST_CASE("Comments", "[comments]")
 	Lexer lexer(reader);
 	Token token;
 
-	// comments 
+	// single comment
 	reader->setSourceString("/// qwewqe \n true");
 	token = lexer.getNextToken();
-	REQUIRE(token.type == TokenType::Comment);
-	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::True);
+
+
+	// multi comments in a row
+	std::string string = R"( //XXX
+
+ // 2xxxx  / / / / //// // / / / / / //
+			// 3xxxx
+
+/////////////////////////////////////
+					///////////////////
+
+// 4 xxx
+123456789
+
+//
+//
+//)";
+	reader->setSourceString(string);
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::Digit);
+	REQUIRE(token.getIntValue() == 123456789);
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::EndOfFile);
 }
 
 
@@ -284,10 +305,10 @@ TEST_CASE("Sample Code", "[code]")
 R"(repeat(10) {
 	zolw1.go(10);
 }
-zolw1.brush.color.set("#000000");
+zolw1.brush.color.set("#000000"); // XXXXXX COMMENT
 zolw2.hidden = true;
 
-if (x < 20) {
+if (x < 20) {								// XXXXXX COMMENT
 	zolw.go(2 + 2);
 } else {
 	zolw.go(x - 20);
@@ -353,6 +374,7 @@ Point point(1, 0);
 	REQUIRE(token.type == TokenType::RoundBracketOpen);
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::StringVal);
+	REQUIRE(token.getStringValue() == "#000000");
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::RoundBracketClose);
 	token = lexer.getNextToken();

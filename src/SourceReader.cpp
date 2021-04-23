@@ -84,7 +84,7 @@ const void SourceReader::skipLine()
     char nextChar;
     nextChar = peek();
 
-    if (checkIfCharIsEndOfLine(nextChar))
+    if (checkIfCharIsEndOfLine(nextChar) || std::isspace(nextChar))
     {
         if (nextChar == '\r')
         {

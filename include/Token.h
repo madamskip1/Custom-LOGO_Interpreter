@@ -7,6 +7,7 @@ class Token {
 public:
 	int getIntValue() const;
 	std::string getStringValue() const;
+	const bool isInvalidOrUnknown();
 
 
 	TokenType type = TokenType::UNKNOWN;
