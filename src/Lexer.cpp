@@ -74,7 +74,6 @@ const bool Lexer::tryToMakeDigit(const char& character)
 			source->getCharacter();
 			curToken.type = TokenType::BadDigitZeros;
 
-			// now skip all digits
 			while (std::isdigit(source->peek()))
 				source->getCharacter();
 
@@ -94,7 +93,6 @@ const bool Lexer::tryToMakeDigit(const char& character)
 			if (counter > Lexer::lexerConfig.at("maxNumOfDigits"))
 			{
 				curToken.type = TokenType::BadDigitTooLong;
-				// now skip all digits
 			}
 			else
 			{
@@ -235,7 +233,10 @@ const bool Lexer::tryToMakeConditionOperator(const char& character)
 	if (character == '&')
 	{
 		if (source->peek() != '&')
-			return false;
+		{
+			curToken.type = TokenType::AndOperatorMissSecond;
+			return true;
+		}
 
 		source->getCharacter();
 		curToken.type = TokenType::And;
@@ -244,7 +245,10 @@ const bool Lexer::tryToMakeConditionOperator(const char& character)
 	else if (character == '|')
 	{
 		if (source->peek() != '|')
-			return false;
+		{
+			curToken.type = TokenType::OrOperatorMissSecond;
+			return true;
+		}
 
 		source->getCharacter();
 		curToken.type = TokenType::Or;

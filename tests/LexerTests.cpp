@@ -202,10 +202,10 @@ TEST_CASE("ConditionOperators", "[conditionOP]")
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::And);
 	token = lexer.getNextToken();
-	REQUIRE(token.type == TokenType::INVALID);
+	REQUIRE(token.type == TokenType::AndOperatorMissSecond);
 	token = lexer.getNextToken();
 	token = lexer.getNextToken();
-	REQUIRE(token.type == TokenType::INVALID);
+	REQUIRE(token.type == TokenType::OrOperatorMissSecond);
 }
 
 TEST_CASE("Relation Operator", "[relationOP]")
