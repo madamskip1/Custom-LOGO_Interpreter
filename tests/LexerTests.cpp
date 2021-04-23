@@ -39,9 +39,11 @@ TEST_CASE("Digit Token", "[digit]")
 	REQUIRE(token.getIntValue() == 12345);
 
 	// digit with zeroes before
-	reader->setSourceString("         00000000678900");
+	reader->setSourceString("         000000006789 false");
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::BadDigitZeros);
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::False);
 
 	// zeroes dot digit
 	reader->setSourceString("000000.1000");
@@ -53,9 +55,11 @@ TEST_CASE("Digit Token", "[digit]")
 	REQUIRE(token.getIntValue() == 1000);
 
 	// digit too long
-	reader->setSourceString("1234567890");
+	reader->setSourceString("12345678900000000000 true");
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::BadDigitTooLong);
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::True);
 }
 
 TEST_CASE("String Token", "[stringToken]")
