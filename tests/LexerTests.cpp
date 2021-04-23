@@ -41,18 +41,21 @@ TEST_CASE("Digit Token", "[digit]")
 	// digit with zeroes before
 	reader->setSourceString("         00000000678900");
 	token = lexer.getNextToken();
-	REQUIRE(token.type == TokenType::Digit);
-	REQUIRE(token.getIntValue() == 678900);
+	REQUIRE(token.type == TokenType::BadDigitZeros);
 
 	// zeroes dot digit
 	reader->setSourceString("000000.1000");
 	token = lexer.getNextToken();
-	REQUIRE(token.type == TokenType::Digit);
-	REQUIRE(token.getIntValue() == 0);
+	REQUIRE(token.type == TokenType::BadDigitZeros);
 	lexer.getNextToken();
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::Digit);
 	REQUIRE(token.getIntValue() == 1000);
+
+	// digit too long
+	reader->setSourceString("1234567890");
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::BadDigitTooLong);
 }
 
 TEST_CASE("String Token", "[stringToken]")

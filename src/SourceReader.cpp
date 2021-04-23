@@ -129,6 +129,11 @@ const int SourceReader::getCharNumber() const
     return charNumber;
 }
 
+const int SourceReader::getStreamPos() const
+{
+    return streamPos;
+}
+
 const void SourceReader::reset()
 {
     lineNumber = 1;

@@ -1,6 +1,11 @@
 #include "Lexer.h"
 #include <iostream>
 
+const std::map<std::string, int> Lexer::lexerConfig =
+{
+	{ "maxNumOfDigits", 9 }
+};
+
 Lexer::Lexer(SourceReader* reader) : source(reader)
 {
 }
@@ -19,6 +24,7 @@ Token Lexer::getNextToken()
 
 	curToken.line = source->getLineNumber();
 	curToken.firstCharPos = source->getCharNumber();
+	curToken.tokenPos = source->getStreamPos();
 
 	if (source->isEof())
 	{
@@ -59,13 +65,46 @@ const bool Lexer::tryToMakeDigit(const char& character)
 		return false;
 
 	int val = character - '0';
-	
-	while (std::isdigit(source->peek()))
+	curToken.type = TokenType::Digit;
+
+	if (val == 0)
 	{
-		val = val * 10 + (source->getCharacter() - '0');
+		if ((source->peek() - '0') == 0)
+		{
+			source->getCharacter();
+			curToken.type = TokenType::BadDigitZeros;
+
+			// now skip all digits
+			while (std::isdigit(source->peek()))
+				source->getCharacter();
+
+			return true;
+		}
+	}
+	else
+	{
+		int counter = 1;
+		char digit;
+
+		while (std::isdigit(source->peek()))
+		{
+			digit = source->getCharacter();
+			counter++;
+			
+			if (counter > Lexer::lexerConfig.at("maxNumOfDigits"))
+			{
+				curToken.type = TokenType::BadDigitTooLong;
+				// now skip all digits
+			}
+			else
+			{
+				val = val * 10 + (digit - '0');
+			}
+
+
+		}
 	}
 
-	curToken.type = TokenType::Digit;
 	curToken.value = val;
 
 	return true;

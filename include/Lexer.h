@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 #include <string>
 #include "Token.h"
 #include "SourceReader.h"
@@ -26,4 +27,5 @@ private:
 
 	const bool isComment(const char& character);
 
+	const static std::map<std::string, int> lexerConfig;
 };

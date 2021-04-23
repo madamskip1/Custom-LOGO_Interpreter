@@ -15,4 +15,5 @@ public:
 
 	int line = 0;
 	int firstCharPos = 0;
+	std::streampos tokenPos;
 };

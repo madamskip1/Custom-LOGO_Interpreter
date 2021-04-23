@@ -63,6 +63,12 @@ enum class TokenType : unsigned int
 	NotOperator,
 	Identifier,
 	EndOfFile,
+
+
+	// Errors token
+	BadDigitZeros,
+	BadDigitTooLong,
+
 	UNKNOWN,
 	INVALID
 };

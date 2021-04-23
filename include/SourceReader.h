@@ -15,6 +15,7 @@ public:
 
 	const int getLineNumber() const;
 	const int getCharNumber() const;
+	const int getStreamPos() const;
 
 private:
 	std::unique_ptr<std::istream> source;
