@@ -68,6 +68,16 @@ enum class TokenType : unsigned int
 	INVALID
 };
 
+const std::array<char, 4> mathOperators = { '+', '-', '/', '*' };
+
+const std::map<char, TokenType> MathOperatorsToTokenType =
+{
+	{ '+', TokenType::Plus },
+	{ '-', TokenType::Minus },
+	{ '/', TokenType::Divide },
+	{ '*', TokenType::Multiply }
+};
+
 const std::map<std::string, TokenType> KeywordToTokenType =
 {
 	{ "repeat", TokenType::Repeat },
@@ -78,19 +88,9 @@ const std::map<std::string, TokenType> KeywordToTokenType =
 	{ "return", TokenType::Return },
 	{ "Integer", TokenType::Integer },
 	{ "String", TokenType::String },
-	{ "Turtle", TokenType::Turtle },	
+	{ "Turtle", TokenType::Turtle },
 	{ "Point", TokenType::Point },
 	{ "Boolean", TokenType::Boolean },
 	{ "true", TokenType::True },
 	{ "false", TokenType::False },
-};
-
-const std::array<char, 4> mathOperators = { '+', '-', '/', '*' };
-
-const std::map<char, TokenType> MathOperatorsToTokenType =
-{
-	{ '+', TokenType::Plus },
-	{ '-', TokenType::Minus },
-	{ '/', TokenType::Divide },
-	{ '*', TokenType::Multiply }
 };

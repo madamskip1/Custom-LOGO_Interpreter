@@ -36,23 +36,23 @@ TEST_CASE("Digit Token", "[digit]")
 	reader->setSourceString("12345");
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::Digit);
-	REQUIRE(std::get<int>(token.value) == 12345);
+	REQUIRE(token.getIntValue() == 12345);
 
 	// digit with zeroes before
 	reader->setSourceString("         00000000678900");
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::Digit);
-	REQUIRE(std::get<int>(token.value) == 678900);
+	REQUIRE(token.getIntValue() == 678900);
 
 	// zeroes dot digit
 	reader->setSourceString("000000.1000");
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::Digit);
-	REQUIRE(std::get<int>(token.value) == 0);
+	REQUIRE(token.getIntValue() == 0);
 	lexer.getNextToken();
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::Digit);
-	REQUIRE(std::get<int>(token.value) == 1000);
+	REQUIRE(token.getIntValue() == 1000);
 }
 
 TEST_CASE("String Token", "[stringToken]")
@@ -65,13 +65,13 @@ TEST_CASE("String Token", "[stringToken]")
 	reader->setSourceString("\"Test String\"");
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::StringVal);
-	REQUIRE(std::get<std::string>(token.value) == "Test String");
+	REQUIRE(token.getStringValue() == "Test String");
 
 	// Empty string
 	reader->setSourceString("\"\"");
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::StringVal);
-	REQUIRE(std::get<std::string>(token.value) == "");
+	REQUIRE(token.getStringValue() == "");
 
 	// Not terminated string
 	reader->setSourceString("\""); 
@@ -83,7 +83,7 @@ TEST_CASE("String Token", "[stringToken]")
 	lexer.getNextToken();
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::StringVal);
-	REQUIRE(std::get<std::string>(token.value) == "TestString");
+	REQUIRE(token.getStringValue() == "TestString");
 }
 
 TEST_CASE("Keywords", "[keywords]")
@@ -100,6 +100,13 @@ TEST_CASE("Keywords", "[keywords]")
 	REQUIRE(token.type == TokenType::Function);
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::Return);
+
+	// true/false
+	reader->setSourceString("true false");
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::True);
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::False);
 }
 
 TEST_CASE("Identifier", "[id]")
@@ -112,13 +119,13 @@ TEST_CASE("Identifier", "[id]")
 	reader->setSourceString("id1");
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::Identifier);
-	REQUIRE(std::get<std::string>(token.value) == "id1");
+	REQUIRE(token.getStringValue() == "id1");
 
 	// identifier with Underscore symbol
 	reader->setSourceString("i_d_1_");
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::Identifier);
-	REQUIRE(std::get<std::string>(token.value) == "i_d_1_");
+	REQUIRE(token.getStringValue() == "i_d_1_");
 }
 
 TEST_CASE("MathOperators", "[mathOP]")
