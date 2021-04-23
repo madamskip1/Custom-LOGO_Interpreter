@@ -15,13 +15,14 @@ private:
 	SourceReader* source;
 	Token curToken;
 
-	const void tryToMakeDigit(const char& character);
-	const void tryToMakeString(const char& character);
-	const void tryToMakeIDorKeywordOrDatatypes(const char& character);
-	const void tryToMakeMathOperator(const char& character);
-	const void tryToMakeConditionOperator(const char& character);
-	const void tryToMakeRelationOperator(const char& character);
-	const void tryToMakeBracket(const char& character);
-	const void tryToMakeSymbols(const char& character);
-	const void tryToMakeComment(const char& character);
+	const bool tryToMakeDigit(const char& character);
+	const bool tryToMakeString(const char& character);
+	const bool tryToMakeIDorKeywordOrDatatypes(const char& character);
+	const bool tryToMakeMathOperator(const char& character);
+	const bool tryToMakeConditionOperator(const char& character);
+	const bool tryToMakeRelationOperator(const char& character);
+	const bool tryToMakeBracket(const char& character);
+	const bool tryToMakeSymbols(const char& character);
+	const bool tryToMakeComment(const char& character);
+
 };

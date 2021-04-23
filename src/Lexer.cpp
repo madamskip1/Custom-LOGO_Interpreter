@@ -23,23 +23,39 @@ Token Lexer::getNextToken()
 		return curToken;
 	}
 
-	tryToMakeDigit(character);
-	tryToMakeString(character);
-	tryToMakeIDorKeywordOrDatatypes(character);
-	tryToMakeMathOperator(character);
-	tryToMakeConditionOperator(character);
-	tryToMakeRelationOperator(character);
-	tryToMakeBracket(character);
-	tryToMakeSymbols(character);
+	if (tryToMakeDigit(character))
+		return curToken;
+
+	if (tryToMakeString(character))
+		return curToken;
+
+	if (tryToMakeIDorKeywordOrDatatypes(character))
+		return curToken;
+
+	if (tryToMakeMathOperator(character))
+		return curToken;
+
+	if (tryToMakeConditionOperator(character))
+		return curToken;
+
+	if (tryToMakeRelationOperator(character))
+		return curToken;
+
+	if (tryToMakeBracket(character))
+		return curToken;
+
+	if (tryToMakeSymbols(character))
+		return curToken;
+
 	tryToMakeComment(character);
 
 	return curToken;
 }
 
-const void Lexer::tryToMakeDigit(const char& character)
+const bool Lexer::tryToMakeDigit(const char& character)
 {
 	if (!std::isdigit(character))
-		return;
+		return false;
 
 	int val = character - '0';
 	
@@ -50,12 +66,14 @@ const void Lexer::tryToMakeDigit(const char& character)
 
 	curToken.type = TokenType::Digit;
 	curToken.value = val;
+
+	return true;
 }
 
-const void Lexer::tryToMakeString(const char& character)
+const bool Lexer::tryToMakeString(const char& character)
 {
 	if (character != '"')
-		return;
+		return false;
 
 	char nextChar = source->peek();
 	std::string string = "";
@@ -69,19 +87,21 @@ const void Lexer::tryToMakeString(const char& character)
 	if (nextChar != '"')
 	{
 		curToken.type = TokenType::INVALID;
-		return;
+		return true;
 	}
 
 	source->getCharacter();
 
 	curToken.type = TokenType::StringVal;
 	curToken.value = string;
+
+	return true;
 }
 
-const void Lexer::tryToMakeIDorKeywordOrDatatypes(const char& character)
+const bool Lexer::tryToMakeIDorKeywordOrDatatypes(const char& character)
 {
 	if (!std::isalpha(character))
-		return;
+		return false;
 	
 	std::string name(1, character);
 
@@ -104,48 +124,56 @@ const void Lexer::tryToMakeIDorKeywordOrDatatypes(const char& character)
 		curToken.type = TokenType::Identifier;
 		curToken.value = name;
 	}
+
+	return true;
 }
 
-const void Lexer::tryToMakeMathOperator(const char& character)
+const bool Lexer::tryToMakeMathOperator(const char& character)
 {
 	std::array<char, 4>::const_iterator end = std::cend(mathOperators);
 
 	if (std::find(std::begin(mathOperators), end, character) == end)
 	{
-		return;
+		return false;
 	}
 
 	if (source->peek() == '/')
 	{
-		return;
+		return false;
 	}
 
 	std::map<char, TokenType>::const_iterator operatorType = MathOperatorsToTokenType.find(character);
 
 	curToken.type = std::get<1>(*operatorType);
+
+	return true;
 }
 
-const void Lexer::tryToMakeConditionOperator(const char& character)
+const bool Lexer::tryToMakeConditionOperator(const char& character)
 {
 	if (character == '&')
 	{
 		if (source->peek() != '&')
-			return;
+			return false;
 
 		source->getCharacter();
 		curToken.type = TokenType::And;
+		return true;
 	}
 	else if (character == '|')
 	{
 		if (source->peek() != '|')
-			return;
+			return false;
 
 		source->getCharacter();
 		curToken.type = TokenType::Or;
+		return true;
 	}
+
+	return false;
 }
 
-const void Lexer::tryToMakeRelationOperator(const char& character)
+const bool Lexer::tryToMakeRelationOperator(const char& character)
 {
 	if (character == '<')
 	{
@@ -153,10 +181,11 @@ const void Lexer::tryToMakeRelationOperator(const char& character)
 		{
 			source->getCharacter();
 			curToken.type = TokenType::LessOrEqual;
-			return;
+			return true;
 		}
 
 		curToken.type = TokenType::Less;
+		return true;
 	}
 	else if (character == '>')
 	{
@@ -164,11 +193,11 @@ const void Lexer::tryToMakeRelationOperator(const char& character)
 		{
 			source->getCharacter();
 			curToken.type = TokenType::GreaterOrEqual;
-			return;
+			return true;
 		}
 
 		curToken.type = TokenType::Greater;
-
+		return true;
 	}
 	else if (character == '=')
 	{
@@ -176,10 +205,11 @@ const void Lexer::tryToMakeRelationOperator(const char& character)
 		{
 			source->getCharacter();
 			curToken.type = TokenType::Equal;
-			return;
+			return true;
 		}
 
 		curToken.type = TokenType::AssignOperator;
+		return true;
 	}
 	else if (character == '!')
 	{
@@ -187,56 +217,70 @@ const void Lexer::tryToMakeRelationOperator(const char& character)
 		{
 			source->getCharacter();
 			curToken.type = TokenType::NotEqual;
-			return;
+			return true;
 		}
 
 		curToken.type = TokenType::NotOperator;
+		return true;
 	}
 
+	return false;
 }
 
-const void Lexer::tryToMakeBracket(const char& character)
+const bool Lexer::tryToMakeBracket(const char& character)
 {
 	if (character == '{')
 	{
 		curToken.type = TokenType::CurlyBracketOpen;
-	} 
+		return true;
+	}
 	else if (character == '}')
 	{
 		curToken.type = TokenType::CurlyBracketClose;
+		return true;
 	}
 	else if (character == '(')
 	{
 		curToken.type = TokenType::RoundBracketOpen;
+		return true;
 	}
 	else if (character == ')')
 	{
 		curToken.type = TokenType::RoundBracketClose;
+		return true;
 	}
 
+	return false;
 }
 
-const void Lexer::tryToMakeSymbols(const char& character)
+const bool Lexer::tryToMakeSymbols(const char& character)
 {
 	if (character == '.')
 	{
 		curToken.type = TokenType::Dot;
+		return true;
 	}
 	else if (character == ';')
 	{
 		curToken.type = TokenType::Semicolon;
+		return true;
 	}
 	else if (character == ',')
 	{
 		curToken.type = TokenType::Comma;
+		return true;
 	}
+
+	return false;
 }
 
-const void Lexer::tryToMakeComment(const char& character)
+const bool Lexer::tryToMakeComment(const char& character)
 {
 	if (character != '/' || source->peek() != '/')
-		return;
+		return false;
 
 	curToken.type = TokenType::Comment;
 	source->skipLine();
+	return true;
 }
+
