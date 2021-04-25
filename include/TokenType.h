@@ -48,14 +48,14 @@ enum class TokenType : unsigned int
 	False,
 
 	// Data Types
-	String,
+	ColorVar,
 	Integer,
 	Turtle,
 	Point,
 	Boolean,
 
 	// Values
-	StringVal,
+	ColorValue,
 	Digit,
 
 	// Others
@@ -68,6 +68,15 @@ enum class TokenType : unsigned int
 	// Errors token
 	BadDigitZeros,
 	BadDigitTooLong,
+
+	ColorValMissHash,
+	ColorValBadSyntax,
+	ColorValTooLong,
+	ColorValTooShort,
+	ColorValNotTerminated,
+
+	AndOperatorMissSecond,
+	OrOperatorMissSecond,
 
 	UNKNOWN,
 	INVALID
@@ -92,7 +101,7 @@ const std::map<std::string, TokenType> KeywordToTokenType =
 	{ "function", TokenType::Function },
 	{ "return", TokenType::Return },
 	{ "Integer", TokenType::Integer },
-	{ "String", TokenType::String },
+	{ "ColorVar", TokenType::ColorVar },
 	{ "Turtle", TokenType::Turtle },
 	{ "Point", TokenType::Point },
 	{ "Boolean", TokenType::Boolean },

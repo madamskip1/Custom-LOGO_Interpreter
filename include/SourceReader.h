@@ -9,7 +9,7 @@ public:
 	const void setSourceString(std::string sourceString);
 	const void setSourceFile(std::string path);
 	const char getCharacter();
-	const char peek() const;
+	const char getNextCharacter();
 	const bool isEof() const;
 	const void skipLine();
 
@@ -24,8 +24,11 @@ private:
 	bool eof;
 	std::streampos streamPos;
 
+	char nextCharacter;
+
 	const void reset();
 	const bool checkIfCharIsEndOfLine(const char& character) const;
 	const char getSingleCharFromSource();
+	const void setEof();
 };
 

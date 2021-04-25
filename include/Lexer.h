@@ -7,7 +7,7 @@
 class Lexer
 {
 public:
-	std::string characters;
+	Lexer() = delete;
 	Lexer(SourceReader* source);
 
 	Token getNextToken();
@@ -15,17 +15,18 @@ public:
 private:
 	SourceReader* source;
 	Token curToken;
+	char firstCharacter;
 
-	const bool tryToMakeDigit(const char& character);
-	const bool tryToMakeColor(const char& character);
-	const bool tryToMakeIDorKeywordOrDatatypes(const char& character);
-	const bool tryToMakeMathOperator(const char& character);
-	const bool tryToMakeConditionOperator(const char& character);
-	const bool tryToMakeRelationOperator(const char& character);
-	const bool tryToMakeBracket(const char& character);
-	const bool tryToMakeSymbols(const char& character);
+	const bool tryToMakeDigit();
+	const bool tryToMakeColor();
+	const bool tryToMakeIDorKeywordOrDatatypes();
+	const bool tryToMakeMathOperator();
+	const bool tryToMakeConditionOperator();
+	const bool tryToMakeRelationOperator();
+	const bool tryToMakeBracket();
+	const bool tryToMakeSymbols();
 
-	const bool isComment(const char& character);
+	const bool isComment() const;
 
 	const static std::map<std::string, int> lexerConfig;
 };

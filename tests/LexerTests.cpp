@@ -49,7 +49,8 @@ TEST_CASE("Digit Token", "[digit]")
 	reader->setSourceString("000000.1000");
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::BadDigitZeros);
-	lexer.getNextToken();
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::Dot);
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::Digit);
 	REQUIRE(token.getIntValue() == 1000);
@@ -116,14 +117,17 @@ TEST_CASE("Keywords", "[keywords]")
 	Lexer lexer(reader);
 	Token token;
 
-	// simple three keywords
-	reader->setSourceString("repeat function return");
+	// simple three keywords and indetifier with almost same name as keyword
+	reader->setSourceString("repeat function return Return");
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::Repeat);
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::Function);
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::Return);
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::Identifier);
+	REQUIRE(token.getStringValue() == "Return");
 
 	// true/false
 	reader->setSourceString("true false");
@@ -159,7 +163,7 @@ TEST_CASE("MathOperators", "[mathOP]")
 	Token token;
 
 	// All math operators
-	reader->setSourceString("+1/-2*");
+	reader->setSourceString("+1/-2***");
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::Plus);
 	token = lexer.getNextToken();
@@ -170,12 +174,18 @@ TEST_CASE("MathOperators", "[mathOP]")
 	token = lexer.getNextToken();
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::Multiply);
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::Multiply);
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::Multiply);
 
 	// Double divide symbol in a row => Comment
-	reader->setSourceString("+1//");
+	reader->setSourceString("+1+//");
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::Plus);
 	token = lexer.getNextToken();
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::Plus);
 	token = lexer.getNextToken();
 	REQUIRE(token.type != TokenType::Divide);
 	REQUIRE(token.type == TokenType::EndOfFile);
@@ -273,7 +283,7 @@ TEST_CASE("Symbols", "[symbols]")
 	Token token;
 
 	// dot, comma and semicolon symbols
-	reader->setSourceString(". , ;");
+	reader->setSourceString(". ,;");
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::Dot);
 	token = lexer.getNextToken();
@@ -304,15 +314,18 @@ TEST_CASE("Comments", "[comments]")
 					///////////////////
 
 // 4 xxx
-123456789
+123456789;
 
 //
 //
 //)";
+
 	reader->setSourceString(string);
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::Digit);
 	REQUIRE(token.getIntValue() == 123456789);
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::Semicolon);
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::EndOfFile);
 }
@@ -337,8 +350,10 @@ if (x < 20) {								// XXXXXX COMMENT
 } else {
 	zolw.go(x - 20);
 }
+
 Turtle zolwik;
-Point point(1, 0);
+
+ Point point(1, 0);
 )";
 
 	SourceReader* reader = new SourceReader();
