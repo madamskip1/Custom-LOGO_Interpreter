@@ -9,3 +9,24 @@ void ExpressionTerm::addMutliOperartor(TokenType multiOperator)
 {
 	multiOperators.push_back(multiOperator);
 }
+
+void ExpressionTerm::addNextExpressionFactor(std::shared_ptr<ExpressionFactor> factor, TokenType multiOperator)
+{
+	expressionFactors.push_back(factor);
+	multiOperators.push_back(multiOperator);
+}
+
+int ExpressionTerm::getFactorsSize()
+{
+	return expressionFactors.size();
+}
+
+std::shared_ptr<ExpressionFactor> ExpressionTerm::getExpressionFactor(int index)
+{
+	return expressionFactors[index];
+}
+
+TokenType ExpressionTerm::getOperator(int index)
+{
+	return multiOperators[index];
+}

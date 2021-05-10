@@ -11,6 +11,11 @@ public:
     const void setNegativeOp(const bool & negative);
     const void setExpression(std::shared_ptr<Expression> expr);
     const void setIntVal(const int& val);
+
+    int getIntVal() const;
+    bool getNegativeOp() const;
+    std::shared_ptr<Expression> getExpression() const;
+
 private:
     bool negativeOp = false;
     int intVal = 0;

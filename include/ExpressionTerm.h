@@ -14,6 +14,11 @@ public:
 
     void addExpressionFactor(std::shared_ptr<ExpressionFactor> factor);
     void addMutliOperartor(TokenType multiOperator);
+    void addNextExpressionFactor(std::shared_ptr<ExpressionFactor> factor, TokenType multiOperator);
+
+    int getFactorsSize();
+    std::shared_ptr<ExpressionFactor> getExpressionFactor(int index);
+    TokenType getOperator(int index);
 
 private:
     std::vector<std::shared_ptr<ExpressionFactor>> expressionFactors;

@@ -156,6 +156,18 @@ std::shared_ptr<Expression> Parser::parseExpression()
 {
 	std::shared_ptr<Expression> expression = std::make_shared<Expression>();
 	expression.get()->addExpressionTerm(parseExpressionTerm());
+
+	Token nextToken = peekToken();
+	TokenType addOperator;
+	while (nextToken.type == TokenType::Plus || nextToken.type == TokenType::Minus)
+	{
+		addOperator = nextToken.type;
+		getNextToken();
+
+		expression.get()->addNextExpressionTerm(parseExpressionTerm(), addOperator);
+		nextToken = peekToken();
+	}
+
 	return expression;
 }
 
@@ -164,13 +176,24 @@ std::shared_ptr<ExpressionTerm> Parser::parseExpressionTerm()
 	std::shared_ptr<ExpressionTerm> term = std::make_shared<ExpressionTerm>();
 	term.get()->addExpressionFactor(parseExpressionFactor());
 
+	Token nextToken = peekToken();
+	TokenType addOperator;
+
+	while (nextToken.type == TokenType::Divide || nextToken.type == TokenType::Multiply)
+	{
+		addOperator = nextToken.type;
+		getNextToken();
+
+		term.get()->addNextExpressionFactor(parseExpressionFactor(), addOperator);
+		nextToken = peekToken();
+	}
+
 	return term;
 }
 
 std::shared_ptr<ExpressionFactor> Parser::parseExpressionFactor()
 {
 	std::shared_ptr<ExpressionFactor> factor = std::make_shared<ExpressionFactor>();
-	//if (checkNextTokenType({TokenType::Minus, TokenType::RoundBracketOpen, TokenType::Identifier, TokenType::Digit)
 	Token token = peekToken();
 
 
