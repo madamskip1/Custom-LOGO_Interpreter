@@ -9,6 +9,8 @@
 #include "RepeatStatement.h"
 #include "RepeatTimeStatement.h"
 #include "Expression.h"
+#include "DefFuncStatement.h"
+#include "Parameter.h"
 
 class Parser
 {
@@ -25,15 +27,20 @@ private:
 	std::unique_ptr<ProgramRootNode> parseProgram();
 
 	std::shared_ptr<InstructionsBlock> parseInstructionsBlock();
-
+	std::shared_ptr<DefFuncStatement> parseDefFuncStatement(TokenType returnType = TokenType::UNKNOWN);
+	std::shared_ptr<Parameter> parseParameter();
 	std::shared_ptr<IfStatement> parseIfStatement();
 	std::shared_ptr<RepeatStatement> parseRepeatStatement();
 	std::shared_ptr<RepeatTimeStatement> parseRepeatTimeStatement();
+
+	std::shared_ptr<Node> parseAssignOrCallFuncStatement();
 
 
 	std::shared_ptr<Expression> parseExpression();
 	std::shared_ptr<ExpressionTerm> parseExpressionTerm();
 	std::shared_ptr<ExpressionFactor> parseExpressionFactor();
+
+	
 
 	Token peekToken();
 	Token getNextToken();

@@ -10,3 +10,13 @@ std::shared_ptr<Expression> RepeatStatement::getHowManyTime()
 {
 	return howManyTime;
 }
+
+const void RepeatStatement::setInstructionsBlock(std::shared_ptr<InstructionsBlock> block)
+{
+	instructionsBlock = block;
+}
+
+std::shared_ptr<InstructionsBlock> RepeatStatement::getInstructuionsBlock() const
+{
+	return instructionsBlock;
+}

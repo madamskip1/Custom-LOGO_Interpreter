@@ -10,6 +10,9 @@ enum class NodeType
 	Expression,
 	ExpressionTerm,
 	ExpressionFactor,
+	DefFuncStatement,
+	Parameter,
+	CallFuncStatement,
 };
 
 class Node
