@@ -20,32 +20,32 @@ TEST_CASE("IFStatement", "[if]")
 	reader->setSourceString("if (false) {} else {}");
 
 	std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-	std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
-	REQUIRE(firstNode.get()->getNodeType() == NodeType::IfStatement);
+	std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
+	REQUIRE(firstNode->getNodeType() == NodeType::IfStatement);
 	std::shared_ptr<IfStatement> ifStatement = std::static_pointer_cast<IfStatement>(firstNode);
 
-	std::shared_ptr<Condition> condition = ifStatement.get()->getCondition();
-	REQUIRE(condition.get()->getNodeType() == NodeType::Condition);
-	REQUIRE(condition.get()->getAndConditionSize() == 1);
+	std::shared_ptr<Condition> condition = ifStatement->getCondition();
+	REQUIRE(condition->getNodeType() == NodeType::Condition);
+	REQUIRE(condition->getAndConditionSize() == 1);
 	
-	std::shared_ptr<AndCondition> andCondition = condition.get()->getAndCondition();
-	REQUIRE(andCondition.get()->getNodeType() == NodeType::AndCondition);
-	REQUIRE(andCondition.get()->getRelationConditionSize() == 1);
+	std::shared_ptr<AndCondition> andCondition = condition->getAndCondition();
+	REQUIRE(andCondition->getNodeType() == NodeType::AndCondition);
+	REQUIRE(andCondition->getRelationConditionSize() == 1);
 
-	std::shared_ptr<RelationCondition> relationCondition = andCondition.get()->getRelationCondition();
-	REQUIRE(relationCondition.get()->getNodeType() == NodeType::RelationCondition);
-	REQUIRE(relationCondition.get()->isBooleanWord());
-	REQUIRE(!relationCondition.get()->getBooleanWord());
-	REQUIRE(!relationCondition.get()->getNotOperator());
-	REQUIRE(relationCondition.get()->getCondition() == nullptr);
-	REQUIRE(relationCondition.get()->getExpression() == nullptr);
+	std::shared_ptr<RelationCondition> relationCondition = andCondition->getRelationCondition();
+	REQUIRE(relationCondition->getNodeType() == NodeType::RelationCondition);
+	REQUIRE(relationCondition->isBooleanWord());
+	REQUIRE(!relationCondition->getBooleanWord());
+	REQUIRE(!relationCondition->getNotOperator());
+	REQUIRE(relationCondition->getCondition() == nullptr);
+	REQUIRE(relationCondition->getExpression() == nullptr);
 
 	
-	std::shared_ptr<Node> trueBlock = ifStatement.get()->getTrueBlockNode();
-	REQUIRE(trueBlock.get()->getNodeType() == NodeType::InstructionsBlock);
+	std::shared_ptr<Node> trueBlock = ifStatement->getTrueBlockNode();
+	REQUIRE(trueBlock->getNodeType() == NodeType::InstructionsBlock);
 	
-	std::shared_ptr<Node> elseBlock = ifStatement.get()->getElseBlockNode();
-	REQUIRE(elseBlock.get()->getNodeType() == NodeType::InstructionsBlock);
+	std::shared_ptr<Node> elseBlock = ifStatement->getElseBlockNode();
+	REQUIRE(elseBlock->getNodeType() == NodeType::InstructionsBlock);
 
 }
 
@@ -60,23 +60,23 @@ TEST_CASE("RepeatStatement", "[repeat]")
 	reader->setSourceString("repeat(50) {}");
 
 	std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-	std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
-	REQUIRE(firstNode.get()->getNodeType() == NodeType::RepeatStatement);
+	std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
+	REQUIRE(firstNode->getNodeType() == NodeType::RepeatStatement);
 
 	std::shared_ptr<RepeatStatement> repeatStatement = std::static_pointer_cast<RepeatStatement>(firstNode);
 	
-	std::shared_ptr<Node> block = repeatStatement.get()->getInstructuionsBlock();
-	REQUIRE(block.get()->getNodeType() == NodeType::InstructionsBlock);
+	std::shared_ptr<Node> block = repeatStatement->getInstructuionsBlock();
+	REQUIRE(block->getNodeType() == NodeType::InstructionsBlock);
 	
-	std::shared_ptr<Expression> expression = repeatStatement.get()->getHowManyTime();
-	REQUIRE(expression.get()->getTermsSize() == 1);
+	std::shared_ptr<Expression> expression = repeatStatement->getHowManyTime();
+	REQUIRE(expression->getTermsSize() == 1);
 
-	std::shared_ptr<ExpressionTerm> expressionTerm = expression.get()->getExpressionTerm(0);
-	REQUIRE(expressionTerm.get()->getFactorsSize() == 1);
+	std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+	REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-	std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm.get()->getExpressionFactor(0);
-	REQUIRE(expressionFactor.get()->getIntVal() == 50);
-	REQUIRE(!expressionFactor.get()->getNegativeOp());
+	std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+	REQUIRE(expressionFactor->getIntVal() == 50);
+	REQUIRE(!expressionFactor->getNegativeOp());
 }
 
 TEST_CASE("RepeatTimeStatement", "[repeat]")
@@ -88,25 +88,25 @@ TEST_CASE("RepeatTimeStatement", "[repeat]")
 	reader->setSourceString("repeatTime(22) {}");
 
 	std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-	std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
-	REQUIRE(firstNode.get()->getNodeType() == NodeType::RepeatTimeStatement);
+	std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
+	REQUIRE(firstNode->getNodeType() == NodeType::RepeatTimeStatement);
 
 	std::shared_ptr<RepeatTimeStatement> repeatTimeStatement = std::static_pointer_cast<RepeatTimeStatement>(firstNode);
 	
-	std::shared_ptr<Node> block = repeatTimeStatement.get()->getInstructuionsBlock();
-	REQUIRE(block.get()->getNodeType() == NodeType::InstructionsBlock);
+	std::shared_ptr<Node> block = repeatTimeStatement->getInstructuionsBlock();
+	REQUIRE(block->getNodeType() == NodeType::InstructionsBlock);
 	
-	std::shared_ptr<Expression> expression = repeatTimeStatement.get()->getPeriod();
-	REQUIRE(expression.get()->getTermsSize() == 1);
+	std::shared_ptr<Expression> expression = repeatTimeStatement->getPeriod();
+	REQUIRE(expression->getTermsSize() == 1);
 
-	std::shared_ptr<ExpressionTerm> expressionTerm = expression.get()->getExpressionTerm(0);
-	REQUIRE(expressionTerm.get()->getFactorsSize() == 1);
+	std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+	REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-	std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm.get()->getExpressionFactor(0);
-	REQUIRE(expressionFactor.get()->getIntVal() == 22);
-	REQUIRE(!expressionFactor.get()->getNegativeOp());
+	std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+	REQUIRE(expressionFactor->getIntVal() == 22);
+	REQUIRE(!expressionFactor->getNegativeOp());
 
-	expression = repeatTimeStatement.get()->getHowManyTime();
+	expression = repeatTimeStatement->getHowManyTime();
 	REQUIRE(expression == nullptr);
 }
 
@@ -121,160 +121,160 @@ TEST_CASE("Expressions", "[parser]")
 	{
 		reader->setSourceString("repeat(0) {}");
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::RepeatStatement);
+		REQUIRE(firstNode->getNodeType() == NodeType::RepeatStatement);
 
 		std::shared_ptr<RepeatStatement> repeatStatement = std::static_pointer_cast<RepeatStatement>(firstNode);
-		std::shared_ptr<Expression> expression = repeatStatement.get()->getHowManyTime();
-		REQUIRE(expression.get()->getTermsSize() == 1);
+		std::shared_ptr<Expression> expression = repeatStatement->getHowManyTime();
+		REQUIRE(expression->getTermsSize() == 1);
 		
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression.get()->getExpressionTerm(0);
-		REQUIRE(expressionTerm.get()->getFactorsSize() == 1);
+		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm.get()->getExpressionFactor(0);
-		REQUIRE(expressionFactor.get()->getIntVal() == 0);
-		REQUIRE(!expressionFactor.get()->getNegativeOp());
+		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 0);
+		REQUIRE(!expressionFactor->getNegativeOp());
 	}
 	
 	SECTION("Simple expression - negative digit")
 	{
 		reader->setSourceString("repeat(-95) {}");
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::RepeatStatement);
+		REQUIRE(firstNode->getNodeType() == NodeType::RepeatStatement);
 
 		std::shared_ptr<RepeatStatement> repeatStatement = std::static_pointer_cast<RepeatStatement>(firstNode);
-		std::shared_ptr<Expression> expression = repeatStatement.get()->getHowManyTime();
-		REQUIRE(expression.get()->getTermsSize() == 1);
+		std::shared_ptr<Expression> expression = repeatStatement->getHowManyTime();
+		REQUIRE(expression->getTermsSize() == 1);
 
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression.get()->getExpressionTerm(0);
-		REQUIRE(expressionTerm.get()->getFactorsSize() == 1);
+		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm.get()->getExpressionFactor(0);
-		REQUIRE(expressionFactor.get()->getIntVal() == 95);
-		REQUIRE(expressionFactor.get()->getNegativeOp());
+		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 95);
+		REQUIRE(expressionFactor->getNegativeOp());
 	}
 
 	SECTION("math operation (+, -, *, /) without bracket")
 	{
 		reader->setSourceString("repeat(-95 + 20 * -20 / -30 - 20) {}");
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::RepeatStatement);
+		REQUIRE(firstNode->getNodeType() == NodeType::RepeatStatement);
 
 		std::shared_ptr<RepeatStatement> repeatStatement = std::static_pointer_cast<RepeatStatement>(firstNode);
-		std::shared_ptr<Expression> expression = repeatStatement.get()->getHowManyTime();
+		std::shared_ptr<Expression> expression = repeatStatement->getHowManyTime();
 		// A + B - C
-		REQUIRE(expression.get()->getTermsSize() == 3);
-		REQUIRE(expression.get()->getOperator(0) == TokenType::Plus);
-		REQUIRE(expression.get()->getOperator(1) == TokenType::Minus);
+		REQUIRE(expression->getTermsSize() == 3);
+		REQUIRE(expression->getOperator(0) == TokenType::Plus);
+		REQUIRE(expression->getOperator(1) == TokenType::Minus);
 
 		// A Term   -95 
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression.get()->getExpressionTerm(0);
-		REQUIRE(expressionTerm.get()->getFactorsSize() == 1);
+		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm.get()->getExpressionFactor(0);
-		REQUIRE(expressionFactor.get()->getIntVal() == 95);
-		REQUIRE(expressionFactor.get()->getNegativeOp());
+		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 95);
+		REQUIRE(expressionFactor->getNegativeOp());
 
 
 
 		// B Term  20 * -20 / -30
-		expressionTerm = expression.get()->getExpressionTerm(1);
-		REQUIRE(expressionTerm.get()->getFactorsSize() == 3);
-		REQUIRE(expressionTerm.get()->getOperator(0) == TokenType::Multiply);
-		REQUIRE(expressionTerm.get()->getOperator(1) == TokenType::Divide);
+		expressionTerm = expression->getExpressionTerm(1);
+		REQUIRE(expressionTerm->getFactorsSize() == 3);
+		REQUIRE(expressionTerm->getOperator(0) == TokenType::Multiply);
+		REQUIRE(expressionTerm->getOperator(1) == TokenType::Divide);
 		
-		expressionFactor = expressionTerm.get()->getExpressionFactor(0);
+		expressionFactor = expressionTerm->getExpressionFactor(0);
 		// 20 * ...
-		REQUIRE(expressionFactor.get()->getIntVal() == 20);
-		REQUIRE(!expressionFactor.get()->getNegativeOp());
+		REQUIRE(expressionFactor->getIntVal() == 20);
+		REQUIRE(!expressionFactor->getNegativeOp());
 		
-		expressionFactor = expressionTerm.get()->getExpressionFactor(1);
+		expressionFactor = expressionTerm->getExpressionFactor(1);
 		// ... * -20 / ...
-		REQUIRE(expressionFactor.get()->getIntVal() == 20);
-		REQUIRE(expressionFactor.get()->getNegativeOp());
+		REQUIRE(expressionFactor->getIntVal() == 20);
+		REQUIRE(expressionFactor->getNegativeOp());
 
-		expressionFactor = expressionTerm.get()->getExpressionFactor(2);
+		expressionFactor = expressionTerm->getExpressionFactor(2);
 		// ... / -30 
-		REQUIRE(expressionFactor.get()->getIntVal() == 30);
-		REQUIRE(expressionFactor.get()->getNegativeOp());
+		REQUIRE(expressionFactor->getIntVal() == 30);
+		REQUIRE(expressionFactor->getNegativeOp());
 
 
 		// C Term 20
 		// Even its  (- 20) its not negation, its substraction
-		expressionTerm = expression.get()->getExpressionTerm(2);
-		REQUIRE(expressionTerm.get()->getFactorsSize() == 1);
+		expressionTerm = expression->getExpressionTerm(2);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-		expressionFactor = expressionTerm.get()->getExpressionFactor(0);
-		REQUIRE(expressionFactor.get()->getIntVal() == 20);
-		REQUIRE(!expressionFactor.get()->getNegativeOp());
+		expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 20);
+		REQUIRE(!expressionFactor->getNegativeOp());
 	}
 
 	SECTION("expression with brackets")
 	{
 		reader->setSourceString("repeat(-(2 + -2) * 2) {}");
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::RepeatStatement);
+		REQUIRE(firstNode->getNodeType() == NodeType::RepeatStatement);
 
 		std::shared_ptr<RepeatStatement> repeatStatement = std::static_pointer_cast<RepeatStatement>(firstNode);
-		std::shared_ptr<Expression> expression = repeatStatement.get()->getHowManyTime();
-		REQUIRE(expression.get()->getTermsSize() == 1);
+		std::shared_ptr<Expression> expression = repeatStatement->getHowManyTime();
+		REQUIRE(expression->getTermsSize() == 1);
 
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression.get()->getExpressionTerm(0);
-		REQUIRE(expressionTerm.get()->getFactorsSize() == 2);
+		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 2);
 
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm.get()->getExpressionFactor(1);
-		REQUIRE(!expressionFactor.get()->getNegativeOp());
-		REQUIRE(expressionFactor.get()->getIntVal() == 2);
+		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(1);
+		REQUIRE(!expressionFactor->getNegativeOp());
+		REQUIRE(expressionFactor->getIntVal() == 2);
 
-		expressionFactor = expressionTerm.get()->getExpressionFactor(0);
-		REQUIRE(expressionFactor.get()->getNegativeOp());
+		expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getNegativeOp());
 
 		// bracket exprssion (2 + -2)
-		std::shared_ptr<Expression> bracketExpression = expressionFactor.get()->getExpression();
-		REQUIRE(bracketExpression.get()->getTermsSize() == 2);
-		REQUIRE(bracketExpression.get()->getOperator(0) == TokenType::Plus);
-		std::shared_ptr<ExpressionTerm> bracketTerm = bracketExpression.get()->getExpressionTerm(0);
-		REQUIRE(bracketTerm.get()->getFactorsSize() == 1);
-		std::shared_ptr<ExpressionFactor> bracketFactor = bracketTerm.get()->getExpressionFactor(0);
-		REQUIRE(!bracketFactor.get()->getNegativeOp());
-		REQUIRE(bracketFactor.get()->getIntVal() == 2);
-		bracketTerm = bracketExpression.get()->getExpressionTerm(1);
-		REQUIRE(bracketTerm.get()->getFactorsSize() == 1);
-		bracketFactor = bracketTerm.get()->getExpressionFactor(0);
-		REQUIRE(bracketFactor.get()->getNegativeOp());
-		REQUIRE(bracketFactor.get()->getIntVal() == 2);
+		std::shared_ptr<Expression> bracketExpression = expressionFactor->getExpression();
+		REQUIRE(bracketExpression->getTermsSize() == 2);
+		REQUIRE(bracketExpression->getOperator(0) == TokenType::Plus);
+		std::shared_ptr<ExpressionTerm> bracketTerm = bracketExpression->getExpressionTerm(0);
+		REQUIRE(bracketTerm->getFactorsSize() == 1);
+		std::shared_ptr<ExpressionFactor> bracketFactor = bracketTerm->getExpressionFactor(0);
+		REQUIRE(!bracketFactor->getNegativeOp());
+		REQUIRE(bracketFactor->getIntVal() == 2);
+		bracketTerm = bracketExpression->getExpressionTerm(1);
+		REQUIRE(bracketTerm->getFactorsSize() == 1);
+		bracketFactor = bracketTerm->getExpressionFactor(0);
+		REQUIRE(bracketFactor->getNegativeOp());
+		REQUIRE(bracketFactor->getIntVal() == 2);
 	}
 
 	SECTION("expression fun call")
 	{
 		reader->setSourceString("repeat(callFunc(20)) {}");
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::RepeatStatement);
+		REQUIRE(firstNode->getNodeType() == NodeType::RepeatStatement);
 
 		std::shared_ptr<RepeatStatement> repeatStatement = std::static_pointer_cast<RepeatStatement>(firstNode);
-		std::shared_ptr<Expression> expression = repeatStatement.get()->getHowManyTime();
-		REQUIRE(expression.get()->getTermsSize() == 1);
+		std::shared_ptr<Expression> expression = repeatStatement->getHowManyTime();
+		REQUIRE(expression->getTermsSize() == 1);
 
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression.get()->getExpressionTerm(0);
-		REQUIRE(expressionTerm.get()->getFactorsSize() == 1);
+		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm.get()->getExpressionFactor(0);
-		REQUIRE(expressionFactor.get()->getIntVal() == 0);
-		REQUIRE(!expressionFactor.get()->getNegativeOp());
-		REQUIRE(!expressionFactor.get()->getExpression());
-		std::shared_ptr<CallFuncStatement> callFunc = expressionFactor.get()->getCallFunc();
-		REQUIRE(callFunc.get()->getNodeType() == NodeType::CallFuncStatement);
-		REQUIRE(callFunc.get()->getArgumentsSize() == 1);
-		REQUIRE(callFunc.get()->getIdentifiersSize() == 1);
+		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 0);
+		REQUIRE(!expressionFactor->getNegativeOp());
+		REQUIRE(!expressionFactor->getExpression());
+		std::shared_ptr<CallFuncStatement> callFunc = expressionFactor->getCallFunc();
+		REQUIRE(callFunc->getNodeType() == NodeType::CallFuncStatement);
+		REQUIRE(callFunc->getArgumentsSize() == 1);
+		REQUIRE(callFunc->getIdentifiersSize() == 1);
 	}
 }
 
@@ -291,25 +291,25 @@ TEST_CASE("Conditions", "[parser]")
 		reader->setSourceString("if (2 < 3) {}");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::IfStatement);
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
+		REQUIRE(firstNode->getNodeType() == NodeType::IfStatement);
 		std::shared_ptr<IfStatement> ifStatement = std::static_pointer_cast<IfStatement>(firstNode);
 
-		std::shared_ptr<Condition> condition = ifStatement.get()->getCondition();
-		REQUIRE(condition.get()->getNodeType() == NodeType::Condition);
-		REQUIRE(condition.get()->getAndConditionSize() == 1);
+		std::shared_ptr<Condition> condition = ifStatement->getCondition();
+		REQUIRE(condition->getNodeType() == NodeType::Condition);
+		REQUIRE(condition->getAndConditionSize() == 1);
 
-		std::shared_ptr<AndCondition> andCondition = condition.get()->getAndCondition();
-		REQUIRE(andCondition.get()->getNodeType() == NodeType::AndCondition);
-		REQUIRE(andCondition.get()->getRelationConditionSize() == 1);
+		std::shared_ptr<AndCondition> andCondition = condition->getAndCondition();
+		REQUIRE(andCondition->getNodeType() == NodeType::AndCondition);
+		REQUIRE(andCondition->getRelationConditionSize() == 1);
 
-		std::shared_ptr<RelationCondition> relationCondition = andCondition.get()->getRelationCondition();
-		REQUIRE(relationCondition.get()->getNodeType() == NodeType::RelationCondition);
-		REQUIRE(!relationCondition.get()->isBooleanWord());
-		REQUIRE(!relationCondition.get()->getNotOperator());
-		REQUIRE(relationCondition.get()->getCondition() == nullptr);
-		REQUIRE(relationCondition.get()->hasSecondExpression());
-		REQUIRE(relationCondition.get()->getRelationOperator() == TokenType::Less);
+		std::shared_ptr<RelationCondition> relationCondition = andCondition->getRelationCondition();
+		REQUIRE(relationCondition->getNodeType() == NodeType::RelationCondition);
+		REQUIRE(!relationCondition->isBooleanWord());
+		REQUIRE(!relationCondition->getNotOperator());
+		REQUIRE(relationCondition->getCondition() == nullptr);
+		REQUIRE(relationCondition->hasSecondExpression());
+		REQUIRE(relationCondition->getRelationOperator() == TokenType::Less);
 	}
 
 	SECTION("AND and OR operators, not ")
@@ -317,49 +317,49 @@ TEST_CASE("Conditions", "[parser]")
 		reader->setSourceString("if (!true && false || true) {}");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::IfStatement);
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
+		REQUIRE(firstNode->getNodeType() == NodeType::IfStatement);
 		std::shared_ptr<IfStatement> ifStatement = std::static_pointer_cast<IfStatement>(firstNode);
 
-		std::shared_ptr<Condition> condition = ifStatement.get()->getCondition();
-		REQUIRE(condition.get()->getNodeType() == NodeType::Condition);
-		REQUIRE(condition.get()->getAndConditionSize() == 2);
+		std::shared_ptr<Condition> condition = ifStatement->getCondition();
+		REQUIRE(condition->getNodeType() == NodeType::Condition);
+		REQUIRE(condition->getAndConditionSize() == 2);
 
-		std::shared_ptr<AndCondition> andCondition = condition.get()->getAndCondition();
-		REQUIRE(andCondition.get()->getNodeType() == NodeType::AndCondition);
-		REQUIRE(andCondition.get()->getRelationConditionSize() == 2);
+		std::shared_ptr<AndCondition> andCondition = condition->getAndCondition();
+		REQUIRE(andCondition->getNodeType() == NodeType::AndCondition);
+		REQUIRE(andCondition->getRelationConditionSize() == 2);
 
-		std::shared_ptr<RelationCondition> relationCondition = andCondition.get()->getRelationCondition();
-		REQUIRE(relationCondition.get()->getNodeType() == NodeType::RelationCondition);
-		REQUIRE(relationCondition.get()->isBooleanWord());
-		REQUIRE(relationCondition.get()->getBooleanWord());
-		REQUIRE(relationCondition.get()->getNotOperator());
-		REQUIRE(relationCondition.get()->getCondition() == nullptr);
-		REQUIRE(!relationCondition.get()->hasSecondExpression());
-		REQUIRE(relationCondition.get()->getExpression() == nullptr);
+		std::shared_ptr<RelationCondition> relationCondition = andCondition->getRelationCondition();
+		REQUIRE(relationCondition->getNodeType() == NodeType::RelationCondition);
+		REQUIRE(relationCondition->isBooleanWord());
+		REQUIRE(relationCondition->getBooleanWord());
+		REQUIRE(relationCondition->getNotOperator());
+		REQUIRE(relationCondition->getCondition() == nullptr);
+		REQUIRE(!relationCondition->hasSecondExpression());
+		REQUIRE(relationCondition->getExpression() == nullptr);
 
-		relationCondition = andCondition.get()->getRelationCondition(1);
-		REQUIRE(relationCondition.get()->getNodeType() == NodeType::RelationCondition);
-		REQUIRE(relationCondition.get()->isBooleanWord());
-		REQUIRE(!relationCondition.get()->getBooleanWord());
-		REQUIRE(!relationCondition.get()->getNotOperator());
-		REQUIRE(relationCondition.get()->getCondition() == nullptr);
-		REQUIRE(!relationCondition.get()->hasSecondExpression());
-		REQUIRE(relationCondition.get()->getExpression() == nullptr);
+		relationCondition = andCondition->getRelationCondition(1);
+		REQUIRE(relationCondition->getNodeType() == NodeType::RelationCondition);
+		REQUIRE(relationCondition->isBooleanWord());
+		REQUIRE(!relationCondition->getBooleanWord());
+		REQUIRE(!relationCondition->getNotOperator());
+		REQUIRE(relationCondition->getCondition() == nullptr);
+		REQUIRE(!relationCondition->hasSecondExpression());
+		REQUIRE(relationCondition->getExpression() == nullptr);
 
 
-		andCondition = condition.get()->getAndCondition(1);
-		REQUIRE(andCondition.get()->getNodeType() == NodeType::AndCondition);
-		REQUIRE(andCondition.get()->getRelationConditionSize() == 1);
+		andCondition = condition->getAndCondition(1);
+		REQUIRE(andCondition->getNodeType() == NodeType::AndCondition);
+		REQUIRE(andCondition->getRelationConditionSize() == 1);
 
-		relationCondition = andCondition.get()->getRelationCondition();
-		REQUIRE(relationCondition.get()->getNodeType() == NodeType::RelationCondition);
-		REQUIRE(relationCondition.get()->isBooleanWord());
-		REQUIRE(relationCondition.get()->getBooleanWord());
-		REQUIRE(!relationCondition.get()->getNotOperator());
-		REQUIRE(relationCondition.get()->getCondition() == nullptr);
-		REQUIRE(!relationCondition.get()->hasSecondExpression());
-		REQUIRE(relationCondition.get()->getExpression() == nullptr);
+		relationCondition = andCondition->getRelationCondition();
+		REQUIRE(relationCondition->getNodeType() == NodeType::RelationCondition);
+		REQUIRE(relationCondition->isBooleanWord());
+		REQUIRE(relationCondition->getBooleanWord());
+		REQUIRE(!relationCondition->getNotOperator());
+		REQUIRE(relationCondition->getCondition() == nullptr);
+		REQUIRE(!relationCondition->hasSecondExpression());
+		REQUIRE(relationCondition->getExpression() == nullptr);
 
 	}
 
@@ -368,64 +368,64 @@ TEST_CASE("Conditions", "[parser]")
 		reader->setSourceString("if (!(callFunc() || 2 == 2) && true) {}");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::IfStatement);
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
+		REQUIRE(firstNode->getNodeType() == NodeType::IfStatement);
 		std::shared_ptr<IfStatement> ifStatement = std::static_pointer_cast<IfStatement>(firstNode);
 
-		std::shared_ptr<Condition> condition = ifStatement.get()->getCondition();
-		REQUIRE(condition.get()->getNodeType() == NodeType::Condition);
-		REQUIRE(condition.get()->getAndConditionSize() == 1);
+		std::shared_ptr<Condition> condition = ifStatement->getCondition();
+		REQUIRE(condition->getNodeType() == NodeType::Condition);
+		REQUIRE(condition->getAndConditionSize() == 1);
 
-		std::shared_ptr<AndCondition> andCondition = condition.get()->getAndCondition();
-		REQUIRE(andCondition.get()->getNodeType() == NodeType::AndCondition);
-		REQUIRE(andCondition.get()->getRelationConditionSize() == 2);
+		std::shared_ptr<AndCondition> andCondition = condition->getAndCondition();
+		REQUIRE(andCondition->getNodeType() == NodeType::AndCondition);
+		REQUIRE(andCondition->getRelationConditionSize() == 2);
 
-		std::shared_ptr<RelationCondition> relationCondition = andCondition.get()->getRelationCondition(1);
-		REQUIRE(relationCondition.get()->getNodeType() == NodeType::RelationCondition);
-		REQUIRE(relationCondition.get()->isBooleanWord());
-		REQUIRE(relationCondition.get()->getBooleanWord());
-		REQUIRE(!relationCondition.get()->getNotOperator());
-		REQUIRE(relationCondition.get()->getCondition() == nullptr);
-		REQUIRE(!relationCondition.get()->hasSecondExpression());
-		REQUIRE(relationCondition.get()->getExpression() == nullptr);
+		std::shared_ptr<RelationCondition> relationCondition = andCondition->getRelationCondition(1);
+		REQUIRE(relationCondition->getNodeType() == NodeType::RelationCondition);
+		REQUIRE(relationCondition->isBooleanWord());
+		REQUIRE(relationCondition->getBooleanWord());
+		REQUIRE(!relationCondition->getNotOperator());
+		REQUIRE(relationCondition->getCondition() == nullptr);
+		REQUIRE(!relationCondition->hasSecondExpression());
+		REQUIRE(relationCondition->getExpression() == nullptr);
 
 
-		relationCondition = andCondition.get()->getRelationCondition();
-		REQUIRE(relationCondition.get()->getNodeType() == NodeType::RelationCondition);
-		REQUIRE(!relationCondition.get()->isBooleanWord());
-		REQUIRE(relationCondition.get()->getNotOperator());
-		REQUIRE(relationCondition.get()->getCondition() != nullptr);
-		REQUIRE(!relationCondition.get()->hasSecondExpression());
-		REQUIRE(relationCondition.get()->getExpression() == nullptr);
+		relationCondition = andCondition->getRelationCondition();
+		REQUIRE(relationCondition->getNodeType() == NodeType::RelationCondition);
+		REQUIRE(!relationCondition->isBooleanWord());
+		REQUIRE(relationCondition->getNotOperator());
+		REQUIRE(relationCondition->getCondition() != nullptr);
+		REQUIRE(!relationCondition->hasSecondExpression());
+		REQUIRE(relationCondition->getExpression() == nullptr);
 
-		condition = relationCondition.get()->getCondition();
-		REQUIRE(condition.get()->getNodeType() == NodeType::Condition);
-		REQUIRE(condition.get()->getAndConditionSize() == 2);
+		condition = relationCondition->getCondition();
+		REQUIRE(condition->getNodeType() == NodeType::Condition);
+		REQUIRE(condition->getAndConditionSize() == 2);
 
-		andCondition = condition.get()->getAndCondition();
-		REQUIRE(andCondition.get()->getNodeType() == NodeType::AndCondition);
-		REQUIRE(andCondition.get()->getRelationConditionSize() == 1);
+		andCondition = condition->getAndCondition();
+		REQUIRE(andCondition->getNodeType() == NodeType::AndCondition);
+		REQUIRE(andCondition->getRelationConditionSize() == 1);
 
-		relationCondition = andCondition.get()->getRelationCondition();
-		REQUIRE(relationCondition.get()->getNodeType() == NodeType::RelationCondition);
-		REQUIRE(!relationCondition.get()->isBooleanWord());
-		REQUIRE(!relationCondition.get()->getNotOperator());
-		REQUIRE(relationCondition.get()->getCondition() == nullptr);
-		REQUIRE(!relationCondition.get()->hasSecondExpression());
-		REQUIRE(relationCondition.get()->getExpression() != nullptr);
+		relationCondition = andCondition->getRelationCondition();
+		REQUIRE(relationCondition->getNodeType() == NodeType::RelationCondition);
+		REQUIRE(!relationCondition->isBooleanWord());
+		REQUIRE(!relationCondition->getNotOperator());
+		REQUIRE(relationCondition->getCondition() == nullptr);
+		REQUIRE(!relationCondition->hasSecondExpression());
+		REQUIRE(relationCondition->getExpression() != nullptr);
 
-		andCondition = condition.get()->getAndCondition(1);
-		REQUIRE(andCondition.get()->getNodeType() == NodeType::AndCondition);
-		REQUIRE(andCondition.get()->getRelationConditionSize() == 1);
+		andCondition = condition->getAndCondition(1);
+		REQUIRE(andCondition->getNodeType() == NodeType::AndCondition);
+		REQUIRE(andCondition->getRelationConditionSize() == 1);
 
-		relationCondition = andCondition.get()->getRelationCondition();
-		REQUIRE(relationCondition.get()->getNodeType() == NodeType::RelationCondition);
-		REQUIRE(!relationCondition.get()->isBooleanWord());
-		REQUIRE(!relationCondition.get()->getNotOperator());
-		REQUIRE(relationCondition.get()->getCondition() == nullptr);
-		REQUIRE(relationCondition.get()->hasSecondExpression());
-		REQUIRE(relationCondition.get()->getExpression() != nullptr);
-		REQUIRE(relationCondition.get()->getRelationOperator() == TokenType::Equal);
+		relationCondition = andCondition->getRelationCondition();
+		REQUIRE(relationCondition->getNodeType() == NodeType::RelationCondition);
+		REQUIRE(!relationCondition->isBooleanWord());
+		REQUIRE(!relationCondition->getNotOperator());
+		REQUIRE(relationCondition->getCondition() == nullptr);
+		REQUIRE(relationCondition->hasSecondExpression());
+		REQUIRE(relationCondition->getExpression() != nullptr);
+		REQUIRE(relationCondition->getRelationOperator() == TokenType::Equal);
 	}
 }
 
@@ -442,14 +442,14 @@ TEST_CASE("def function", "[parser]")
 		reader->setSourceString("function test() {}");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::DefFuncStatement);
+		REQUIRE(firstNode->getNodeType() == NodeType::DefFuncStatement);
 
 		std::shared_ptr<DefFuncStatement> defFunction = std::static_pointer_cast<DefFuncStatement>(firstNode);
-		REQUIRE(defFunction.get()->getName() == "test");
-		REQUIRE(defFunction.get()->getParametersSize() == 0);
-		REQUIRE(!defFunction.get()->hasReturnType());
+		REQUIRE(defFunction->getName() == "test");
+		REQUIRE(defFunction->getParametersSize() == 0);
+		REQUIRE(!defFunction->hasReturnType());
 	}
 
 	SECTION("function with one parameters, without return type")
@@ -457,18 +457,18 @@ TEST_CASE("def function", "[parser]")
 		reader->setSourceString("function test2(Turtle zolw) {}");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::DefFuncStatement);
+		REQUIRE(firstNode->getNodeType() == NodeType::DefFuncStatement);
 
 		std::shared_ptr<DefFuncStatement> defFunction = std::static_pointer_cast<DefFuncStatement>(firstNode);
-		REQUIRE(defFunction.get()->getName() == "test2");
-		REQUIRE(defFunction.get()->getParametersSize() == 1);
-		REQUIRE(!defFunction.get()->hasReturnType());
+		REQUIRE(defFunction->getName() == "test2");
+		REQUIRE(defFunction->getParametersSize() == 1);
+		REQUIRE(!defFunction->hasReturnType());
 
-		std::shared_ptr<Parameter> parameter = defFunction.get()->getParameter(0);
-		REQUIRE(parameter.get()->getType() == TokenType::Turtle);
-		REQUIRE(parameter.get()->getName() == "zolw");
+		std::shared_ptr<Parameter> parameter = defFunction->getParameter(0);
+		REQUIRE(parameter->getType() == TokenType::Turtle);
+		REQUIRE(parameter->getName() == "zolw");
 	}
 
 	SECTION("function with multi parameters, witout return type")
@@ -476,26 +476,26 @@ TEST_CASE("def function", "[parser]")
 		reader->setSourceString("function test3(Turtle zolw, ColorVar color, Integer int) {}");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::DefFuncStatement);
+		REQUIRE(firstNode->getNodeType() == NodeType::DefFuncStatement);
 
 		std::shared_ptr<DefFuncStatement> defFunction = std::static_pointer_cast<DefFuncStatement>(firstNode);
-		REQUIRE(defFunction.get()->getName() == "test3");
-		REQUIRE(defFunction.get()->getParametersSize() == 3);
-		REQUIRE(!defFunction.get()->hasReturnType());
+		REQUIRE(defFunction->getName() == "test3");
+		REQUIRE(defFunction->getParametersSize() == 3);
+		REQUIRE(!defFunction->hasReturnType());
 
-		std::shared_ptr<Parameter> parameter = defFunction.get()->getParameter(0);
-		REQUIRE(parameter.get()->getType() == TokenType::Turtle);
-		REQUIRE(parameter.get()->getName() == "zolw");
+		std::shared_ptr<Parameter> parameter = defFunction->getParameter(0);
+		REQUIRE(parameter->getType() == TokenType::Turtle);
+		REQUIRE(parameter->getName() == "zolw");
 		
-		parameter = defFunction.get()->getParameter(1);
-		REQUIRE(parameter.get()->getType() == TokenType::ColorVar);
-		REQUIRE(parameter.get()->getName() == "color");
+		parameter = defFunction->getParameter(1);
+		REQUIRE(parameter->getType() == TokenType::ColorVar);
+		REQUIRE(parameter->getName() == "color");
 
-		parameter = defFunction.get()->getParameter(2);
-		REQUIRE(parameter.get()->getType() == TokenType::Integer);
-		REQUIRE(parameter.get()->getName() == "int");
+		parameter = defFunction->getParameter(2);
+		REQUIRE(parameter->getType() == TokenType::Integer);
+		REQUIRE(parameter->getName() == "int");
 	}
 
 	SECTION("function without parameters, with return type")
@@ -503,15 +503,15 @@ TEST_CASE("def function", "[parser]")
 		reader->setSourceString("Turtle function test4() {}");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::DefFuncStatement);
+		REQUIRE(firstNode->getNodeType() == NodeType::DefFuncStatement);
 
 		std::shared_ptr<DefFuncStatement> defFunction = std::static_pointer_cast<DefFuncStatement>(firstNode);
-		REQUIRE(defFunction.get()->getName() == "test4");
-		REQUIRE(defFunction.get()->getParametersSize() == 0);
-		REQUIRE(defFunction.get()->hasReturnType());
-		REQUIRE(defFunction.get()->getReturnType() == TokenType::Turtle);
+		REQUIRE(defFunction->getName() == "test4");
+		REQUIRE(defFunction->getParametersSize() == 0);
+		REQUIRE(defFunction->hasReturnType());
+		REQUIRE(defFunction->getReturnType() == TokenType::Turtle);
 	}
 
 	SECTION("function witn parameters, with return type")
@@ -519,23 +519,23 @@ TEST_CASE("def function", "[parser]")
 		reader->setSourceString("Integer function test5(Point point, Integer int) {}");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::DefFuncStatement);
+		REQUIRE(firstNode->getNodeType() == NodeType::DefFuncStatement);
 
 		std::shared_ptr<DefFuncStatement> defFunction = std::static_pointer_cast<DefFuncStatement>(firstNode);
-		REQUIRE(defFunction.get()->getName() == "test5");
-		REQUIRE(defFunction.get()->getParametersSize() == 2);
-		REQUIRE(defFunction.get()->hasReturnType());
-		REQUIRE(defFunction.get()->getReturnType() == TokenType::Integer);
+		REQUIRE(defFunction->getName() == "test5");
+		REQUIRE(defFunction->getParametersSize() == 2);
+		REQUIRE(defFunction->hasReturnType());
+		REQUIRE(defFunction->getReturnType() == TokenType::Integer);
 
-		std::shared_ptr<Parameter> parameter = defFunction.get()->getParameter(0);
-		REQUIRE(parameter.get()->getType() == TokenType::Point);
-		REQUIRE(parameter.get()->getName() == "point");
+		std::shared_ptr<Parameter> parameter = defFunction->getParameter(0);
+		REQUIRE(parameter->getType() == TokenType::Point);
+		REQUIRE(parameter->getName() == "point");
 
-		parameter = defFunction.get()->getParameter(1);
-		REQUIRE(parameter.get()->getType() == TokenType::Integer);
-		REQUIRE(parameter.get()->getName() == "int");
+		parameter = defFunction->getParameter(1);
+		REQUIRE(parameter->getType() == TokenType::Integer);
+		REQUIRE(parameter->getName() == "int");
 	}
 }
 
@@ -550,14 +550,14 @@ TEST_CASE("call function", "[parser]")
 		reader->setSourceString("test();");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::CallFuncStatement);
+		REQUIRE(firstNode->getNodeType() == NodeType::CallFuncStatement);
 
 		std::shared_ptr<CallFuncStatement> callFunc = std::static_pointer_cast<CallFuncStatement>(firstNode);
-		REQUIRE(callFunc.get()->getArgumentsSize() == 0);
-		REQUIRE(callFunc.get()->getIdentifiersSize() == 1);
-		REQUIRE(callFunc.get()->getIdentifier(0) == "test");
+		REQUIRE(callFunc->getArgumentsSize() == 0);
+		REQUIRE(callFunc->getIdentifiersSize() == 1);
+		REQUIRE(callFunc->getIdentifier(0) == "test");
 	}
 
 	SECTION("call function with one argument, int")
@@ -565,25 +565,25 @@ TEST_CASE("call function", "[parser]")
 		reader->setSourceString("test2(153);");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::CallFuncStatement);
+		REQUIRE(firstNode->getNodeType() == NodeType::CallFuncStatement);
 
 		std::shared_ptr<CallFuncStatement> callFunc = std::static_pointer_cast<CallFuncStatement>(firstNode);
-		REQUIRE(callFunc.get()->getArgumentsSize() == 1);
-		REQUIRE(callFunc.get()->getIdentifiersSize() == 1);
-		REQUIRE(callFunc.get()->getIdentifier(0) == "test2");
+		REQUIRE(callFunc->getArgumentsSize() == 1);
+		REQUIRE(callFunc->getIdentifiersSize() == 1);
+		REQUIRE(callFunc->getIdentifier(0) == "test2");
 
 
-		std::shared_ptr<Expression> expression = callFunc.get()->getArgument(0);
-		REQUIRE(expression.get()->getTermsSize() == 1);
+		std::shared_ptr<Expression> expression = callFunc->getArgument(0);
+		REQUIRE(expression->getTermsSize() == 1);
 
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression.get()->getExpressionTerm(0);
-		REQUIRE(expressionTerm.get()->getFactorsSize() == 1);
+		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm.get()->getExpressionFactor(0);
-		REQUIRE(expressionFactor.get()->getIntVal() == 153);
-		REQUIRE(!expressionFactor.get()->getNegativeOp());
+		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 153);
+		REQUIRE(!expressionFactor->getNegativeOp());
 	}
 
 	SECTION("call function with more arguments")
@@ -591,39 +591,39 @@ TEST_CASE("call function", "[parser]")
 		reader->setSourceString("test3(160, -20, 10);");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::CallFuncStatement);
+		REQUIRE(firstNode->getNodeType() == NodeType::CallFuncStatement);
 
 		std::shared_ptr<CallFuncStatement> callFunc = std::static_pointer_cast<CallFuncStatement>(firstNode);
-		REQUIRE(callFunc.get()->getArgumentsSize() == 3);
-		REQUIRE(callFunc.get()->getIdentifiersSize() == 1);
-		REQUIRE(callFunc.get()->getIdentifier(0) == "test3");
+		REQUIRE(callFunc->getArgumentsSize() == 3);
+		REQUIRE(callFunc->getIdentifiersSize() == 1);
+		REQUIRE(callFunc->getIdentifier(0) == "test3");
 
 
-		std::shared_ptr<Expression> expression = callFunc.get()->getArgument(0);
-		REQUIRE(expression.get()->getTermsSize() == 1);
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression.get()->getExpressionTerm(0);
-		REQUIRE(expressionTerm.get()->getFactorsSize() == 1);
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm.get()->getExpressionFactor(0);
-		REQUIRE(expressionFactor.get()->getIntVal() == 160);
-		REQUIRE(!expressionFactor.get()->getNegativeOp());
+		std::shared_ptr<Expression> expression = callFunc->getArgument(0);
+		REQUIRE(expression->getTermsSize() == 1);
+		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
+		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 160);
+		REQUIRE(!expressionFactor->getNegativeOp());
 
-		expression = callFunc.get()->getArgument(1);
-		REQUIRE(expression.get()->getTermsSize() == 1);
-		expressionTerm = expression.get()->getExpressionTerm(0);
-		REQUIRE(expressionTerm.get()->getFactorsSize() == 1);
-		expressionFactor = expressionTerm.get()->getExpressionFactor(0);
-		REQUIRE(expressionFactor.get()->getIntVal() == 20);
-		REQUIRE(expressionFactor.get()->getNegativeOp());
+		expression = callFunc->getArgument(1);
+		REQUIRE(expression->getTermsSize() == 1);
+		expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
+		expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 20);
+		REQUIRE(expressionFactor->getNegativeOp());
 
-		expression = callFunc.get()->getArgument(2);
-		REQUIRE(expression.get()->getTermsSize() == 1);
-		expressionTerm = expression.get()->getExpressionTerm(0);
-		REQUIRE(expressionTerm.get()->getFactorsSize() == 1);
-		expressionFactor = expressionTerm.get()->getExpressionFactor(0);
-		REQUIRE(expressionFactor.get()->getIntVal() == 10);
-		REQUIRE(!expressionFactor.get()->getNegativeOp());
+		expression = callFunc->getArgument(2);
+		REQUIRE(expression->getTermsSize() == 1);
+		expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
+		expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 10);
+		REQUIRE(!expressionFactor->getNegativeOp());
 	}
 
 	SECTION("call function multi level ID")
@@ -631,16 +631,16 @@ TEST_CASE("call function", "[parser]")
 		reader->setSourceString("test4.test44.test444();");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::CallFuncStatement);
+		REQUIRE(firstNode->getNodeType() == NodeType::CallFuncStatement);
 
 		std::shared_ptr<CallFuncStatement> callFunc = std::static_pointer_cast<CallFuncStatement>(firstNode);
-		REQUIRE(callFunc.get()->getArgumentsSize() == 0);
-		REQUIRE(callFunc.get()->getIdentifiersSize() == 3);
-		REQUIRE(callFunc.get()->getIdentifier(0) == "test4");
-		REQUIRE(callFunc.get()->getIdentifier(1) == "test44");
-		REQUIRE(callFunc.get()->getIdentifier(2) == "test444");
+		REQUIRE(callFunc->getArgumentsSize() == 0);
+		REQUIRE(callFunc->getIdentifiersSize() == 3);
+		REQUIRE(callFunc->getIdentifier(0) == "test4");
+		REQUIRE(callFunc->getIdentifier(1) == "test44");
+		REQUIRE(callFunc->getIdentifier(2) == "test444");
 	}
 
 	SECTION("call function multi level ID and multi args")
@@ -648,40 +648,40 @@ TEST_CASE("call function", "[parser]")
 		reader->setSourceString("test5.test55.test555(1, -2, 3);");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::CallFuncStatement);
+		REQUIRE(firstNode->getNodeType() == NodeType::CallFuncStatement);
 
 		std::shared_ptr<CallFuncStatement> callFunc = std::static_pointer_cast<CallFuncStatement>(firstNode);
-		REQUIRE(callFunc.get()->getArgumentsSize() == 3);
-		REQUIRE(callFunc.get()->getIdentifiersSize() == 3);
-		REQUIRE(callFunc.get()->getIdentifier(0) == "test5");
-		REQUIRE(callFunc.get()->getIdentifier(1) == "test55");
-		REQUIRE(callFunc.get()->getIdentifier(2) == "test555");
+		REQUIRE(callFunc->getArgumentsSize() == 3);
+		REQUIRE(callFunc->getIdentifiersSize() == 3);
+		REQUIRE(callFunc->getIdentifier(0) == "test5");
+		REQUIRE(callFunc->getIdentifier(1) == "test55");
+		REQUIRE(callFunc->getIdentifier(2) == "test555");
 
-		std::shared_ptr<Expression> expression = callFunc.get()->getArgument(0);
-		REQUIRE(expression.get()->getTermsSize() == 1);
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression.get()->getExpressionTerm(0);
-		REQUIRE(expressionTerm.get()->getFactorsSize() == 1);
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm.get()->getExpressionFactor(0);
-		REQUIRE(expressionFactor.get()->getIntVal() == 1);
-		REQUIRE(!expressionFactor.get()->getNegativeOp());
+		std::shared_ptr<Expression> expression = callFunc->getArgument(0);
+		REQUIRE(expression->getTermsSize() == 1);
+		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
+		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 1);
+		REQUIRE(!expressionFactor->getNegativeOp());
 
-		expression = callFunc.get()->getArgument(1);
-		REQUIRE(expression.get()->getTermsSize() == 1);
-		expressionTerm = expression.get()->getExpressionTerm(0);
-		REQUIRE(expressionTerm.get()->getFactorsSize() == 1);
-		expressionFactor = expressionTerm.get()->getExpressionFactor(0);
-		REQUIRE(expressionFactor.get()->getIntVal() == 2);
-		REQUIRE(expressionFactor.get()->getNegativeOp());
+		expression = callFunc->getArgument(1);
+		REQUIRE(expression->getTermsSize() == 1);
+		expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
+		expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 2);
+		REQUIRE(expressionFactor->getNegativeOp());
 
-		expression = callFunc.get()->getArgument(2);
-		REQUIRE(expression.get()->getTermsSize() == 1);
-		expressionTerm = expression.get()->getExpressionTerm(0);
-		REQUIRE(expressionTerm.get()->getFactorsSize() == 1);
-		expressionFactor = expressionTerm.get()->getExpressionFactor(0);
-		REQUIRE(expressionFactor.get()->getIntVal() == 3);
-		REQUIRE(!expressionFactor.get()->getNegativeOp());
+		expression = callFunc->getArgument(2);
+		REQUIRE(expression->getTermsSize() == 1);
+		expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
+		expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 3);
+		REQUIRE(!expressionFactor->getNegativeOp());
 	
 	}
 
@@ -699,23 +699,23 @@ TEST_CASE("assign", "[parser]")
 		reader->setSourceString("test = -20");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::AssignStatement);
+		REQUIRE(firstNode->getNodeType() == NodeType::AssignStatement);
 
 		std::shared_ptr<AssignStatement> assign = std::static_pointer_cast<AssignStatement>(firstNode);
-		REQUIRE(assign.get()->getIdentifier() == "test");
+		REQUIRE(assign->getIdentifier() == "test");
 
-		std::shared_ptr<Expression> expression = assign.get()->getExpression();
+		std::shared_ptr<Expression> expression = assign->getExpression();
 		REQUIRE(expression != nullptr);
-		REQUIRE(expression.get()->getTermsSize() == 1);
+		REQUIRE(expression->getTermsSize() == 1);
 
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression.get()->getExpressionTerm(0);
-		REQUIRE(expressionTerm.get()->getFactorsSize() == 1);
+		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm.get()->getExpressionFactor(0);
-		REQUIRE(expressionFactor.get()->getIntVal() == 20);
-		REQUIRE(expressionFactor.get()->getNegativeOp());
+		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 20);
+		REQUIRE(expressionFactor->getNegativeOp());
 	}
 
 	SECTION("multi level id assign and calc Func")
@@ -723,25 +723,25 @@ TEST_CASE("assign", "[parser]")
 		reader->setSourceString("test2.test22.test222 = calcFunc()");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::AssignStatement);
+		REQUIRE(firstNode->getNodeType() == NodeType::AssignStatement);
 
 		std::shared_ptr<AssignStatement> assign = std::static_pointer_cast<AssignStatement>(firstNode);
-		REQUIRE(assign.get()->getIdentifier() == "test2");
-		REQUIRE(assign.get()->getIdentifier(1) == "test22");
-		REQUIRE(assign.get()->getIdentifier(2) == "test222");
+		REQUIRE(assign->getIdentifier() == "test2");
+		REQUIRE(assign->getIdentifier(1) == "test22");
+		REQUIRE(assign->getIdentifier(2) == "test222");
 
-		std::shared_ptr<Expression> expression = assign.get()->getExpression();
+		std::shared_ptr<Expression> expression = assign->getExpression();
 		REQUIRE(expression != nullptr);
-		REQUIRE(expression.get()->getTermsSize() == 1);
+		REQUIRE(expression->getTermsSize() == 1);
 
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression.get()->getExpressionTerm(0);
-		REQUIRE(expressionTerm.get()->getFactorsSize() == 1);
+		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm.get()->getExpressionFactor(0);
-		REQUIRE(!expressionFactor.get()->getNegativeOp());
-		REQUIRE(expressionFactor.get()->getCallFunc() != nullptr);
+		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(!expressionFactor->getNegativeOp());
+		REQUIRE(expressionFactor->getCallFunc() != nullptr);
 	}
 }
 
@@ -757,14 +757,14 @@ TEST_CASE("Var declartion", "[parser]")
 		reader->setSourceString("Integer test;");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::DeclareVarStatement);
+		REQUIRE(firstNode->getNodeType() == NodeType::DeclareVarStatement);
 
 		std::shared_ptr<DeclareVarStatement> varDeclare = std::static_pointer_cast<DeclareVarStatement>(firstNode);
-		REQUIRE(varDeclare.get()->getIdentifier() == "test");
-		REQUIRE(varDeclare.get()->getAssignStatemnt() == nullptr);
-		REQUIRE(varDeclare.get()->getType() == TokenType::Integer);
+		REQUIRE(varDeclare->getIdentifier() == "test");
+		REQUIRE(varDeclare->getAssignStatemnt() == nullptr);
+		REQUIRE(varDeclare->getType() == TokenType::Integer);
 	}
 
 
@@ -773,13 +773,13 @@ TEST_CASE("Var declartion", "[parser]")
 		reader->setSourceString("Boolean test2 = !true;");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode.get()->getNodeType() == NodeType::DeclareVarStatement);
+		REQUIRE(firstNode->getNodeType() == NodeType::DeclareVarStatement);
 
 		std::shared_ptr<DeclareVarStatement> varDeclare = std::static_pointer_cast<DeclareVarStatement>(firstNode);
-		REQUIRE(varDeclare.get()->getIdentifier() == "test2");
-		REQUIRE(varDeclare.get()->getAssignStatemnt() != nullptr);
-		REQUIRE(varDeclare.get()->getType() == TokenType::Boolean);
+		REQUIRE(varDeclare->getIdentifier() == "test2");
+		REQUIRE(varDeclare->getAssignStatemnt() != nullptr);
+		REQUIRE(varDeclare->getType() == TokenType::Boolean);
 	}
 }

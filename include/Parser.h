@@ -52,9 +52,15 @@ private:
 
 	Token peekToken();
 	Token getNextToken();
-	bool hasBufferedToken();
+	const bool hasBufferedToken() const;
 
-	bool checkNextTokenType(const std::vector<TokenType>& types);
-	bool checkIfTokenTypeIsOneOf(const TokenType& type, const std::vector<TokenType>& types);
+	
+	const bool checkNextTokenType(const TokenType& type);
+	const bool checkNextTokenType(const std::vector<TokenType>& types);
+	const bool consumeNextTokenIfIsType(const TokenType& type);
+	const bool consumeNextTokenIfIsType(const std::vector<TokenType>& types);
+	const bool checkIfTokenTypeIsOneOf(const TokenType& type, const std::vector<TokenType>& types) const;
+	const bool checkIfTokenTypeEqual(const TokenType& tokenType, const TokenType& type) const;
+	const bool checkIfTokenTypeEqual(const Token& token, const TokenType& type) const;
 };
 
