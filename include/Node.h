@@ -15,7 +15,9 @@ enum class NodeType
 	CallFuncStatement,
 	Condition,
 	AndCondition,
-	RelationCondition
+	RelationCondition,
+	AssignStatement,
+	DeclareVarStatement
 };
 
 class Node

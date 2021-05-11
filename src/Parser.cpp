@@ -32,8 +32,9 @@ std::unique_ptr<ProgramRootNode> Parser::parseProgram()
 			}
 			else
 			{
-				// Deklaracja zmiennych
-
+				// Deklaracja lub definicja zmiennych
+				std::shared_ptr<DeclareVarStatement> varDec = parseDeclareVarStatement(curToken.type);
+				rootNode.get()->addInstruction(varDec);
 			}
 		}
 		else if (curToken.type == TokenType::Function)
@@ -329,8 +330,7 @@ std::shared_ptr<Node> Parser::parseAssignOrCallFuncStatement()
 	
 	if (peekToken().type == TokenType::AssignOperator)
 	{
-		// Assignment
-		// TO DO
+		return parseAssignStatement(idNames);
 	}
 
 
@@ -379,6 +379,52 @@ std::shared_ptr<CallFuncStatement> Parser::parseCallFunc(std::vector<std::string
 		callFunc.get()->addIdentifier(name);
 
 	return callFunc;
+}
+
+std::shared_ptr<AssignStatement> Parser::parseAssignStatement(std::vector<std::string> idNames)
+{
+	if (peekToken().type != TokenType::AssignOperator)
+		return nullptr;
+	getNextToken();
+
+	std::shared_ptr<AssignStatement> assign = std::make_shared<AssignStatement>();
+
+	assign.get()->setExpression(parseExpression());
+
+	for (auto const& name : idNames)
+		assign.get()->addIdentifier(name);
+
+	return assign;
+}
+
+std::shared_ptr<DeclareVarStatement> Parser::parseDeclareVarStatement(TokenType type)
+{
+	if (!checkIfTokenTypeIsOneOf(type, { TokenType::ColorVar, TokenType::Integer, TokenType::Turtle, TokenType::Point, TokenType::Boolean }))
+		return nullptr;
+
+	Token id = peekToken();
+	if (id.type != TokenType::Identifier)
+		return nullptr;
+	getNextToken();
+
+	std::shared_ptr<DeclareVarStatement> varStatement = std::make_shared<DeclareVarStatement>();
+	varStatement.get()->setIdentifier(id.getStringValue());
+	varStatement.get()->setType(type);
+
+	if (type != TokenType::Point && type != TokenType::Turtle)
+	{
+		if (peekToken().type == TokenType::AssignOperator)
+		{
+			varStatement.get()->setAssignStatement(parseAssignStatement({ id.getStringValue() }));
+		}
+	}
+	else
+	{
+		// TO DO
+		// Point, Turtle troche inaczej mo¿e?, bo test(2, 2)
+	}
+
+	return varStatement;
 }
 
 

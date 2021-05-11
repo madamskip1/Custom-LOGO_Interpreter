@@ -686,3 +686,100 @@ TEST_CASE("call function", "[parser]")
 	}
 
 }
+
+
+TEST_CASE("assign", "[parser]")
+{
+	SourceReader* reader = new SourceReader();
+	Lexer* lexer = new Lexer(reader);
+	Parser parser(lexer);
+
+	SECTION("simple assign")
+	{
+		reader->setSourceString("test = -20");
+
+		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
+		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+
+		REQUIRE(firstNode.get()->getNodeType() == NodeType::AssignStatement);
+
+		std::shared_ptr<AssignStatement> assign = std::static_pointer_cast<AssignStatement>(firstNode);
+		REQUIRE(assign.get()->getIdentifier() == "test");
+
+		std::shared_ptr<Expression> expression = assign.get()->getExpression();
+		REQUIRE(expression != nullptr);
+		REQUIRE(expression.get()->getTermsSize() == 1);
+
+		std::shared_ptr<ExpressionTerm> expressionTerm = expression.get()->getExpressionTerm(0);
+		REQUIRE(expressionTerm.get()->getFactorsSize() == 1);
+
+		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm.get()->getExpressionFactor(0);
+		REQUIRE(expressionFactor.get()->getIntVal() == 20);
+		REQUIRE(expressionFactor.get()->getNegativeOp());
+	}
+
+	SECTION("multi level id assign and calc Func")
+	{
+		reader->setSourceString("test2.test22.test222 = calcFunc()");
+
+		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
+		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+
+		REQUIRE(firstNode.get()->getNodeType() == NodeType::AssignStatement);
+
+		std::shared_ptr<AssignStatement> assign = std::static_pointer_cast<AssignStatement>(firstNode);
+		REQUIRE(assign.get()->getIdentifier() == "test2");
+		REQUIRE(assign.get()->getIdentifier(1) == "test22");
+		REQUIRE(assign.get()->getIdentifier(2) == "test222");
+
+		std::shared_ptr<Expression> expression = assign.get()->getExpression();
+		REQUIRE(expression != nullptr);
+		REQUIRE(expression.get()->getTermsSize() == 1);
+
+		std::shared_ptr<ExpressionTerm> expressionTerm = expression.get()->getExpressionTerm(0);
+		REQUIRE(expressionTerm.get()->getFactorsSize() == 1);
+
+		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm.get()->getExpressionFactor(0);
+		REQUIRE(!expressionFactor.get()->getNegativeOp());
+		REQUIRE(expressionFactor.get()->getCallFunc() != nullptr);
+	}
+}
+
+
+TEST_CASE("Var declartion", "[parser]")
+{
+	SourceReader* reader = new SourceReader();
+	Lexer* lexer = new Lexer(reader);
+	Parser parser(lexer);
+
+	SECTION("simple def var")
+	{
+		reader->setSourceString("Integer test;");
+
+		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
+		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+
+		REQUIRE(firstNode.get()->getNodeType() == NodeType::DeclareVarStatement);
+
+		std::shared_ptr<DeclareVarStatement> varDeclare = std::static_pointer_cast<DeclareVarStatement>(firstNode);
+		REQUIRE(varDeclare.get()->getIdentifier() == "test");
+		REQUIRE(varDeclare.get()->getAssignStatemnt() == nullptr);
+		REQUIRE(varDeclare.get()->getType() == TokenType::Integer);
+	}
+
+
+	SECTION("def var with assign")
+	{
+		reader->setSourceString("Boolean test2 = !true;");
+
+		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
+		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+
+		REQUIRE(firstNode.get()->getNodeType() == NodeType::DeclareVarStatement);
+
+		std::shared_ptr<DeclareVarStatement> varDeclare = std::static_pointer_cast<DeclareVarStatement>(firstNode);
+		REQUIRE(varDeclare.get()->getIdentifier() == "test2");
+		REQUIRE(varDeclare.get()->getAssignStatemnt() != nullptr);
+		REQUIRE(varDeclare.get()->getType() == TokenType::Boolean);
+	}
+}

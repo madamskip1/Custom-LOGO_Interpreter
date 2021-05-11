@@ -12,6 +12,8 @@
 #include "DefFuncStatement.h"
 #include "Parameter.h"
 #include "Condition.h"
+#include "AssignStatement.h"
+#include "DeclareVarStatement.h"
 
 class Parser
 {
@@ -36,6 +38,9 @@ private:
 
 	std::shared_ptr<Node> parseAssignOrCallFuncStatement();
 	std::shared_ptr<CallFuncStatement> parseCallFunc(std::vector<std::string> idNames);
+	std::shared_ptr<AssignStatement> parseAssignStatement(std::vector<std::string> idNames);
+
+	std::shared_ptr<DeclareVarStatement> parseDeclareVarStatement(TokenType type);
 
 	std::shared_ptr<Expression> parseExpression();
 	std::shared_ptr<ExpressionTerm> parseExpressionTerm();
