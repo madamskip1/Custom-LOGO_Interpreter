@@ -6,6 +6,7 @@
 #include "ProgramRootNode.h"
 #include "Node.h"
 #include "CallFuncStatement.h"
+#include "Logger.h"
 #include <iostream> 
 
 #pragma warning(push, 0)        
@@ -17,7 +18,8 @@ TEST_CASE("IFStatement", "[if]")
 {
 	SourceReader* reader = new SourceReader();
 	Lexer* lexer = new Lexer(reader);
-	Parser parser(lexer);
+	Logger* logger = new Logger();
+	Parser parser(lexer, logger);
 
 	reader->setSourceString("if (false) {} else {}");
 
@@ -57,7 +59,8 @@ TEST_CASE("RepeatStatement", "[repeat]")
 {
 	SourceReader* reader = new SourceReader();
 	Lexer* lexer = new Lexer(reader);
-	Parser parser(lexer);
+	Logger* logger = new Logger();
+	Parser parser(lexer, logger);
 
 	reader->setSourceString("repeat(50) {}");
 
@@ -85,7 +88,8 @@ TEST_CASE("RepeatTimeStatement", "[repeat]")
 {
 	SourceReader* reader = new SourceReader();
 	Lexer* lexer = new Lexer(reader);
-	Parser parser(lexer);
+	Logger* logger = new Logger();
+	Parser parser(lexer, logger);
 
 	reader->setSourceString("repeatTime(22) {}");
 
@@ -117,7 +121,8 @@ TEST_CASE("Expressions", "[parser]")
 {
 	SourceReader* reader = new SourceReader();
 	Lexer* lexer = new Lexer(reader);
-	Parser parser(lexer);
+	Logger* logger = new Logger();
+	Parser parser(lexer, logger);
 
 	SECTION("Simple expression - just digit (zero)")
 	{
@@ -286,7 +291,8 @@ TEST_CASE("Conditions", "[parser]")
 {
 	SourceReader* reader = new SourceReader();
 	Lexer* lexer = new Lexer(reader);
-	Parser parser(lexer);
+	Logger* logger = new Logger();
+	Parser parser(lexer, logger);
 
 	SECTION("simple relation Operator")
 	{
@@ -437,7 +443,8 @@ TEST_CASE("def function", "[parser]")
 {
 	SourceReader* reader = new SourceReader();
 	Lexer* lexer = new Lexer(reader);
-	Parser parser(lexer);
+	Logger* logger = new Logger();
+	Parser parser(lexer, logger);
 
 	SECTION("simple function, without parameters, without return type")
 	{
@@ -545,7 +552,8 @@ TEST_CASE("call function", "[parser]")
 {
 	SourceReader* reader = new SourceReader();
 	Lexer* lexer = new Lexer(reader);
-	Parser parser(lexer);
+	Logger* logger = new Logger();
+	Parser parser(lexer, logger);
 
 	SECTION("simple call function")
 	{
@@ -694,7 +702,8 @@ TEST_CASE("assign", "[parser]")
 {
 	SourceReader* reader = new SourceReader();
 	Lexer* lexer = new Lexer(reader);
-	Parser parser(lexer);
+	Logger* logger = new Logger();
+	Parser parser(lexer, logger);
 
 	SECTION("simple assign")
 	{
@@ -752,7 +761,8 @@ TEST_CASE("Var declartion", "[parser]")
 {
 	SourceReader* reader = new SourceReader();
 	Lexer* lexer = new Lexer(reader);
-	Parser parser(lexer);
+	Logger* logger = new Logger();
+	Parser parser(lexer, logger);
 
 	SECTION("simple def var")
 	{
@@ -791,7 +801,8 @@ TEST_CASE("Block of instructions", "[parser]")
 {
 	SourceReader* reader = new SourceReader();
 	Lexer* lexer = new Lexer(reader);
-	Parser parser(lexer);
+	Logger* logger = new Logger();
+	Parser parser(lexer, logger);
 
 	SECTION("empty block")
 	{

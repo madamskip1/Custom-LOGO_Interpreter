@@ -1,8 +1,9 @@
 #include "Parser.h"
 #include "CallFuncStatement.h"
 #include <iostream>
+#include "Logger.h"
 
-Parser::Parser(Lexer* lex) : lexer(lex)
+Parser::Parser(Lexer* lex, Logger* logger) : lexer(lex), logger(logger)
 {
 	nextToken = std::nullopt;
 }
@@ -27,9 +28,8 @@ std::unique_ptr<ProgramRootNode> Parser::parseProgram()
 		}
 		else
 		{
-			// brak dopasowania
-			// TODO ERROR
-			getNextToken();
+			//Token badToken = getNextToken();
+			//logger->newLog(LogType::NotRecognizedToken, badToken);
 		}
 	}
 
@@ -56,7 +56,7 @@ std::shared_ptr<Node> Parser::parseInstructions()
 
 			if (!consumeNextTokenIfIsType(TokenType::Semicolon))
 			{
-				// brakuje œrednika
+				logger->newLog(LogType::MissingSemicolon, curToken);
 				return nullptr;
 			}
 

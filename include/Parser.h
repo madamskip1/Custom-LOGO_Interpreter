@@ -14,16 +14,18 @@
 #include "Condition.h"
 #include "AssignStatement.h"
 #include "DeclareVarStatement.h"
+#include "Logger.h"
 
 class Parser
 {
 public:
 	Parser() = delete;
-	Parser(Lexer* lex);
+	Parser(Lexer* lex, Logger* logger);
 
 	std::unique_ptr<ProgramRootNode> parse();
 private:
 	Lexer* lexer;
+	Logger* logger;
 	std::optional<Token> nextToken;
 
 
