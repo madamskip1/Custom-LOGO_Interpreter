@@ -28,8 +28,7 @@ std::unique_ptr<ProgramRootNode> Parser::parseProgram()
 		}
 		else
 		{
-			//Token badToken = getNextToken();
-			//logger->newLog(LogType::NotRecognizedToken, badToken);
+			getNextToken();
 		}
 	}
 
@@ -107,20 +106,27 @@ std::shared_ptr<InstructionsBlock> Parser::parseInstructionsBlock()
 
 	if (!consumeNextTokenIfIsType(TokenType::CurlyBracketOpen))
 		return nullptr;
+
+
 	std::shared_ptr<Node> node;
 
-	while (!consumeNextTokenIfIsType(TokenType::CurlyBracketClose))
+	while (!checkNextTokenType(TokenType::CurlyBracketClose) && !checkNextTokenType(TokenType::EndOfFile))
 	{
 		node = parseInstructions();
-		if (node->getNodeType() == NodeType::DefFuncStatement)
+		if (node != nullptr && node->getNodeType() == NodeType::DefFuncStatement)
 		{
-			// W bloku nie mo¿emy definiowaæ funkcji
-			// TO DO WARNING
+			logger->newLog(LogType::CantDefFuncInBlock, peekToken());
 		}
 		else
 		{
 			instructionsBlock->addInstruction(node);
 		}
+	}
+
+	if (!consumeNextTokenIfIsType(TokenType::CurlyBracketClose))
+	{
+		logger->newLog(LogType::MissingCurlyBracketClose, peekToken());
+		return nullptr;
 	}
 
 
@@ -143,14 +149,16 @@ std::shared_ptr<DefFuncStatement> Parser::parseDefFuncStatement(TokenType return
 	std::string name = peekToken().getStringValue();
 
 	if (!consumeNextTokenIfIsType(TokenType::Identifier))
+	{
+		logger->newLog(LogType::MissingIdentifier, peekToken());
 		return nullptr;
+	}
 
 	defFuncStatement->setName(name);
 	
 	if (!consumeNextTokenIfIsType(TokenType::RoundBracketOpen))
 	{
-		// brak nawiasu otwierajacego
-		// TO DO ERROR
+		logger->newLog(LogType::MissingRoundBracketOpen, peekToken());
 		return nullptr;
 	}
 	
@@ -167,8 +175,8 @@ std::shared_ptr<DefFuncStatement> Parser::parseDefFuncStatement(TokenType return
 
 		if(!consumeNextTokenIfIsType(TokenType::RoundBracketClose))
 		{
-			// JAKIS ERROR TO DO
-			// Nie ma przecinka, a nastêpny token to nie zamykaj¹cy nawias
+			logger->newLog(LogType::MissingParameter, peekToken());
+			return nullptr;
 		}
 	}
 
@@ -187,8 +195,7 @@ std::shared_ptr<Parameter> Parser::parseParameter()
 
 	if (!consumeNextTokenIfIsType({ TokenType::ColorVar, TokenType::Integer, TokenType::Turtle, TokenType::Point, TokenType::Boolean }))
 	{
-		// Parameter nie zaczyna siê od TYPU
-		// TODO ERROR
+		logger->newLog(LogType::BadSyntaxParameter, peekToken());
 		return nullptr;
 	}
 
@@ -196,8 +203,7 @@ std::shared_ptr<Parameter> Parser::parseParameter()
 
 	if (!checkNextTokenType(TokenType::Identifier))
 	{
-		// Brakuje nazwy parametru
-		// TODO ERROR
+		logger->newLog(LogType::MissingIdentifier, peekToken());
 		return nullptr;
 	}
 
@@ -219,12 +225,18 @@ std::shared_ptr<IfStatement> Parser::parseIfStatement()
 	std::shared_ptr<IfStatement> ifStatement = std::make_shared<IfStatement>();
 
 	if (!consumeNextTokenIfIsType(TokenType::RoundBracketOpen))
+	{
+		logger->newLog(LogType::MissingRoundBracketOpen, peekToken());
 		return nullptr;
+	}
 
 	ifStatement->setCondition(parseCondition());
 
 	if (!consumeNextTokenIfIsType(TokenType::RoundBracketClose))
+	{	
+		logger->newLog(LogType::MissingRoundBracketClose, peekToken());
 		return nullptr;
+	}
 
 	std::shared_ptr<InstructionsBlock> trueBlock = parseInstructionsBlock();
 	ifStatement->setTrueBlockNode(trueBlock);
@@ -246,14 +258,20 @@ std::shared_ptr<RepeatStatement> Parser::parseRepeatStatement()
 	std::shared_ptr<RepeatStatement> repeatStatement = std::make_shared<RepeatStatement>();
 
 	if (!consumeNextTokenIfIsType(TokenType::RoundBracketOpen))
+	{
+		logger->newLog(LogType::MissingRoundBracketOpen, peekToken());
 		return nullptr;
+	}
 
 	std::shared_ptr<Expression> expression = parseExpression();
 	repeatStatement->setHowManyTime(expression);
 
 
 	if (!consumeNextTokenIfIsType(TokenType::RoundBracketClose))
+	{
+		logger->newLog(LogType::MissingRoundBracketClose, peekToken());
 		return nullptr;
+	}
 
 	std::shared_ptr<InstructionsBlock> block = parseInstructionsBlock();
 	repeatStatement->setInstructionsBlock(block);
@@ -269,7 +287,10 @@ std::shared_ptr<RepeatTimeStatement> Parser::parseRepeatTimeStatement()
 	std::shared_ptr<RepeatTimeStatement> repeatTimeStatement = std::make_shared<RepeatTimeStatement>();
 
 	if (!consumeNextTokenIfIsType(TokenType::RoundBracketOpen))
+	{
+		logger->newLog(LogType::MissingRoundBracketOpen, peekToken());
 		return nullptr;
+	}
 
 	std::shared_ptr<Expression> period = parseExpression();
 	repeatTimeStatement->setPeriod(period);
@@ -281,7 +302,10 @@ std::shared_ptr<RepeatTimeStatement> Parser::parseRepeatTimeStatement()
 	}
 
 	if (!consumeNextTokenIfIsType(TokenType::RoundBracketClose))
+	{
+		logger->newLog(LogType::MissingRoundBracketClose, peekToken());
 		return nullptr;
+	}
 
 	std::shared_ptr<InstructionsBlock> block = parseInstructionsBlock();
 	repeatTimeStatement->setInstructionsBlock(block);
@@ -295,7 +319,7 @@ std::shared_ptr<Node> Parser::parseAssignOrCallFuncStatement()
 
 	if (!checkIfTokenTypeEqual(idToken, TokenType::Identifier))
 	{
-		// Nie zaczyna siê od identyfikatora
+		logger->newLog(LogType::MissingIdentifier, peekToken());
 		return nullptr;
 	}
 
@@ -311,8 +335,7 @@ std::shared_ptr<Node> Parser::parseAssignOrCallFuncStatement()
 		}
 		else
 		{
-			// Powinien byæ identyfikator
-			// TODO ERROR
+			logger->newLog(LogType::MissingIdentifier, peekToken());
 			return nullptr;
 		}
 	}
@@ -351,8 +374,7 @@ std::shared_ptr<CallFuncStatement> Parser::parseCallFunc(std::vector<std::string
 
 		if (!consumeNextTokenIfIsType(TokenType::RoundBracketClose))
 		{
-			// brakuje zamkniecia nawiasu
-			// to do error
+			logger->newLog(LogType::MissingRoundBracketClose, peekToken());
 			return nullptr;
 		}
 	}
@@ -383,14 +405,16 @@ std::shared_ptr<DeclareVarStatement> Parser::parseDeclareVarStatement(TokenType 
 	std::string identifier = peekToken().getStringValue();
 
 	if (!consumeNextTokenIfIsType(TokenType::Identifier))
+	{
+		logger->newLog(LogType::MissingIdentifierOrFunctionKeyword, peekToken());
 		return nullptr;
+	}
 
 
 	std::shared_ptr<DeclareVarStatement> varStatement = std::make_shared<DeclareVarStatement>();
 	varStatement->setIdentifier(identifier);
 	varStatement->setType(type);
 
-	//if (checkIfTokenTypeIsOneOf(type, {)
 	if (!checkIfTokenTypeIsOneOf(type, { TokenType::Point, TokenType::Turtle }))
 	{
 		if (checkNextTokenType(TokenType::AssignOperator))
@@ -459,7 +483,7 @@ std::shared_ptr<ExpressionFactor> Parser::parseExpressionFactor()
 
 		if (!consumeNextTokenIfIsType(TokenType::RoundBracketClose))
 		{
-			// ERROR BRAKUJE ZAMKNIECIA NAWIASU
+			logger->newLog(LogType::MissingRoundBracketClose, peekToken());
 			return nullptr;
 		}
 	}
@@ -468,7 +492,7 @@ std::shared_ptr<ExpressionFactor> Parser::parseExpressionFactor()
 		std::vector<std::string> names;
 		names.push_back(token.getStringValue());
 
-		while (consumeNextTokenIfIsType(TokenType::Comma))
+		while (consumeNextTokenIfIsType(TokenType::Dot))
 		{
 			if (peekToken().type == TokenType::Identifier)
 			{
@@ -477,8 +501,7 @@ std::shared_ptr<ExpressionFactor> Parser::parseExpressionFactor()
 			}
 			else
 			{
-				// Powinien byæ identyfikator
-				// TO DOO ERROR
+				logger->newLog(LogType::MissingIdentifier, peekToken());
 				return nullptr;
 			}
 		}
@@ -507,7 +530,7 @@ std::shared_ptr<ExpressionFactor> Parser::parseExpressionFactor()
 	}
 	else
 	{
-		// Znaczy, ¿e z³e expression
+		logger->newLog(LogType::BadExpression, token);
 	}
 
 	return factor;
@@ -543,31 +566,27 @@ std::shared_ptr<RelationCondition> Parser::parseRelationCondition()
 {
 	std::shared_ptr<RelationCondition> relationCondition = std::make_shared<RelationCondition>();
 	
-	if (checkIfTokenTypeEqual(peekToken(), TokenType::NotOperator))
+	if (consumeNextTokenIfIsType(TokenType::NotOperator))
 	{
-		getNextToken();
 		relationCondition->setNotOperator(true);
 	}
 
 	Token token = peekToken();
 
-	if (checkIfTokenTypeIsOneOf(token.type, { TokenType::True, TokenType::False }))
+	if (consumeNextTokenIfIsType({ TokenType::True, TokenType::False }))
 	{
 		relationCondition->setBooleanWord(token.type == TokenType::True);
-		getNextToken();
 
 		return relationCondition;
 	}
 
-	if (checkIfTokenTypeEqual(token.type, TokenType::RoundBracketOpen))
+	if (consumeNextTokenIfIsType(TokenType::RoundBracketOpen))
 	{
-		getNextToken();
 		relationCondition->setCondition(parseCondition());
 
 		if (!checkIfTokenTypeEqual(peekToken(), TokenType::RoundBracketClose))
 		{
-			// brak zamkniecia nawiasu
-			// TO DO ERROR
+			logger->newLog(LogType::MissingRoundBracketClose, peekToken());
 			return nullptr;
 		}
 		getNextToken();
@@ -578,10 +597,9 @@ std::shared_ptr<RelationCondition> Parser::parseRelationCondition()
 	relationCondition->setExpression(parseExpression());
 	token = peekToken();
 
-	if (checkIfTokenTypeIsOneOf(token.type, { TokenType::Equal, TokenType::NotEqual, TokenType::Less, TokenType::Greater, TokenType::LessOrEqual, TokenType::GreaterOrEqual }))
+	if (consumeNextTokenIfIsType({ TokenType::Equal, TokenType::NotEqual, TokenType::Less, TokenType::Greater, TokenType::LessOrEqual, TokenType::GreaterOrEqual }))
 	{
 		relationCondition->setRelationOperator(token.type);
-		getNextToken();
 		relationCondition->setExpression(parseExpression(), 2);
 	}
 

@@ -7,20 +7,16 @@
 #include "Log.h"
 #include "Token.h"
 
-enum class LogType
-{
-	MissingElem,
-	MissingSemicolon,
-	NotRecognizedToken,
-};
-
-
 class Logger
 {
 public:
 	std::string toString() const;
 	const void newLog(const LogType& logType, const Token& token);
 	const void newLog(const LogType& logType, const int& line, const int& firstCharPos, const std::streampos& streamPos, const TokenType& type = TokenType::UNKNOWN);
+
+	const std::size_t getLogsSize() const;
+	std::vector<std::shared_ptr<Log>> getLogs() const;
+	std::shared_ptr<Log> getLog(int index) const;
 
 private:
 	std::vector<std::shared_ptr<Log>> logs;

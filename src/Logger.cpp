@@ -17,17 +17,22 @@ const void Logger::newLog(const LogType& logType, const Token& token)
 
 const void Logger::newLog(const LogType& logType, const int& line, const int& firstCharPos, const std::streampos& streamPos, const TokenType& type)
 {
-	std::shared_ptr<Log> newLog;
-	if (logType == LogType::NotRecognizedToken)
-	{
-		newLog = std::make_shared<NotRecognizedToken>(line, firstCharPos, streamPos, type);
-	}
-	else if (logType == LogType::MissingSemicolon)
-	{
-		newLog = std::make_shared<MissingSemicolon>(line, firstCharPos, streamPos, type);
-	}
-
-	
+	std::shared_ptr<Log> newLog = std::make_shared<Log>(logType, line, firstCharPos, streamPos, type);
 	logs.push_back(newLog);
+}
+
+const std::size_t Logger::getLogsSize() const
+{
+	return logs.size();
+}
+
+std::vector<std::shared_ptr<Log>> Logger::getLogs() const
+{
+	return logs;
+}
+
+std::shared_ptr<Log> Logger::getLog(int index) const
+{
+	return logs[index];
 }
 
