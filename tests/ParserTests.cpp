@@ -283,6 +283,28 @@ TEST_CASE("Expressions", "[parser]")
 		REQUIRE(callFunc->getArgumentsSize() == 1);
 		REQUIRE(callFunc->getIdentifiersSize() == 1);
 	}
+
+	SECTION("expression identifier")
+	{
+		reader->setSourceString("repeat(identifier) {}");
+		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
+
+		REQUIRE(firstNode->getNodeType() == NodeType::RepeatStatement);
+
+		std::shared_ptr<RepeatStatement> repeatStatement = std::static_pointer_cast<RepeatStatement>(firstNode);
+		std::shared_ptr<Expression> expression = repeatStatement->getHowManyTime();
+		REQUIRE(expression->getTermsSize() == 1);
+
+		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
+
+		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 0);
+		REQUIRE(!expressionFactor->getNegativeOp());
+		REQUIRE(!expressionFactor->getExpression());
+		REQUIRE(expressionFactor->getVarName()[0] == "identifier");
+	}
 }
 
 
@@ -707,7 +729,7 @@ TEST_CASE("assign", "[parser]")
 
 	SECTION("simple assign")
 	{
-		reader->setSourceString("test = -20");
+		reader->setSourceString("test = -20;");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
 		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
@@ -731,7 +753,7 @@ TEST_CASE("assign", "[parser]")
 
 	SECTION("multi level id assign and calc Func")
 	{
-		reader->setSourceString("test2.test22.test222 = calcFunc()");
+		reader->setSourceString("test2.test22.test222 = calcFunc();");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
 		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
@@ -852,4 +874,227 @@ TEST_CASE("Block of instructions", "[parser]")
 		instruction = instructionsBlock->getInstruction(2);
 		REQUIRE(instruction->getNodeType() == NodeType::DeclareVarStatement);
 	}
+}
+
+TEST_CASE("Sample Code parsing", "[parser]")
+{
+	// A test case that checks the correct analysis of sample code that can be used in the program.
+	// Includes combinations of different designs
+
+	// Code contains: repeat keyword, digits, identifier, dot/comma/semicolon symbol, string, bracket, relation operators, mathOperators, data types 
+	std::string code =
+		R"(repeat(10) {
+	zolw1.go(-30);
+}
+	 // XXXXXX COMMENT
+
+if (x < -20) {								// XXXXXX COMMENT
+	zolw.go(2 + -2);
+} else {
+	Integer test = 20;
+	
+}
+Integer test2;
+test2 = -50;
+)";
+
+	SourceReader* reader = new SourceReader();
+	Lexer* lexer = new Lexer(reader);
+	Logger* logger = new Logger();
+	Parser parser(lexer, logger);
+
+	reader->setSourceString(code);
+
+	std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
+	REQUIRE(logger->getLogsSize() == 0);
+
+	std::shared_ptr<Node> instruction = rootNode->getNextInstruction();
+
+	std::shared_ptr<Expression> expression;
+	std::shared_ptr<ExpressionTerm> expressionTerm;
+	std::shared_ptr<ExpressionFactor> expressionFactor;
+	std::shared_ptr<InstructionsBlock> instructionsBlock;
+	std::shared_ptr<CallFuncStatement> callFuncStatement;
+	std::shared_ptr<RepeatStatement> repeatStatement;
+	std::shared_ptr<IfStatement> ifStatement;
+	std::shared_ptr<Condition> condition;
+	std::shared_ptr<AndCondition> andCondition;
+	std::shared_ptr<RelationCondition> relationCondition;
+	std::shared_ptr<DeclareVarStatement> varDeclare;
+	std::shared_ptr<AssignStatement> assign;
+
+	//////////////////////////////////
+	//			REPEAT statement	//
+	//////////////////////////////////
+	REQUIRE(instruction->getNodeType() == NodeType::RepeatStatement);
+	repeatStatement = std::static_pointer_cast<RepeatStatement>(instruction);
+
+	// Expression - how many time repeat
+	expression = repeatStatement->getHowManyTime();
+	REQUIRE(expression->getTermsSize() == 1);
+
+	expressionTerm = expression->getExpressionTerm(0);
+	REQUIRE(expressionTerm->getFactorsSize() == 1);
+
+	expressionFactor = expressionTerm->getExpressionFactor(0);
+	REQUIRE(expressionFactor->getIntVal() == 10);
+	REQUIRE(!expressionFactor->getNegativeOp());
+
+	// Repeat instructions block
+	instructionsBlock = repeatStatement->getInstructuionsBlock();
+	REQUIRE(instructionsBlock->getInstructionsSize() == 1);
+
+	// zolw1.go(10);
+	instruction = instructionsBlock->getInstruction(0);
+	REQUIRE(instruction->getNodeType() == NodeType::CallFuncStatement);
+	callFuncStatement = std::static_pointer_cast<CallFuncStatement>(instruction);
+	REQUIRE(callFuncStatement->getArgumentsSize() == 1);
+	REQUIRE(callFuncStatement->getIdentifiersSize() == 2);
+	REQUIRE(callFuncStatement->getIdentifier(0) == "zolw1");
+	REQUIRE(callFuncStatement->getIdentifier(1) == "go");
+	expression = callFuncStatement->getArgument(0);
+	REQUIRE(expression->getTermsSize() == 1);
+
+	expressionTerm = expression->getExpressionTerm(0);
+	REQUIRE(expressionTerm->getFactorsSize() == 1);
+
+	expressionFactor = expressionTerm->getExpressionFactor(0);
+	REQUIRE(expressionFactor->getIntVal() == 30);
+	REQUIRE(expressionFactor->getNegativeOp());
+
+	//////////////////////////////////
+	//			IF statement		//
+	//////////////////////////////////
+
+	instruction = rootNode->getNextInstruction();
+	REQUIRE(instruction->getNodeType() == NodeType::IfStatement);
+	ifStatement = std::static_pointer_cast<IfStatement>(instruction);
+	REQUIRE(ifStatement->hasElseBlock());
+
+	// IF Condition x < -20
+	condition = ifStatement->getCondition();
+	REQUIRE(condition->getNodeType() == NodeType::Condition);
+	REQUIRE(condition->getAndConditionSize() == 1);
+
+	andCondition = condition->getAndCondition();
+	REQUIRE(andCondition->getNodeType() == NodeType::AndCondition);
+	REQUIRE(andCondition->getRelationConditionSize() == 1);
+
+	relationCondition = andCondition->getRelationCondition();
+	REQUIRE(relationCondition->getNodeType() == NodeType::RelationCondition);
+	REQUIRE(!relationCondition->isBooleanWord());
+	REQUIRE(!relationCondition->getNotOperator());
+	REQUIRE(relationCondition->getCondition() == nullptr);
+	REQUIRE(relationCondition->hasSecondExpression());
+	REQUIRE(relationCondition->getRelationOperator() == TokenType::Less);
+
+	// x
+	expression = relationCondition->getExpression(1);
+	REQUIRE(expression->getTermsSize() == 1);
+
+	expressionTerm = expression->getExpressionTerm(0);
+	REQUIRE(expressionTerm->getFactorsSize() == 1);
+
+	expressionFactor = expressionTerm->getExpressionFactor(0);
+	REQUIRE(expressionFactor->getVarName()[0] == "x");
+	REQUIRE(!expressionFactor->getNegativeOp());
+
+	// -20
+	expression = relationCondition->getExpression(2);
+	REQUIRE(expression->getTermsSize() == 1);
+
+	expressionTerm = expression->getExpressionTerm(0);
+	REQUIRE(expressionTerm->getFactorsSize() == 1);
+
+	expressionFactor = expressionTerm->getExpressionFactor(0);
+	REQUIRE(expressionFactor->getIntVal() == 20);
+	REQUIRE(expressionFactor->getNegativeOp());
+
+	// if true node
+	instructionsBlock = ifStatement->getTrueBlockNode();
+	REQUIRE(instructionsBlock->getInstructionsSize() == 1);
+
+	// zolw.go(2 + 2);
+	instruction = instructionsBlock->getInstruction(0);
+	REQUIRE(instruction->getNodeType() == NodeType::CallFuncStatement);
+	callFuncStatement = std::static_pointer_cast<CallFuncStatement>(instruction);
+	REQUIRE(callFuncStatement->getArgumentsSize() == 1);
+	REQUIRE(callFuncStatement->getIdentifiersSize() == 2);
+	REQUIRE(callFuncStatement->getIdentifier(0) == "zolw");
+	REQUIRE(callFuncStatement->getIdentifier(1) == "go");
+
+	expression = callFuncStatement->getArgument(0);
+	REQUIRE(expression->getTermsSize() == 2);
+	REQUIRE(expression->getOperator(0) == TokenType::Plus);
+
+	expressionTerm = expression->getExpressionTerm(0);
+	REQUIRE(expressionTerm->getFactorsSize() == 1);
+
+	expressionFactor = expressionTerm->getExpressionFactor(0);
+	REQUIRE(expressionFactor->getIntVal() == 2);
+	REQUIRE(!expressionFactor->getNegativeOp());
+
+	expressionTerm = expression->getExpressionTerm(1);
+	REQUIRE(expressionTerm->getFactorsSize() == 1);
+
+	expressionFactor = expressionTerm->getExpressionFactor(0);
+	REQUIRE(expressionFactor->getIntVal() == 2);
+	REQUIRE(expressionFactor->getNegativeOp());
+
+	// if else node
+	instructionsBlock = ifStatement->getElseBlockNode();
+	REQUIRE(instructionsBlock->getInstructionsSize() == 1);
+	
+	// Integer test = 20;
+	instruction = instructionsBlock->getInstruction(0);
+	REQUIRE(instruction->getNodeType() == NodeType::DeclareVarStatement);
+	varDeclare = std::static_pointer_cast<DeclareVarStatement>(instruction);
+	REQUIRE(varDeclare->getIdentifier() == "test");
+	REQUIRE(varDeclare->getAssignStatemnt() != nullptr);
+	REQUIRE(varDeclare->getType() == TokenType::Integer);
+
+	assign = varDeclare->getAssignStatemnt();
+	expression = assign->getExpression();
+	REQUIRE(expression != nullptr);
+	REQUIRE(expression->getTermsSize() == 1);
+
+	expressionTerm = expression->getExpressionTerm(0);
+	REQUIRE(expressionTerm->getFactorsSize() == 1);
+
+	expressionFactor = expressionTerm->getExpressionFactor(0);
+	REQUIRE(expressionFactor->getIntVal() == 20);
+	REQUIRE(!expressionFactor->getNegativeOp());
+
+
+	//////////////////////////////////
+	//			Declare Var			//
+	//////////////////////////////////
+
+	instruction = rootNode->getNextInstruction();
+	// Integer test2;
+	REQUIRE(instruction->getNodeType() == NodeType::DeclareVarStatement);
+
+	varDeclare = std::static_pointer_cast<DeclareVarStatement>(instruction);
+	REQUIRE(varDeclare->getIdentifier() == "test2");
+	REQUIRE(varDeclare->getAssignStatemnt() == nullptr);
+	REQUIRE(varDeclare->getType() == TokenType::Integer);
+
+	//////////////////////////////////
+	//			assign Var			//
+	//////////////////////////////////
+	instruction = rootNode->getNextInstruction();
+	// test2 = -50;
+	REQUIRE(instruction->getNodeType() == NodeType::AssignStatement);
+	assign = std::static_pointer_cast<AssignStatement>(instruction);
+
+	expression = assign->getExpression();
+	REQUIRE(expression != nullptr);
+	REQUIRE(expression->getTermsSize() == 1);
+
+	expressionTerm = expression->getExpressionTerm(0);
+	REQUIRE(expressionTerm->getFactorsSize() == 1);
+
+	expressionFactor = expressionTerm->getExpressionFactor(0);
+	REQUIRE(expressionFactor->getIntVal() == 50);
+	REQUIRE(expressionFactor->getNegativeOp());
 }
