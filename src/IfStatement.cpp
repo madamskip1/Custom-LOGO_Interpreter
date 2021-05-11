@@ -1,21 +1,31 @@
 #include "IfStatement.h"
 
-void IfStatement::setTrueBlockNode(std::shared_ptr<InstructionsBlock> block)
+const void IfStatement::setTrueBlockNode(std::shared_ptr<InstructionsBlock> block)
 {
 	trueBlockNode = block;
 }
 
-void IfStatement::setElseBlockNode(std::shared_ptr<InstructionsBlock> block)
+const void IfStatement::setElseBlockNode(std::shared_ptr<InstructionsBlock> block)
 {
 	elseBlockNode = block;
 }
 
-std::shared_ptr<InstructionsBlock> IfStatement::getTrueBlockNode()
+const void IfStatement::setCondition(std::shared_ptr<Condition> cond)
+{
+	condition = cond;
+}
+
+std::shared_ptr<InstructionsBlock> IfStatement::getTrueBlockNode() const
 {
 	return trueBlockNode;
 }
 
-std::shared_ptr<InstructionsBlock> IfStatement::getElseBlockNode()
+std::shared_ptr<InstructionsBlock> IfStatement::getElseBlockNode() const
 {
 	return elseBlockNode;
+}
+
+std::shared_ptr<Condition> IfStatement::getCondition() const
+{
+	return condition;
 }

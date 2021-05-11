@@ -2,6 +2,7 @@
 #include <memory>
 #include "Node.h"
 #include "InstructionsBlock.h"
+#include "Condition.h"
 
 class IfStatement :
     public Node
@@ -9,14 +10,16 @@ class IfStatement :
 public:
     IfStatement() : Node(NodeType::IfStatement) {};
 
-    void setTrueBlockNode(std::shared_ptr<InstructionsBlock> block);
-    void setElseBlockNode(std::shared_ptr<InstructionsBlock> block);
+    const void setTrueBlockNode(std::shared_ptr<InstructionsBlock> block);
+    const void setElseBlockNode(std::shared_ptr<InstructionsBlock> block);
+    const void setCondition(std::shared_ptr<Condition> cond);
 
-    std::shared_ptr<InstructionsBlock> getTrueBlockNode();
-    std::shared_ptr<InstructionsBlock> getElseBlockNode();
+    std::shared_ptr<InstructionsBlock> getTrueBlockNode() const;
+    std::shared_ptr<InstructionsBlock> getElseBlockNode() const;
+    std::shared_ptr<Condition> getCondition() const;
 
 private:
-    //std::shared_ptr<Condition> conditionNode;
+    std::shared_ptr<Condition> condition;
     std::shared_ptr<InstructionsBlock> trueBlockNode;
     std::shared_ptr<InstructionsBlock> elseBlockNode;
 };

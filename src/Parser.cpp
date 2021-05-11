@@ -212,11 +212,7 @@ std::shared_ptr<IfStatement> Parser::parseIfStatement()
 
 	getNextToken();
 
-	// parseCondition
-
-	// ifStatement->setCondtion
-
-	getNextToken();
+	ifStatement->setCondition(parseCondition());
 
 	if (!checkNextTokenType({ TokenType::RoundBracketClose }))
 		return nullptr;
@@ -326,55 +322,63 @@ std::shared_ptr<Node> Parser::parseAssignOrCallFuncStatement()
 		}
 	}
 
-	// TODO napisaæ osobn¹ funkcjê
 	if (peekToken().type == TokenType::RoundBracketOpen)
 	{
-		// Function Call
-		getNextToken();
-		std::shared_ptr<CallFuncStatement> call = std::make_shared<CallFuncStatement>();
-
-		for (auto const& name : idNames)
-			call.get()->addIdentifier(name);
-		
-		if (peekToken().type != TokenType::RoundBracketClose)
-		{
-			call.get()->addArgument(parseExpression());
-
-			Token nextToken = peekToken();
-			while (nextToken.type == TokenType::Comma)
-			{
-				getNextToken();
-				call.get()->addArgument(parseExpression());
-				nextToken = peekToken();
-			}
-
-			if (nextToken.type == TokenType::RoundBracketClose)
-			{
-				getNextToken();
-			}
-			else
-			{
-				// brakuje zamkniecia nawiasu
-				// to do error
-			}
-		}
-		else
-		{
-			getNextToken();
-		}
-
-		return call;
+		return parseCallFunc(idNames);
 	}
 	
 	if (peekToken().type == TokenType::AssignOperator)
 	{
 		// Assignment
+		// TO DO
 	}
 
 
 	
 	//return std::shared_ptr<Node>();
 	return nullptr;
+}
+
+std::shared_ptr<CallFuncStatement> Parser::parseCallFunc(std::vector<std::string> idNames)
+{
+	if (peekToken().type != TokenType::RoundBracketOpen)
+		return nullptr;
+	getNextToken();
+
+	std::shared_ptr<CallFuncStatement> callFunc = std::make_shared<CallFuncStatement>();
+
+	if (peekToken().type != TokenType::RoundBracketClose)
+	{
+		callFunc.get()->addArgument(parseExpression());
+
+		Token nextToken = peekToken();
+		while (nextToken.type == TokenType::Comma)
+		{
+			getNextToken();
+			callFunc.get()->addArgument(parseExpression());
+			nextToken = peekToken();
+		}
+
+		if (nextToken.type == TokenType::RoundBracketClose)
+		{
+			getNextToken();
+		}
+		else
+		{
+			// brakuje zamkniecia nawiasu
+			// to do error
+			return nullptr;
+		}
+	}
+	else
+	{
+		getNextToken();
+	}
+
+	for (auto const& name : idNames)
+		callFunc.get()->addIdentifier(name);
+
+	return callFunc;
 }
 
 
@@ -446,9 +450,42 @@ std::shared_ptr<ExpressionFactor> Parser::parseExpressionFactor()
 	}
 	else if (token.type == TokenType::Identifier)
 	{
-		// TODO
-		// sprawdzic czy var czy funCall
-		// ustawic opdowiendie
+		std::vector<std::string> names;
+		names.push_back(token.getStringValue());
+		getNextToken();
+
+		while (peekToken().type == TokenType::Comma)
+		{
+			getNextToken();
+			if (peekToken().type == TokenType::Identifier)
+			{
+				token = getNextToken();
+				names.push_back(token.getStringValue());
+			}
+			else
+			{
+				// Powinien byæ identyfikator
+				// TO DOO ERROR
+				return nullptr;
+			}
+		}
+
+		if (peekToken().type == TokenType::RoundBracketOpen)
+		{
+			std::shared_ptr<CallFuncStatement> callFunc = parseCallFunc(names);
+			if (callFunc == nullptr)
+			{
+				// Jakiœ error
+				return nullptr;
+			}
+
+			factor.get()->setCallFunc(callFunc);
+		}
+		else
+		{
+			// TO IDENTYFIKATOR
+			// TO DO
+		}
 	}
 	else if (token.type == TokenType::Digit)
 	{
@@ -461,6 +498,84 @@ std::shared_ptr<ExpressionFactor> Parser::parseExpressionFactor()
 	}
 
 	return factor;
+}
+
+std::shared_ptr<Condition> Parser::parseCondition()
+{
+	std::shared_ptr<Condition> condition = std::make_shared<Condition>();
+	condition.get()->addAndCondition(parseAndCondition());
+
+	while (peekToken().type == TokenType::Or)
+	{
+		getNextToken();
+		condition.get()->addAndCondition(parseAndCondition());
+	}
+
+	return condition;
+}
+
+std::shared_ptr<AndCondition> Parser::parseAndCondition()
+{
+	std::shared_ptr<AndCondition> andCondition = std::make_shared<AndCondition>();
+	andCondition.get()->addRelationCondition(parseRelationCondition());
+
+	while (peekToken().type == TokenType::And)
+	{
+		getNextToken();
+		andCondition.get()->addRelationCondition(parseRelationCondition());
+	}
+
+	return andCondition;
+}
+
+std::shared_ptr<RelationCondition> Parser::parseRelationCondition()
+{
+	std::shared_ptr<RelationCondition> relationCondition = std::make_shared<RelationCondition>();
+	
+	if (peekToken().type == TokenType::NotOperator)
+	{
+		getNextToken();
+		relationCondition.get()->setNotOperator(true);
+	}
+
+	Token token = peekToken();
+
+	if (token.type == TokenType::True)
+	{
+		relationCondition.get()->setBooleanWord(true);
+		getNextToken();
+	}
+	else if (token.type == TokenType::False)
+	{
+		relationCondition.get()->setBooleanWord(false);
+		getNextToken();
+	}
+	else if (token.type == TokenType::RoundBracketOpen)
+	{
+		getNextToken();
+		relationCondition.get()->setCondition(parseCondition());
+
+		if (peekToken().type != TokenType::RoundBracketClose)
+		{
+			// brak zamkniecia nawiasu
+			// TO DO ERROR
+			return nullptr;
+		}
+		getNextToken();
+	}
+	else
+	{
+		relationCondition.get()->setExpression(parseExpression());
+		token = peekToken();
+		if (checkIfTokenTypeIsOneOf(token.type, { TokenType::Equal, TokenType::NotEqual, TokenType::Less, TokenType::Greater, TokenType::LessOrEqual, TokenType::GreaterOrEqual }))
+		{
+			relationCondition.get()->setRelationOperator(token.type);
+			getNextToken();
+			relationCondition.get()->setExpression(parseExpression(), 2);
+		}
+	}
+
+	return relationCondition;
 }
 
 

@@ -11,6 +11,7 @@
 #include "Expression.h"
 #include "DefFuncStatement.h"
 #include "Parameter.h"
+#include "Condition.h"
 
 class Parser
 {
@@ -34,13 +35,15 @@ private:
 	std::shared_ptr<RepeatTimeStatement> parseRepeatTimeStatement();
 
 	std::shared_ptr<Node> parseAssignOrCallFuncStatement();
-
+	std::shared_ptr<CallFuncStatement> parseCallFunc(std::vector<std::string> idNames);
 
 	std::shared_ptr<Expression> parseExpression();
 	std::shared_ptr<ExpressionTerm> parseExpressionTerm();
 	std::shared_ptr<ExpressionFactor> parseExpressionFactor();
 
-	
+	std::shared_ptr<Condition> parseCondition();
+	std::shared_ptr<AndCondition> parseAndCondition();
+	std::shared_ptr<RelationCondition> parseRelationCondition();
 
 	Token peekToken();
 	Token getNextToken();

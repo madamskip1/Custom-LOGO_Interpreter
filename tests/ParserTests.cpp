@@ -17,18 +17,36 @@ TEST_CASE("IFStatement", "[if]")
 	Lexer* lexer = new Lexer(reader);
 	Parser parser(lexer);
 
-	reader->setSourceString("if (22) {} else {}");
+	reader->setSourceString("if (false) {} else {}");
 
 	std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
 	std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
 	REQUIRE(firstNode.get()->getNodeType() == NodeType::IfStatement);
 	std::shared_ptr<IfStatement> ifStatement = std::static_pointer_cast<IfStatement>(firstNode);
+
+	std::shared_ptr<Condition> condition = ifStatement.get()->getCondition();
+	REQUIRE(condition.get()->getNodeType() == NodeType::Condition);
+	REQUIRE(condition.get()->getAndConditionSize() == 1);
+	
+	std::shared_ptr<AndCondition> andCondition = condition.get()->getAndCondition();
+	REQUIRE(andCondition.get()->getNodeType() == NodeType::AndCondition);
+	REQUIRE(andCondition.get()->getRelationConditionSize() == 1);
+
+	std::shared_ptr<RelationCondition> relationCondition = andCondition.get()->getRelationCondition();
+	REQUIRE(relationCondition.get()->getNodeType() == NodeType::RelationCondition);
+	REQUIRE(relationCondition.get()->isBooleanWord());
+	REQUIRE(!relationCondition.get()->getBooleanWord());
+	REQUIRE(!relationCondition.get()->getNotOperator());
+	REQUIRE(relationCondition.get()->getCondition() == nullptr);
+	REQUIRE(relationCondition.get()->getExpression() == nullptr);
+
 	
 	std::shared_ptr<Node> trueBlock = ifStatement.get()->getTrueBlockNode();
 	REQUIRE(trueBlock.get()->getNodeType() == NodeType::InstructionsBlock);
 	
 	std::shared_ptr<Node> elseBlock = ifStatement.get()->getElseBlockNode();
 	REQUIRE(elseBlock.get()->getNodeType() == NodeType::InstructionsBlock);
+
 }
 
 
@@ -233,8 +251,183 @@ TEST_CASE("Expressions", "[parser]")
 		REQUIRE(bracketFactor.get()->getNegativeOp());
 		REQUIRE(bracketFactor.get()->getIntVal() == 2);
 	}
+
+	SECTION("expression fun call")
+	{
+		reader->setSourceString("repeat(callFunc(20)) {}");
+		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
+		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+
+		REQUIRE(firstNode.get()->getNodeType() == NodeType::RepeatStatement);
+
+		std::shared_ptr<RepeatStatement> repeatStatement = std::static_pointer_cast<RepeatStatement>(firstNode);
+		std::shared_ptr<Expression> expression = repeatStatement.get()->getHowManyTime();
+		REQUIRE(expression.get()->getTermsSize() == 1);
+
+		std::shared_ptr<ExpressionTerm> expressionTerm = expression.get()->getExpressionTerm(0);
+		REQUIRE(expressionTerm.get()->getFactorsSize() == 1);
+
+		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm.get()->getExpressionFactor(0);
+		REQUIRE(expressionFactor.get()->getIntVal() == 0);
+		REQUIRE(!expressionFactor.get()->getNegativeOp());
+		REQUIRE(!expressionFactor.get()->getExpression());
+		std::shared_ptr<CallFuncStatement> callFunc = expressionFactor.get()->getCallFunc();
+		REQUIRE(callFunc.get()->getNodeType() == NodeType::CallFuncStatement);
+		REQUIRE(callFunc.get()->getArgumentsSize() == 1);
+		REQUIRE(callFunc.get()->getIdentifiersSize() == 1);
+	}
 }
 
+
+
+TEST_CASE("Conditions", "[parser]")
+{
+	SourceReader* reader = new SourceReader();
+	Lexer* lexer = new Lexer(reader);
+	Parser parser(lexer);
+
+	SECTION("simple relation Operator")
+	{
+		reader->setSourceString("if (2 < 3) {}");
+
+		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
+		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		REQUIRE(firstNode.get()->getNodeType() == NodeType::IfStatement);
+		std::shared_ptr<IfStatement> ifStatement = std::static_pointer_cast<IfStatement>(firstNode);
+
+		std::shared_ptr<Condition> condition = ifStatement.get()->getCondition();
+		REQUIRE(condition.get()->getNodeType() == NodeType::Condition);
+		REQUIRE(condition.get()->getAndConditionSize() == 1);
+
+		std::shared_ptr<AndCondition> andCondition = condition.get()->getAndCondition();
+		REQUIRE(andCondition.get()->getNodeType() == NodeType::AndCondition);
+		REQUIRE(andCondition.get()->getRelationConditionSize() == 1);
+
+		std::shared_ptr<RelationCondition> relationCondition = andCondition.get()->getRelationCondition();
+		REQUIRE(relationCondition.get()->getNodeType() == NodeType::RelationCondition);
+		REQUIRE(!relationCondition.get()->isBooleanWord());
+		REQUIRE(!relationCondition.get()->getNotOperator());
+		REQUIRE(relationCondition.get()->getCondition() == nullptr);
+		REQUIRE(relationCondition.get()->hasSecondExpression());
+		REQUIRE(relationCondition.get()->getRelationOperator() == TokenType::Less);
+	}
+
+	SECTION("AND and OR operators, not ")
+	{
+		reader->setSourceString("if (!true && false || true) {}");
+
+		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
+		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		REQUIRE(firstNode.get()->getNodeType() == NodeType::IfStatement);
+		std::shared_ptr<IfStatement> ifStatement = std::static_pointer_cast<IfStatement>(firstNode);
+
+		std::shared_ptr<Condition> condition = ifStatement.get()->getCondition();
+		REQUIRE(condition.get()->getNodeType() == NodeType::Condition);
+		REQUIRE(condition.get()->getAndConditionSize() == 2);
+
+		std::shared_ptr<AndCondition> andCondition = condition.get()->getAndCondition();
+		REQUIRE(andCondition.get()->getNodeType() == NodeType::AndCondition);
+		REQUIRE(andCondition.get()->getRelationConditionSize() == 2);
+
+		std::shared_ptr<RelationCondition> relationCondition = andCondition.get()->getRelationCondition();
+		REQUIRE(relationCondition.get()->getNodeType() == NodeType::RelationCondition);
+		REQUIRE(relationCondition.get()->isBooleanWord());
+		REQUIRE(relationCondition.get()->getBooleanWord());
+		REQUIRE(relationCondition.get()->getNotOperator());
+		REQUIRE(relationCondition.get()->getCondition() == nullptr);
+		REQUIRE(!relationCondition.get()->hasSecondExpression());
+		REQUIRE(relationCondition.get()->getExpression() == nullptr);
+
+		relationCondition = andCondition.get()->getRelationCondition(1);
+		REQUIRE(relationCondition.get()->getNodeType() == NodeType::RelationCondition);
+		REQUIRE(relationCondition.get()->isBooleanWord());
+		REQUIRE(!relationCondition.get()->getBooleanWord());
+		REQUIRE(!relationCondition.get()->getNotOperator());
+		REQUIRE(relationCondition.get()->getCondition() == nullptr);
+		REQUIRE(!relationCondition.get()->hasSecondExpression());
+		REQUIRE(relationCondition.get()->getExpression() == nullptr);
+
+
+		andCondition = condition.get()->getAndCondition(1);
+		REQUIRE(andCondition.get()->getNodeType() == NodeType::AndCondition);
+		REQUIRE(andCondition.get()->getRelationConditionSize() == 1);
+
+		relationCondition = andCondition.get()->getRelationCondition();
+		REQUIRE(relationCondition.get()->getNodeType() == NodeType::RelationCondition);
+		REQUIRE(relationCondition.get()->isBooleanWord());
+		REQUIRE(relationCondition.get()->getBooleanWord());
+		REQUIRE(!relationCondition.get()->getNotOperator());
+		REQUIRE(relationCondition.get()->getCondition() == nullptr);
+		REQUIRE(!relationCondition.get()->hasSecondExpression());
+		REQUIRE(relationCondition.get()->getExpression() == nullptr);
+
+	}
+
+	SECTION("Brackets")
+	{
+		reader->setSourceString("if (!(callFunc() || 2 == 2) && true) {}");
+
+		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
+		std::shared_ptr<Node> firstNode = rootNode.get()->getNextInstruction();
+		REQUIRE(firstNode.get()->getNodeType() == NodeType::IfStatement);
+		std::shared_ptr<IfStatement> ifStatement = std::static_pointer_cast<IfStatement>(firstNode);
+
+		std::shared_ptr<Condition> condition = ifStatement.get()->getCondition();
+		REQUIRE(condition.get()->getNodeType() == NodeType::Condition);
+		REQUIRE(condition.get()->getAndConditionSize() == 1);
+
+		std::shared_ptr<AndCondition> andCondition = condition.get()->getAndCondition();
+		REQUIRE(andCondition.get()->getNodeType() == NodeType::AndCondition);
+		REQUIRE(andCondition.get()->getRelationConditionSize() == 2);
+
+		std::shared_ptr<RelationCondition> relationCondition = andCondition.get()->getRelationCondition(1);
+		REQUIRE(relationCondition.get()->getNodeType() == NodeType::RelationCondition);
+		REQUIRE(relationCondition.get()->isBooleanWord());
+		REQUIRE(relationCondition.get()->getBooleanWord());
+		REQUIRE(!relationCondition.get()->getNotOperator());
+		REQUIRE(relationCondition.get()->getCondition() == nullptr);
+		REQUIRE(!relationCondition.get()->hasSecondExpression());
+		REQUIRE(relationCondition.get()->getExpression() == nullptr);
+
+
+		relationCondition = andCondition.get()->getRelationCondition();
+		REQUIRE(relationCondition.get()->getNodeType() == NodeType::RelationCondition);
+		REQUIRE(!relationCondition.get()->isBooleanWord());
+		REQUIRE(relationCondition.get()->getNotOperator());
+		REQUIRE(relationCondition.get()->getCondition() != nullptr);
+		REQUIRE(!relationCondition.get()->hasSecondExpression());
+		REQUIRE(relationCondition.get()->getExpression() == nullptr);
+
+		condition = relationCondition.get()->getCondition();
+		REQUIRE(condition.get()->getNodeType() == NodeType::Condition);
+		REQUIRE(condition.get()->getAndConditionSize() == 2);
+
+		andCondition = condition.get()->getAndCondition();
+		REQUIRE(andCondition.get()->getNodeType() == NodeType::AndCondition);
+		REQUIRE(andCondition.get()->getRelationConditionSize() == 1);
+
+		relationCondition = andCondition.get()->getRelationCondition();
+		REQUIRE(relationCondition.get()->getNodeType() == NodeType::RelationCondition);
+		REQUIRE(!relationCondition.get()->isBooleanWord());
+		REQUIRE(!relationCondition.get()->getNotOperator());
+		REQUIRE(relationCondition.get()->getCondition() == nullptr);
+		REQUIRE(!relationCondition.get()->hasSecondExpression());
+		REQUIRE(relationCondition.get()->getExpression() != nullptr);
+
+		andCondition = condition.get()->getAndCondition(1);
+		REQUIRE(andCondition.get()->getNodeType() == NodeType::AndCondition);
+		REQUIRE(andCondition.get()->getRelationConditionSize() == 1);
+
+		relationCondition = andCondition.get()->getRelationCondition();
+		REQUIRE(relationCondition.get()->getNodeType() == NodeType::RelationCondition);
+		REQUIRE(!relationCondition.get()->isBooleanWord());
+		REQUIRE(!relationCondition.get()->getNotOperator());
+		REQUIRE(relationCondition.get()->getCondition() == nullptr);
+		REQUIRE(relationCondition.get()->hasSecondExpression());
+		REQUIRE(relationCondition.get()->getExpression() != nullptr);
+		REQUIRE(relationCondition.get()->getRelationOperator() == TokenType::Equal);
+	}
+}
 
 
 

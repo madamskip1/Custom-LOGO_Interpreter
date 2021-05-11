@@ -15,6 +15,11 @@ const void ExpressionFactor::setIntVal(const int& val)
 	intVal = val;
 }
 
+const void ExpressionFactor::setCallFunc(std::shared_ptr<CallFuncStatement> func)
+{
+	callFunc = func;
+}
+
 int ExpressionFactor::getIntVal() const
 {
 	return intVal;
@@ -28,4 +33,9 @@ bool ExpressionFactor::getNegativeOp() const
 std::shared_ptr<Expression> ExpressionFactor::getExpression() const
 {
 	return expression;
+}
+
+std::shared_ptr<CallFuncStatement> ExpressionFactor::getCallFunc() const
+{
+	return callFunc;
 }

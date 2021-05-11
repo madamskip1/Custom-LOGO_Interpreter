@@ -13,6 +13,9 @@ enum class NodeType
 	DefFuncStatement,
 	Parameter,
 	CallFuncStatement,
+	Condition,
+	AndCondition,
+	RelationCondition
 };
 
 class Node

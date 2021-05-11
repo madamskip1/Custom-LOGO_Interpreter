@@ -4,6 +4,8 @@
 #include "Node.h"
 #include "Expression.h"
 
+class Expression;
+
 class CallFuncStatement :
     public Node
 {

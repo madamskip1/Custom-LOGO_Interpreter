@@ -18,6 +18,6 @@ public:
 
 private:
     std::string name;
-    TokenType type;
+    TokenType type = TokenType::UNKNOWN;
 };
 
