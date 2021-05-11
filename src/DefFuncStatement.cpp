@@ -30,7 +30,7 @@ std::shared_ptr<InstructionsBlock> DefFuncStatement::getInstructionsBlock() cons
 	return instructionsBlock;
 }
 
-int DefFuncStatement::getParametersSize() const
+std::size_t DefFuncStatement::getParametersSize() const
 {
 	return parameters.size();
 }

@@ -13,10 +13,11 @@ public:
     CallFuncStatement() : Node(NodeType::CallFuncStatement) {};
     const void addArgument(std::shared_ptr<Expression> arg);
     const void addIdentifier(const std::string id);
+    const void addIdentifiers(const std::vector<std::string>& ids);
 
-    int getArgumentsSize() const;
+    std::size_t getArgumentsSize() const;
     std::shared_ptr<Expression> getArgument(int index) const;
-    int getIdentifiersSize() const;
+    std::size_t getIdentifiersSize() const;
     std::string getIdentifier(int index) const;
 
 private:

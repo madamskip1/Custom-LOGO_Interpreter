@@ -10,7 +10,13 @@ const void CallFuncStatement::addIdentifier(const std::string id)
     identifiers.push_back(id);
 }
 
-int CallFuncStatement::getArgumentsSize() const
+const void CallFuncStatement::addIdentifiers(const std::vector<std::string>& ids)
+{
+    for (auto const& id : ids)
+        identifiers.push_back(id);
+}
+
+std::size_t CallFuncStatement::getArgumentsSize() const
 {
     return arguments.size();
 }
@@ -20,7 +26,7 @@ std::shared_ptr<Expression> CallFuncStatement::getArgument(int index) const
     return arguments[index];
 }
 
-int CallFuncStatement::getIdentifiersSize() const
+std::size_t CallFuncStatement::getIdentifiersSize() const
 {
     return identifiers.size();
 }

@@ -13,7 +13,7 @@ public:
 
     const void addRelationCondition(std::shared_ptr<RelationCondition> condition);
 
-    int getRelationConditionSize() const;
+    std::size_t getRelationConditionSize() const;
     std::shared_ptr<RelationCondition> getRelationCondition(int index = 0) const;
 
 private:

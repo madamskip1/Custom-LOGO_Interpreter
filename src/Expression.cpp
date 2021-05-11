@@ -16,7 +16,7 @@ void Expression::addNextExpressionTerm(std::shared_ptr<ExpressionTerm> term, Tok
 	addOperators.push_back(addOperator);
 }
 
-int Expression::getTermsSize()
+std::size_t Expression::getTermsSize()
 {
 	return expressionTerms.size();
 }

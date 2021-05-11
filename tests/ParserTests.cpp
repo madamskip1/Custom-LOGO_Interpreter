@@ -8,8 +8,10 @@
 #include "CallFuncStatement.h"
 #include <iostream> 
 
-#define CATCH_CONFIG_MAIN
+#pragma warning(push, 0)        
 #include "catch.hpp"
+#pragma warning(pop)
+
 
 TEST_CASE("IFStatement", "[if]")
 {
@@ -770,7 +772,7 @@ TEST_CASE("Var declartion", "[parser]")
 
 	SECTION("def var with assign")
 	{
-		reader->setSourceString("Boolean test2 = !true;");
+		reader->setSourceString("Integer test2 =  2 + 2;");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
 		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
@@ -780,6 +782,63 @@ TEST_CASE("Var declartion", "[parser]")
 		std::shared_ptr<DeclareVarStatement> varDeclare = std::static_pointer_cast<DeclareVarStatement>(firstNode);
 		REQUIRE(varDeclare->getIdentifier() == "test2");
 		REQUIRE(varDeclare->getAssignStatemnt() != nullptr);
-		REQUIRE(varDeclare->getType() == TokenType::Boolean);
+		REQUIRE(varDeclare->getType() == TokenType::Integer);
+	}
+}
+
+
+TEST_CASE("Block of instructions", "[parser]")
+{
+	SourceReader* reader = new SourceReader();
+	Lexer* lexer = new Lexer(reader);
+	Parser parser(lexer);
+
+	SECTION("empty block")
+	{
+		reader->setSourceString(R"(if (true)
+{
+
+}
+)");
+
+		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
+
+		REQUIRE(firstNode->getNodeType() == NodeType::IfStatement);
+
+		std::shared_ptr<IfStatement> ifStatement = std::static_pointer_cast<IfStatement>(firstNode);
+		std::shared_ptr<InstructionsBlock> instructionsBlock = ifStatement->getTrueBlockNode();
+
+		REQUIRE(instructionsBlock->getInstructionsSize() == 0);
+	}
+
+	SECTION("two instructions in block")
+	{
+		reader->setSourceString(R"(if (true)
+{
+	callFunc();
+	repeat(20) {}
+	Turtle testTurtle;
+}
+)");
+
+		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
+
+		REQUIRE(firstNode->getNodeType() == NodeType::IfStatement);
+
+		std::shared_ptr<IfStatement> ifStatement = std::static_pointer_cast<IfStatement>(firstNode);
+		std::shared_ptr<InstructionsBlock> instructionsBlock = ifStatement->getTrueBlockNode();
+
+		REQUIRE(instructionsBlock->getInstructionsSize() == 3);
+
+		std::shared_ptr<Node> instruction = instructionsBlock->getInstruction(0);
+		REQUIRE(instruction->getNodeType() == NodeType::CallFuncStatement);
+
+		instruction = instructionsBlock->getInstruction(1);
+		REQUIRE(instruction->getNodeType() == NodeType::RepeatStatement);
+
+		instruction = instructionsBlock->getInstruction(2);
+		REQUIRE(instruction->getNodeType() == NodeType::DeclareVarStatement);
 	}
 }

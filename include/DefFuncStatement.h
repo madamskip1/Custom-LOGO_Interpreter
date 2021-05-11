@@ -17,7 +17,7 @@ public:
 
 	std::string getName() const;
 	std::shared_ptr<InstructionsBlock> getInstructionsBlock() const;
-	int getParametersSize() const;
+	std::size_t getParametersSize() const;
 	std::shared_ptr<Parameter> getParameter(const int& index) const;
 
 	bool hasReturnType() const;

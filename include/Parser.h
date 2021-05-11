@@ -29,6 +29,8 @@ private:
 
 	std::unique_ptr<ProgramRootNode> parseProgram();
 
+	std::shared_ptr<Node> parseInstructions();
+
 	std::shared_ptr<InstructionsBlock> parseInstructionsBlock();
 	std::shared_ptr<DefFuncStatement> parseDefFuncStatement(TokenType returnType = TokenType::UNKNOWN);
 	std::shared_ptr<Parameter> parseParameter();

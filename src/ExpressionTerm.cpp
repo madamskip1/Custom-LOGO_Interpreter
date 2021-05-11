@@ -16,7 +16,7 @@ void ExpressionTerm::addNextExpressionFactor(std::shared_ptr<ExpressionFactor> f
 	multiOperators.push_back(multiOperator);
 }
 
-int ExpressionTerm::getFactorsSize()
+std::size_t ExpressionTerm::getFactorsSize()
 {
 	return expressionFactors.size();
 }

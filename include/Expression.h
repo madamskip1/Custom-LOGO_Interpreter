@@ -16,7 +16,7 @@ public:
     void addAddOperartor(TokenType addOperator);
     void addNextExpressionTerm(std::shared_ptr<ExpressionTerm> term, TokenType addOperator);
 
-    int getTermsSize();
+    std::size_t getTermsSize();
     std::shared_ptr<ExpressionTerm> getExpressionTerm(int index);
     TokenType getOperator(int index);
 

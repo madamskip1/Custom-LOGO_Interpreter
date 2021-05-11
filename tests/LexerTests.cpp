@@ -1,9 +1,9 @@
 #include "SourceReader.h"
 #include "Lexer.h"
 
-#define CATCH_CONFIG_MAIN
+#pragma warning(push, 0)        
 #include "catch.hpp"
-
+#pragma warning(pop)
 
 TEST_CASE("EmptySource Token", "[token]")
 {

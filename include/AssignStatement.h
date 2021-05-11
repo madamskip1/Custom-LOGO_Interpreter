@@ -11,7 +11,8 @@ class AssignStatement :
 public:
     AssignStatement() : Node(NodeType::AssignStatement) {};
 
-    const void addIdentifier(std::string name);
+    const void addIdentifier(std::string id);
+    const void addIdentifiers(const std::vector<std::string>& ids);
     std::string getIdentifier(int index = 0) const;
 
     const void setExpression(std::shared_ptr<Expression> expr);

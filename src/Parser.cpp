@@ -15,57 +15,15 @@ std::unique_ptr<ProgramRootNode> Parser::parse()
 std::unique_ptr<ProgramRootNode> Parser::parseProgram()
 {
 	std::unique_ptr<ProgramRootNode> rootNode = std::make_unique<ProgramRootNode>();
+	std::shared_ptr<Node> temp;
 
-	Token curToken = peekToken();
-
-	while (curToken.type != TokenType::EndOfFile)
+	while (!checkNextTokenType(TokenType::EndOfFile))
 	{
-		if (checkIfTokenTypeIsOneOf(curToken.type, { TokenType::ColorVar, TokenType::Integer, TokenType::Turtle, TokenType::Point, TokenType::Boolean }))
-		{
-			getNextToken();
-			if (peekToken().type == TokenType::Function)
-			{
-				// Definicja Funkcji
-				std::shared_ptr<DefFuncStatement> defFunc = parseDefFuncStatement(curToken.type);
-				rootNode->addInstruction(defFunc);
-			}
-			else
-			{
-				// Deklaracja lub definicja zmiennych
-				std::shared_ptr<DeclareVarStatement> varDec = parseDeclareVarStatement(curToken.type);
-				rootNode->addInstruction(varDec);
-			}
-		}
-		else if (curToken.type == TokenType::Function)
-		{
-			std::shared_ptr<DefFuncStatement> defFunc = parseDefFuncStatement();
-			rootNode->addInstruction(defFunc);
-		}
-		else if (curToken.type == TokenType::If)
-		{
-			std::shared_ptr<IfStatement> ifStatement = parseIfStatement();
-			rootNode->addInstruction(ifStatement);
-		}
-		else if (curToken.type == TokenType::Repeat)
-		{
-			std::shared_ptr<RepeatStatement> repeatStatement = parseRepeatStatement();
-			rootNode->addInstruction(repeatStatement);
-		}
-		else if (curToken.type == TokenType::RepeatTime)
-		{
-			std::shared_ptr<RepeatTimeStatement> RepeatTimeStatement = parseRepeatTimeStatement();
-			rootNode->addInstruction(RepeatTimeStatement);
-		}
-		else if (curToken.type == TokenType::Identifier)
-		{
-			std::shared_ptr<Node> assignOrCallFuncStatement = parseAssignOrCallFuncStatement();
-			rootNode->addInstruction(assignOrCallFuncStatement);
+		temp = parseInstructions();
 
-			if (!consumeNextTokenIfIsType(TokenType::Semicolon))
-			{
-				// Brakuje œrednika
-				// TO DO ERROR
-			}
+		if (temp != nullptr)
+		{
+			rootNode->addInstruction(temp);
 		}
 		else
 		{
@@ -73,14 +31,74 @@ std::unique_ptr<ProgramRootNode> Parser::parseProgram()
 			// TODO ERROR
 			getNextToken();
 		}
-
-		curToken = peekToken();
 	}
 
 	return rootNode;
 }
 
+std::shared_ptr<Node> Parser::parseInstructions()
+{
+	Token curToken = peekToken();
 
+	if (checkIfTokenTypeIsOneOf(curToken.type, { TokenType::ColorVar, TokenType::Integer, TokenType::Turtle, TokenType::Point, TokenType::Boolean }))
+	{
+		getNextToken();
+
+		if (checkNextTokenType(TokenType::Function))
+		{
+			// Definicja Funkcji
+			return parseDefFuncStatement(curToken.type);
+		}
+		else
+		{
+			// Deklaracja lub definicja zmiennych
+			std::shared_ptr<Node> declareVar = parseDeclareVarStatement(curToken.type);
+
+			if (!consumeNextTokenIfIsType(TokenType::Semicolon))
+			{
+				// brakuje œrednika
+				return nullptr;
+			}
+
+			return declareVar;
+		}
+	}
+	
+	if (checkIfTokenTypeEqual(curToken, TokenType::Function))
+	{
+		return parseDefFuncStatement();
+	}
+	
+	if (checkIfTokenTypeEqual(curToken, TokenType::If))
+	{
+		return parseIfStatement();
+	}
+	
+	if (checkIfTokenTypeEqual(curToken, TokenType::Repeat))
+	{
+		return parseRepeatStatement();
+	}
+	
+	if (checkIfTokenTypeEqual(curToken, TokenType::RepeatTime))
+	{
+		return parseRepeatTimeStatement();
+	}
+	
+	if (checkIfTokenTypeEqual(curToken, TokenType::Identifier))
+	{
+		std::shared_ptr<Node> assignOrCallFuncStatement = parseAssignOrCallFuncStatement();
+
+		if (!consumeNextTokenIfIsType(TokenType::Semicolon))
+		{
+			// Brakuje œrednika
+			// TO DO ERROR
+		}
+
+		return assignOrCallFuncStatement;
+	}
+
+	return nullptr; // coœ posz³o Ÿle
+}
 
 
 std::shared_ptr<InstructionsBlock> Parser::parseInstructionsBlock()
@@ -89,11 +107,22 @@ std::shared_ptr<InstructionsBlock> Parser::parseInstructionsBlock()
 
 	if (!consumeNextTokenIfIsType(TokenType::CurlyBracketOpen))
 		return nullptr;
+	std::shared_ptr<Node> node;
 
-	// parseInstructions;
+	while (!consumeNextTokenIfIsType(TokenType::CurlyBracketClose))
+	{
+		node = parseInstructions();
+		if (node->getNodeType() == NodeType::DefFuncStatement)
+		{
+			// W bloku nie mo¿emy definiowaæ funkcji
+			// TO DO WARNING
+		}
+		else
+		{
+			instructionsBlock->addInstruction(node);
+		}
+	}
 
-	if (!consumeNextTokenIfIsType(TokenType::CurlyBracketClose))
-		return nullptr;
 
 	return instructionsBlock;
 }
@@ -328,8 +357,7 @@ std::shared_ptr<CallFuncStatement> Parser::parseCallFunc(std::vector<std::string
 		}
 	}
 
-	for (auto const& name : idNames)
-		callFunc->addIdentifier(name);
+	callFunc->addIdentifiers(idNames);
 
 	return callFunc;
 }
@@ -342,9 +370,7 @@ std::shared_ptr<AssignStatement> Parser::parseAssignStatement(std::vector<std::s
 	std::shared_ptr<AssignStatement> assign = std::make_shared<AssignStatement>();
 
 	assign->setExpression(parseExpression());
-
-	for (auto const& name : idNames)
-		assign->addIdentifier(name);
+	assign->addIdentifiers(idNames);
 
 	return assign;
 }
@@ -364,6 +390,7 @@ std::shared_ptr<DeclareVarStatement> Parser::parseDeclareVarStatement(TokenType 
 	varStatement->setIdentifier(identifier);
 	varStatement->setType(type);
 
+	//if (checkIfTokenTypeIsOneOf(type, {)
 	if (!checkIfTokenTypeIsOneOf(type, { TokenType::Point, TokenType::Turtle }))
 	{
 		if (checkNextTokenType(TokenType::AssignOperator))

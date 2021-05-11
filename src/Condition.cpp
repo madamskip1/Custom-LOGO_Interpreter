@@ -5,7 +5,7 @@ const void Condition::addAndCondition(std::shared_ptr<AndCondition> condition)
 	andConditions.push_back(condition);
 }
 
-int Condition::getAndConditionSize() const
+std::size_t Condition::getAndConditionSize() const
 {
 	return andConditions.size();;
 }

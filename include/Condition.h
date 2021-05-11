@@ -13,7 +13,7 @@ public:
 
     const void addAndCondition(std::shared_ptr<AndCondition> condition);
 
-    int getAndConditionSize() const;
+    std::size_t getAndConditionSize() const;
     std::shared_ptr<AndCondition> getAndCondition(int index = 0) const;
 
 private:

@@ -3,6 +3,7 @@
 
 enum class NodeType
 {
+	NOTYPE,
 	IfStatement,
 	RepeatStatement,
 	RepeatTimeStatement,
@@ -23,6 +24,7 @@ enum class NodeType
 class Node
 {	
 public:
+	Node() :nodeType(NodeType::NOTYPE) {};
 	Node(NodeType type) : nodeType(type) {};
 
 	void setParentNode(std::shared_ptr<Node> node);

@@ -5,7 +5,7 @@ const void AndCondition::addRelationCondition(std::shared_ptr<RelationCondition>
     relationConditions.push_back(condition);
 }
 
-int AndCondition::getRelationConditionSize() const
+std::size_t AndCondition::getRelationConditionSize() const
 {
     return relationConditions.size();
 }
