@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <memory>
 #include "Node.h"
 #include "TokenType.h"
 #include "AssignStatement.h"
@@ -9,9 +10,9 @@ class DeclareVarStatement :
     public Node
 {
 public:
-    DeclareVarStatement() : Node(NodeType::DeclareVarStatement) { };
+    DeclareVarStatement();
 
-    const void setType(TokenType type);
+    const void setType(const TokenType& type);
     const void setIdentifier(std::string id);
     const void setAssignStatement(std::shared_ptr<AssignStatement> assign);
     const void setAssignClassStatement(std::shared_ptr<AssignClassStatement> assignClass);

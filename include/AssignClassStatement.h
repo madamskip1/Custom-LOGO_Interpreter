@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <memory>
 #include "Node.h"
 #include "Expression.h"
 
@@ -7,7 +8,7 @@ class AssignClassStatement :
     public Node
 {
 public:
-    AssignClassStatement() : Node(NodeType::AssignClassStatement) {};
+    AssignClassStatement();
 
     const void addExpression(std::shared_ptr<Expression> expression);
 

@@ -1,5 +1,7 @@
 #include "AssignClassStatement.h"
 
+AssignClassStatement::AssignClassStatement() : Node(NodeType::AssignClassStatement) {};
+
 const void AssignClassStatement::addExpression(std::shared_ptr<Expression> expression)
 {
     expressions.push_back(expression);

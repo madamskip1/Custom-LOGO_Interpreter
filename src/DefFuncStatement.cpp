@@ -1,5 +1,7 @@
 #include "DefFuncStatement.h"
 
+DefFuncStatement::DefFuncStatement() : Node(NodeType::DefFuncStatement) {};
+
 const void DefFuncStatement::setName(std::string name)
 {
 	this->name = name;
@@ -15,7 +17,7 @@ const void DefFuncStatement::addParameter(std::shared_ptr<Parameter> parameter)
 	parameters.push_back(parameter);
 }
 
-const void DefFuncStatement::setReturnType(TokenType retType)
+const void DefFuncStatement::setReturnType(const TokenType& retType)
 {
 	returnType = retType;
 }
@@ -40,7 +42,7 @@ std::shared_ptr<Parameter> DefFuncStatement::getParameter(const int& index) cons
 	return parameters[index];
 }
 
-bool DefFuncStatement::hasReturnType() const
+const bool DefFuncStatement::hasReturnType() const
 {
 	return (returnType != TokenType::UNKNOWN);
 }

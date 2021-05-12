@@ -1,5 +1,7 @@
 #include "IfStatement.h"
 
+IfStatement::IfStatement() : Node(NodeType::IfStatement) {};
+
 const void IfStatement::setTrueBlockNode(std::shared_ptr<InstructionsBlock> block)
 {
 	trueBlockNode = block;

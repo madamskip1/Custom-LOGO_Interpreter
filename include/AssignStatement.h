@@ -1,15 +1,15 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <memory>
 #include "Node.h"
-#include "Condition.h"
 #include "Expression.h"
 
 class AssignStatement :
     public Node
 {
 public:
-    AssignStatement() : Node(NodeType::AssignStatement) {};
+    AssignStatement();
 
     const void addIdentifier(std::string id);
     const void addIdentifiers(const std::vector<std::string>& ids);

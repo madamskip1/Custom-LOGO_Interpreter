@@ -1,9 +1,9 @@
 #pragma once
-#include <memory>
 
 enum class NodeType
 {
 	NOTYPE,
+	Root,
 	IfStatement,
 	RepeatStatement,
 	RepeatTimeStatement,
@@ -26,17 +26,12 @@ enum class NodeType
 class Node
 {	
 public:
-	Node() :nodeType(NodeType::NOTYPE) {};
-	Node(NodeType type) : nodeType(type) {};
+	Node();
+	Node(NodeType type);
 
-	void setParentNode(std::shared_ptr<Node> node);
-	NodeType getNodeType() {
-		return nodeType;
-	}
+	NodeType getNodeType() const;
+
 protected:
 	NodeType nodeType;
-private:
-	std::weak_ptr<Node> parentNode;
-	
 };
 

@@ -1,14 +1,16 @@
 #pragma once
 #include <vector>
+#include <memory>
 #include "Node.h"
+
 class InstructionsBlock :
     public Node
 {
 public:
-    InstructionsBlock() : Node(NodeType::InstructionsBlock) {};
+    InstructionsBlock();
 
     const void addInstruction(std::shared_ptr<Node> node);
-    std::size_t getInstructionsSize() const;
+    const std::size_t getInstructionsSize() const;
     std::shared_ptr<Node> getInstruction(const int& index) const;
 
 private:

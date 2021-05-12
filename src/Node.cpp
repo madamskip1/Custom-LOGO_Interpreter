@@ -1,6 +1,10 @@
 #include "Node.h"
 
-void Node::setParentNode(std::shared_ptr<Node> node)
+Node::Node() : nodeType(NodeType::NOTYPE) {};
+
+Node::Node(NodeType type) : nodeType(type) {};
+
+NodeType Node::getNodeType() const
 {
-	parentNode = node;
+	return nodeType;
 }

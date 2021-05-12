@@ -1,5 +1,7 @@
 #include "AndCondition.h"
 
+AndCondition::AndCondition() : Node(NodeType::AndCondition) {};
+
 const void AndCondition::addRelationCondition(std::shared_ptr<RelationCondition> condition)
 {
     relationConditions.push_back(condition);

@@ -8,10 +8,10 @@ class Parameter :
     public Node
 {
 public:
-    Parameter() : Node(NodeType::Parameter) {};
+    Parameter();
 
-    void setName(const std::string paramName);
-    void setType(const TokenType type);
+    const void setName(const std::string paramName);
+    const void setType(const TokenType type);
 
     std::string getName() const;
     TokenType getType() const;

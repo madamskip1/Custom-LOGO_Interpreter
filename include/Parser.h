@@ -24,6 +24,7 @@ public:
 	Parser(Lexer* lex, Logger* logger);
 
 	std::unique_ptr<ProgramRootNode> parse();
+
 private:
 	Lexer* lexer;
 	Logger* logger;
@@ -32,9 +33,10 @@ private:
 
 	std::unique_ptr<ProgramRootNode> parseProgram();
 
-	std::shared_ptr<Node> parseInstructions();
+	std::shared_ptr<Node> parseInstruction();
 
 	std::shared_ptr<InstructionsBlock> parseInstructionsBlock();
+	std::shared_ptr<Node> parseDeclareVarORDefFuncWithReturStatement();
 	std::shared_ptr<DefFuncStatement> parseDefFuncStatement(TokenType returnType = TokenType::UNKNOWN);
 	std::shared_ptr<Parameter> parseParameter();
 	std::shared_ptr<IfStatement> parseIfStatement();
@@ -45,13 +47,13 @@ private:
 	std::shared_ptr<CallFuncStatement> parseCallFunc(std::vector<std::string> idNames);
 	std::shared_ptr<AssignStatement> parseAssignStatement(std::vector<std::string> idNames);
 	std::shared_ptr<AssignClassStatement> parseAssignClassStatement();
-
-
 	std::shared_ptr<DeclareVarStatement> parseDeclareVarStatement(TokenType type);
 
+	std::vector<std::string> parseIdentifiers();
+
 	std::shared_ptr<Expression> parseExpression();
-	std::shared_ptr<ExpressionTerm> parseExpressionTerm();
-	std::shared_ptr<ExpressionFactor> parseExpressionFactor();
+	std::shared_ptr<TermExpression> parseExpressionTerm();
+	std::shared_ptr<FactorExpression> parseExpressionFactor();
 
 	std::shared_ptr<Condition> parseCondition();
 	std::shared_ptr<AndCondition> parseAndCondition();

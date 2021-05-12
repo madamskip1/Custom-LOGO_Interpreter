@@ -12,20 +12,20 @@ class RelationCondition :
     public Node
 {
 public:
-    RelationCondition() : Node(NodeType::RelationCondition) {};
+    RelationCondition();
 
     const void setBooleanWord(const bool& word);
     const void setNotOperator(const bool& notOp);
     const void setCondition(std::shared_ptr<Condition> cond);
     const void setExpression(std::shared_ptr<Expression> expr, const int& index = 1);
-    const void setRelationOperator(TokenType relOperator);
+    const void setRelationOperator(const TokenType& relOperator);
 
-    bool isBooleanWord() const;
-    bool getBooleanWord() const;
-    bool getNotOperator() const;
+    const bool isBooleanWord() const;
+    const bool getBooleanWord() const;
+    const bool getNotOperator() const;
     std::shared_ptr<Condition> getCondition() const;
     std::shared_ptr<Expression> getExpression(const int& index = 1) const;
-    bool hasSecondExpression() const;
+    const bool hasSecondExpression() const;
     TokenType getRelationOperator() const;
 
 private:

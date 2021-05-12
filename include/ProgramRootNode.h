@@ -3,16 +3,17 @@
 #include <memory>
 #include "Node.h"
 
-class ProgramRootNode
+class ProgramRootNode :
+	public Node
 {
 public:
 	ProgramRootNode();
+	
+	const void addInstruction(std::shared_ptr<Node> instruction);
 
 	std::shared_ptr<Node> getNextInstruction();
-	void addInstruction(std::shared_ptr<Node> instruction);
-
-	bool hasAnyInstruction();
-	bool hasNextInstruction();
+	const bool hasAnyInstruction() const;
+	const bool hasNextInstruction() const;
 
 private:
 	std::vector<std::shared_ptr<Node>>::iterator instructionIterator;

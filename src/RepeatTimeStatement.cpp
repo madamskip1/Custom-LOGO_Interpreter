@@ -1,11 +1,13 @@
 #include "RepeatTimeStatement.h"
 
-void RepeatTimeStatement::setPeriod(std::shared_ptr<Expression> time)
+RepeatTimeStatement::RepeatTimeStatement() : Node(NodeType::RepeatTimeStatement) {};
+
+const void RepeatTimeStatement::setPeriod(std::shared_ptr<Expression> time)
 {
 	period = time;
 }
 
-void RepeatTimeStatement::setHowManyTime(std::shared_ptr<Expression> howMany)
+const void RepeatTimeStatement::setHowManyTime(std::shared_ptr<Expression> howMany)
 {
 	howManyTime = howMany;
 }

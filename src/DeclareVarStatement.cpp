@@ -1,6 +1,8 @@
 #include "DeclareVarStatement.h"
 
-const void DeclareVarStatement::setType(TokenType type)
+DeclareVarStatement::DeclareVarStatement() : Node(NodeType::DeclareVarStatement) {};
+
+const void DeclareVarStatement::setType(const TokenType& type)
 {
     this->type = type;
 }

@@ -1,12 +1,13 @@
 #include "RepeatStatement.h"
 
+RepeatStatement::RepeatStatement() : Node(NodeType::RepeatStatement) {};
 
-void RepeatStatement::setHowManyTime(std::shared_ptr<Expression> howMany)
+const void RepeatStatement::setHowManyTime(std::shared_ptr<Expression> howMany)
 {
 	howManyTime = howMany;
 }
 
-std::shared_ptr<Expression> RepeatStatement::getHowManyTime()
+std::shared_ptr<Expression> RepeatStatement::getHowManyTime() const
 {
 	return howManyTime;
 }

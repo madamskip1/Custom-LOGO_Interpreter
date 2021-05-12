@@ -76,10 +76,10 @@ TEST_CASE("RepeatStatement", "[repeat]")
 	std::shared_ptr<Expression> expression = repeatStatement->getHowManyTime();
 	REQUIRE(expression->getTermsSize() == 1);
 
-	std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+	std::shared_ptr<TermExpression> expressionTerm = expression->getExpressionTerm(0);
 	REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-	std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+	std::shared_ptr<FactorExpression> expressionFactor = expressionTerm->getExpressionFactor(0);
 	REQUIRE(expressionFactor->getIntVal() == 50);
 	REQUIRE(!expressionFactor->getNegativeOp());
 }
@@ -105,10 +105,10 @@ TEST_CASE("RepeatTimeStatement", "[repeat]")
 	std::shared_ptr<Expression> expression = repeatTimeStatement->getPeriod();
 	REQUIRE(expression->getTermsSize() == 1);
 
-	std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+	std::shared_ptr<TermExpression> expressionTerm = expression->getExpressionTerm(0);
 	REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-	std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+	std::shared_ptr<FactorExpression> expressionFactor = expressionTerm->getExpressionFactor(0);
 	REQUIRE(expressionFactor->getIntVal() == 22);
 	REQUIRE(!expressionFactor->getNegativeOp());
 
@@ -136,10 +136,10 @@ TEST_CASE("Expressions", "[parser]")
 		std::shared_ptr<Expression> expression = repeatStatement->getHowManyTime();
 		REQUIRE(expression->getTermsSize() == 1);
 		
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		std::shared_ptr<TermExpression> expressionTerm = expression->getExpressionTerm(0);
 		REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		std::shared_ptr<FactorExpression> expressionFactor = expressionTerm->getExpressionFactor(0);
 		REQUIRE(expressionFactor->getIntVal() == 0);
 		REQUIRE(!expressionFactor->getNegativeOp());
 	}
@@ -156,10 +156,10 @@ TEST_CASE("Expressions", "[parser]")
 		std::shared_ptr<Expression> expression = repeatStatement->getHowManyTime();
 		REQUIRE(expression->getTermsSize() == 1);
 
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		std::shared_ptr<TermExpression> expressionTerm = expression->getExpressionTerm(0);
 		REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		std::shared_ptr<FactorExpression> expressionFactor = expressionTerm->getExpressionFactor(0);
 		REQUIRE(expressionFactor->getIntVal() == 95);
 		REQUIRE(expressionFactor->getNegativeOp());
 	}
@@ -180,10 +180,10 @@ TEST_CASE("Expressions", "[parser]")
 		REQUIRE(expression->getOperator(1) == TokenType::Minus);
 
 		// A Term   -95 
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		std::shared_ptr<TermExpression> expressionTerm = expression->getExpressionTerm(0);
 		REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		std::shared_ptr<FactorExpression> expressionFactor = expressionTerm->getExpressionFactor(0);
 		REQUIRE(expressionFactor->getIntVal() == 95);
 		REQUIRE(expressionFactor->getNegativeOp());
 
@@ -233,10 +233,10 @@ TEST_CASE("Expressions", "[parser]")
 		std::shared_ptr<Expression> expression = repeatStatement->getHowManyTime();
 		REQUIRE(expression->getTermsSize() == 1);
 
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		std::shared_ptr<TermExpression> expressionTerm = expression->getExpressionTerm(0);
 		REQUIRE(expressionTerm->getFactorsSize() == 2);
 
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(1);
+		std::shared_ptr<FactorExpression> expressionFactor = expressionTerm->getExpressionFactor(1);
 		REQUIRE(!expressionFactor->getNegativeOp());
 		REQUIRE(expressionFactor->getIntVal() == 2);
 
@@ -247,9 +247,9 @@ TEST_CASE("Expressions", "[parser]")
 		std::shared_ptr<Expression> bracketExpression = expressionFactor->getExpression();
 		REQUIRE(bracketExpression->getTermsSize() == 2);
 		REQUIRE(bracketExpression->getOperator(0) == TokenType::Plus);
-		std::shared_ptr<ExpressionTerm> bracketTerm = bracketExpression->getExpressionTerm(0);
+		std::shared_ptr<TermExpression> bracketTerm = bracketExpression->getExpressionTerm(0);
 		REQUIRE(bracketTerm->getFactorsSize() == 1);
-		std::shared_ptr<ExpressionFactor> bracketFactor = bracketTerm->getExpressionFactor(0);
+		std::shared_ptr<FactorExpression> bracketFactor = bracketTerm->getExpressionFactor(0);
 		REQUIRE(!bracketFactor->getNegativeOp());
 		REQUIRE(bracketFactor->getIntVal() == 2);
 		bracketTerm = bracketExpression->getExpressionTerm(1);
@@ -271,10 +271,10 @@ TEST_CASE("Expressions", "[parser]")
 		std::shared_ptr<Expression> expression = repeatStatement->getHowManyTime();
 		REQUIRE(expression->getTermsSize() == 1);
 
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		std::shared_ptr<TermExpression> expressionTerm = expression->getExpressionTerm(0);
 		REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		std::shared_ptr<FactorExpression> expressionFactor = expressionTerm->getExpressionFactor(0);
 		REQUIRE(expressionFactor->getIntVal() == 0);
 		REQUIRE(!expressionFactor->getNegativeOp());
 		REQUIRE(!expressionFactor->getExpression());
@@ -296,10 +296,10 @@ TEST_CASE("Expressions", "[parser]")
 		std::shared_ptr<Expression> expression = repeatStatement->getHowManyTime();
 		REQUIRE(expression->getTermsSize() == 1);
 
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		std::shared_ptr<TermExpression> expressionTerm = expression->getExpressionTerm(0);
 		REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		std::shared_ptr<FactorExpression> expressionFactor = expressionTerm->getExpressionFactor(0);
 		REQUIRE(expressionFactor->getIntVal() == 0);
 		REQUIRE(!expressionFactor->getNegativeOp());
 		REQUIRE(!expressionFactor->getExpression());
@@ -610,10 +610,10 @@ TEST_CASE("call function", "[parser]")
 		std::shared_ptr<Expression> expression = callFunc->getArgument(0);
 		REQUIRE(expression->getTermsSize() == 1);
 
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		std::shared_ptr<TermExpression> expressionTerm = expression->getExpressionTerm(0);
 		REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		std::shared_ptr<FactorExpression> expressionFactor = expressionTerm->getExpressionFactor(0);
 		REQUIRE(expressionFactor->getIntVal() == 153);
 		REQUIRE(!expressionFactor->getNegativeOp());
 	}
@@ -635,9 +635,9 @@ TEST_CASE("call function", "[parser]")
 
 		std::shared_ptr<Expression> expression = callFunc->getArgument(0);
 		REQUIRE(expression->getTermsSize() == 1);
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		std::shared_ptr<TermExpression> expressionTerm = expression->getExpressionTerm(0);
 		REQUIRE(expressionTerm->getFactorsSize() == 1);
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		std::shared_ptr<FactorExpression> expressionFactor = expressionTerm->getExpressionFactor(0);
 		REQUIRE(expressionFactor->getIntVal() == 160);
 		REQUIRE(!expressionFactor->getNegativeOp());
 
@@ -693,9 +693,9 @@ TEST_CASE("call function", "[parser]")
 
 		std::shared_ptr<Expression> expression = callFunc->getArgument(0);
 		REQUIRE(expression->getTermsSize() == 1);
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		std::shared_ptr<TermExpression> expressionTerm = expression->getExpressionTerm(0);
 		REQUIRE(expressionTerm->getFactorsSize() == 1);
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		std::shared_ptr<FactorExpression> expressionFactor = expressionTerm->getExpressionFactor(0);
 		REQUIRE(expressionFactor->getIntVal() == 1);
 		REQUIRE(!expressionFactor->getNegativeOp());
 
@@ -782,10 +782,10 @@ TEST_CASE("assign", "[parser]")
 		REQUIRE(expression != nullptr);
 		REQUIRE(expression->getTermsSize() == 1);
 
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		std::shared_ptr<TermExpression> expressionTerm = expression->getExpressionTerm(0);
 		REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		std::shared_ptr<FactorExpression> expressionFactor = expressionTerm->getExpressionFactor(0);
 		REQUIRE(expressionFactor->getIntVal() == 20);
 		REQUIRE(expressionFactor->getNegativeOp());
 	}
@@ -808,10 +808,10 @@ TEST_CASE("assign", "[parser]")
 		REQUIRE(expression != nullptr);
 		REQUIRE(expression->getTermsSize() == 1);
 
-		std::shared_ptr<ExpressionTerm> expressionTerm = expression->getExpressionTerm(0);
+		std::shared_ptr<TermExpression> expressionTerm = expression->getExpressionTerm(0);
 		REQUIRE(expressionTerm->getFactorsSize() == 1);
 
-		std::shared_ptr<ExpressionFactor> expressionFactor = expressionTerm->getExpressionFactor(0);
+		std::shared_ptr<FactorExpression> expressionFactor = expressionTerm->getExpressionFactor(0);
 		REQUIRE(!expressionFactor->getNegativeOp());
 		REQUIRE(expressionFactor->getCallFunc() != nullptr);
 	}
@@ -856,8 +856,8 @@ TEST_CASE("declare class-type", "[parser]")
 
 		std::shared_ptr<AssignClassStatement> assignClass;
 		std::shared_ptr<Expression> expression;
-		std::shared_ptr<ExpressionTerm> expressionTerm;
-		std::shared_ptr<ExpressionFactor> expressionFactor;
+		std::shared_ptr<TermExpression> expressionTerm;
+		std::shared_ptr<FactorExpression> expressionFactor;
 
 		REQUIRE(node->getNodeType() == NodeType::DeclareVarStatement);
 		std::shared_ptr<DeclareVarStatement> decVar = std::static_pointer_cast<DeclareVarStatement>(node);
@@ -908,8 +908,8 @@ TEST_CASE("declare class-type", "[parser]")
 
 		std::shared_ptr<AssignClassStatement> assignClass;
 		std::shared_ptr<Expression> expression;
-		std::shared_ptr<ExpressionTerm> expressionTerm;
-		std::shared_ptr<ExpressionFactor> expressionFactor;
+		std::shared_ptr<TermExpression> expressionTerm;
+		std::shared_ptr<FactorExpression> expressionFactor;
 
 		REQUIRE(node->getNodeType() == NodeType::DeclareVarStatement);
 		std::shared_ptr<DeclareVarStatement> decVar = std::static_pointer_cast<DeclareVarStatement>(node);
@@ -1096,10 +1096,11 @@ if (x < -20) {								// XXXXXX COMMENT
 	zolw.go(2 + -2);
 } else {
 	Integer test = 20;
-	
 }
-Integer test2;
-test2 = -50;
+Turtle test2;
+Point test3(20, 10);
+Color test4 = "#123456";
+test5 = -50;
 )";
 
 	SourceReader* reader = new SourceReader();
@@ -1115,8 +1116,8 @@ test2 = -50;
 	std::shared_ptr<Node> instruction = rootNode->getNextInstruction();
 
 	std::shared_ptr<Expression> expression;
-	std::shared_ptr<ExpressionTerm> expressionTerm;
-	std::shared_ptr<ExpressionFactor> expressionFactor;
+	std::shared_ptr<TermExpression> expressionTerm;
+	std::shared_ptr<FactorExpression> expressionFactor;
 	std::shared_ptr<InstructionsBlock> instructionsBlock;
 	std::shared_ptr<CallFuncStatement> callFuncStatement;
 	std::shared_ptr<RepeatStatement> repeatStatement;
@@ -1126,6 +1127,7 @@ test2 = -50;
 	std::shared_ptr<RelationCondition> relationCondition;
 	std::shared_ptr<DeclareVarStatement> varDeclare;
 	std::shared_ptr<AssignStatement> assign;
+	std::shared_ptr<AssignClassStatement> assignClass;
 
 	//////////////////////////////////
 	//			REPEAT statement	//
@@ -1275,19 +1277,43 @@ test2 = -50;
 	//////////////////////////////////
 
 	instruction = rootNode->getNextInstruction();
-	// Integer test2;
+	// Turtle test2;
 	REQUIRE(instruction->getNodeType() == NodeType::DeclareVarStatement);
 
 	varDeclare = std::static_pointer_cast<DeclareVarStatement>(instruction);
 	REQUIRE(varDeclare->getIdentifier() == "test2");
 	REQUIRE(varDeclare->getAssignStatemnt() == nullptr);
-	REQUIRE(varDeclare->getType() == TokenType::Integer);
+	REQUIRE(varDeclare->getType() == TokenType::Turtle);
+	REQUIRE(varDeclare->getAssignClassStatement() == nullptr);
+	REQUIRE(varDeclare->getColorVal().empty());
+
+
+	instruction = rootNode->getNextInstruction();
+	//Point test3(20, 10);
+	varDeclare = std::static_pointer_cast<DeclareVarStatement>(instruction);
+	REQUIRE(varDeclare->getIdentifier() == "test3");
+	REQUIRE(varDeclare->getAssignStatemnt() == nullptr);
+	REQUIRE(varDeclare->getType() == TokenType::Point);
+	REQUIRE(varDeclare->getAssignClassStatement() != nullptr);
+	REQUIRE(varDeclare->getColorVal().empty());
+
+	assignClass = varDeclare->getAssignClassStatement();
+	REQUIRE(assignClass->getExpressionsSize() == 2);
+
+	instruction = rootNode->getNextInstruction();
+	// Color test4 = "#123456";
+	varDeclare = std::static_pointer_cast<DeclareVarStatement>(instruction);
+	REQUIRE(varDeclare->getIdentifier() == "test4");
+	REQUIRE(varDeclare->getAssignStatemnt() == nullptr);
+	REQUIRE(varDeclare->getType() == TokenType::ColorVar);
+	REQUIRE(varDeclare->getAssignClassStatement() == nullptr);
+	REQUIRE(varDeclare->getColorVal() == "#123456");
 
 	//////////////////////////////////
 	//			assign Var			//
 	//////////////////////////////////
 	instruction = rootNode->getNextInstruction();
-	// test2 = -50;
+	// test5 = -50;
 	REQUIRE(instruction->getNodeType() == NodeType::AssignStatement);
 	assign = std::static_pointer_cast<AssignStatement>(instruction);
 

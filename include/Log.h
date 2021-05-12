@@ -23,9 +23,7 @@ enum class LogType
 class Log
 {
 public:
-	Log(LogType logType, const int& line, const int& firstCharPos, const std::streampos& streamPos, const TokenType& type = TokenType::UNKNOWN) :
-		logType(logType), line(line), firstCharPos(firstCharPos), streamPos(streamPos), type(type)
-	{};
+	Log(LogType logType, const int& line, const int& firstCharPos, const std::streampos& streamPos, const TokenType& type = TokenType::UNKNOWN);
 
 	std::string toString() const;
 	LogType getLogType() const;

@@ -1,6 +1,6 @@
 #include "ProgramRootNode.h"
 
-ProgramRootNode::ProgramRootNode()
+ProgramRootNode::ProgramRootNode() : Node(NodeType::Root)
 {
 	instructionIterator = instructions.end();
 }
@@ -12,18 +12,18 @@ std::shared_ptr<Node> ProgramRootNode::getNextInstruction()
 	return *instructionIterator++;
 }
 
-void ProgramRootNode::addInstruction(std::shared_ptr<Node> instruction)
+const void ProgramRootNode::addInstruction(std::shared_ptr<Node> instruction)
 {
 	instructions.push_back(instruction);
 	instructionIterator = instructions.begin();
 }
 
-bool ProgramRootNode::hasAnyInstruction()
+const bool ProgramRootNode::hasAnyInstruction() const
 {
 	return instructions.empty();
 }
 
-bool ProgramRootNode::hasNextInstruction()
+const bool ProgramRootNode::hasNextInstruction() const
 {
 	return (instructionIterator != instructions.end());
 }

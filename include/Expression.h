@@ -1,27 +1,28 @@
 #pragma once
 #include <vector>
+#include <memory>
 #include "Node.h"
 #include "TokenType.h"
-#include "ExpressionTerm.h"
+#include "TermExpression.h"
 
-class ExpressionTerm;
+class TermExpression;
 
 class Expression :
     public Node
 {
 public:
-    Expression() : Node(NodeType::Expression) {};
+    Expression();
 
-    void addExpressionTerm(std::shared_ptr<ExpressionTerm> term);
-    void addAddOperartor(TokenType addOperator);
-    void addNextExpressionTerm(std::shared_ptr<ExpressionTerm> term, TokenType addOperator);
+    const void addExpressionTerm(std::shared_ptr<TermExpression> term);
+    const void addAddOperartor(const TokenType& addOperator);
+    const void addNextExpressionTerm(std::shared_ptr<TermExpression> term, const TokenType& addOperator);
 
-    std::size_t getTermsSize();
-    std::shared_ptr<ExpressionTerm> getExpressionTerm(int index);
-    TokenType getOperator(int index);
+    const std::size_t getTermsSize() const;
+    std::shared_ptr<TermExpression> getExpressionTerm(const int& index) const;
+    TokenType getOperator(const int& index) const;
 
 private:
-    std::vector<std::shared_ptr<ExpressionTerm>> expressionTerms;
+    std::vector<std::shared_ptr<TermExpression>> expressionTerms;
     std::vector<TokenType> addOperators;
 };
 

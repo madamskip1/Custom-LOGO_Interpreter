@@ -1,5 +1,7 @@
 #include "AssignStatement.h"
 
+AssignStatement::AssignStatement() : Node(NodeType::AssignStatement) {};
+
 const void AssignStatement::addIdentifier(std::string id)
 {
     identifiers.push_back(id);

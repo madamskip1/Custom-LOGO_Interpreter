@@ -8,7 +8,7 @@ class IfStatement :
     public Node
 {
 public:
-    IfStatement() : Node(NodeType::IfStatement) {};
+    IfStatement();
 
     const void setTrueBlockNode(std::shared_ptr<InstructionsBlock> block);
     const void setElseBlockNode(std::shared_ptr<InstructionsBlock> block);

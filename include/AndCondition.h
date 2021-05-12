@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <memory>
 #include "Node.h"
 #include "RelationCondition.h"
 
@@ -9,7 +10,7 @@ class AndCondition :
     public Node
 {
 public:
-    AndCondition() : Node(NodeType::AndCondition) {};
+    AndCondition();
 
     const void addRelationCondition(std::shared_ptr<RelationCondition> condition);
 

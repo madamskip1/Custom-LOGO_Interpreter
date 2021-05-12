@@ -1,11 +1,13 @@
 #include "InstructionsBlock.h"
 
+InstructionsBlock::InstructionsBlock() : Node(NodeType::InstructionsBlock) {};
+
 const void InstructionsBlock::addInstruction(std::shared_ptr<Node> node)
 {
     instructions.push_back(node);
 }
 
-std::size_t InstructionsBlock::getInstructionsSize() const
+const std::size_t InstructionsBlock::getInstructionsSize() const
 {
     return instructions.size();
 }

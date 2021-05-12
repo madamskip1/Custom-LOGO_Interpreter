@@ -1,5 +1,7 @@
 #include "RelationCondition.h"
 
+RelationCondition::RelationCondition() : Node(NodeType::RelationCondition) {};
+
 const void RelationCondition::setBooleanWord(const bool& word)
 {
     booleanWord = word;
@@ -24,22 +26,22 @@ const void RelationCondition::setExpression(std::shared_ptr<Expression> expr, co
         secondExpression = expr;
 }
 
-const void RelationCondition::setRelationOperator(TokenType relOperator)
+const void RelationCondition::setRelationOperator(const TokenType& relOperator)
 {
     relationOperator = relOperator;
 }
 
-bool RelationCondition::isBooleanWord() const
+const bool RelationCondition::isBooleanWord() const
 {
     return isBooleanWordFlag;
 }
 
-bool RelationCondition::getBooleanWord() const
+const bool RelationCondition::getBooleanWord() const
 {
     return booleanWord;
 }
 
-bool RelationCondition::getNotOperator() const
+const bool RelationCondition::getNotOperator() const
 {
     return notOperator;
 }
@@ -58,7 +60,7 @@ std::shared_ptr<Expression> RelationCondition::getExpression(const int& index) c
 }
 
 
-bool RelationCondition::hasSecondExpression() const
+const bool RelationCondition::hasSecondExpression() const
 {
     return (secondExpression != nullptr && relationOperator != TokenType::UNKNOWN);
 }

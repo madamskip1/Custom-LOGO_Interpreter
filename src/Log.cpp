@@ -1,5 +1,9 @@
 #include "Log.h"
 
+Log::Log(LogType logType, const int& line, const int& firstCharPos, const std::streampos& streamPos, const TokenType& type) :
+	logType(logType), line(line), firstCharPos(firstCharPos), streamPos(streamPos), type(type)
+{};
+
 std::string Log::toString() const
 {
 	std::string string = lineAndPos_toString();
