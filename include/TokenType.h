@@ -101,7 +101,7 @@ const std::map<std::string, TokenType> KeywordToTokenType =
 	{ "function", TokenType::Function },
 	{ "return", TokenType::Return },
 	{ "Integer", TokenType::Integer },
-	{ "ColorVar", TokenType::ColorVar },
+	{ "Color", TokenType::ColorVar },
 	{ "Turtle", TokenType::Turtle },
 	{ "Point", TokenType::Point },
 	{ "Boolean", TokenType::Boolean },

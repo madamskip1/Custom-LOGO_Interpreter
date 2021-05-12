@@ -25,3 +25,13 @@ std::shared_ptr<Expression> AssignStatement::getExpression() const
 {
     return expression;
 }
+
+//const void AssignStatement::setCondition(std::shared_ptr<Condition> cond)
+//{
+//    condition = cond;
+//}
+//
+//std::shared_ptr<Condition> AssignStatement::getCondition() const
+//{
+//    return condition;
+//}

@@ -130,11 +130,10 @@ TEST_CASE("Keywords", "[keywords]")
 	REQUIRE(token.getStringValue() == "Return");
 
 	// true/false
-	reader->setSourceString("true false");
+	reader->setSourceString("Color");
 	token = lexer.getNextToken();
-	REQUIRE(token.type == TokenType::True);
-	token = lexer.getNextToken();
-	REQUIRE(token.type == TokenType::False);
+	REQUIRE(token.type == TokenType::ColorVar);
+
 }
 
 TEST_CASE("Identifier", "[id]")
@@ -360,6 +359,8 @@ if (x < 20) {								// XXXXXX COMMENT
 Turtle zolwik;
 
  Point point(1, 0);
+
+Color col = "#123456";
 )";
 
 	SourceReader* reader = new SourceReader();
@@ -533,6 +534,18 @@ Turtle zolwik;
 	REQUIRE(token.type == TokenType::Digit);
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::RoundBracketClose);
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::Semicolon);
+
+	// 14th line
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::ColorVar);
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::Identifier);
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::AssignOperator);
+	token = lexer.getNextToken();
+	REQUIRE(token.type == TokenType::ColorValue);
 	token = lexer.getNextToken();
 	REQUIRE(token.type == TokenType::Semicolon);
 

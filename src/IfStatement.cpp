@@ -15,6 +15,11 @@ const void IfStatement::setCondition(std::shared_ptr<Condition> cond)
 	condition = cond;
 }
 
+const bool IfStatement::hasElseBlock() const
+{
+	return elseBlockNode != nullptr;
+}
+
 std::shared_ptr<InstructionsBlock> IfStatement::getTrueBlockNode() const
 {
 	return trueBlockNode;

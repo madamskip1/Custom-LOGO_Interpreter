@@ -18,7 +18,9 @@ enum class NodeType
 	AndCondition,
 	RelationCondition,
 	AssignStatement,
-	DeclareVarStatement
+	AssignClassStatement,
+	DeclareVarStatement,
+
 };
 
 class Node

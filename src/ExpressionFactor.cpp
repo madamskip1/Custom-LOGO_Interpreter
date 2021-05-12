@@ -20,6 +20,11 @@ const void ExpressionFactor::setCallFunc(std::shared_ptr<CallFuncStatement> func
 	callFunc = func;
 }
 
+const void ExpressionFactor::setVariable(std::vector<std::string> varName)
+{
+	variable = varName;
+}
+
 int ExpressionFactor::getIntVal() const
 {
 	return intVal;
@@ -38,4 +43,9 @@ std::shared_ptr<Expression> ExpressionFactor::getExpression() const
 std::shared_ptr<CallFuncStatement> ExpressionFactor::getCallFunc() const
 {
 	return callFunc;
+}
+
+std::vector<std::string> ExpressionFactor::getVarName() const
+{
+	return variable;
 }

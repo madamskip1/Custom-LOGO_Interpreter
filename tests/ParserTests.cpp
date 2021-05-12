@@ -459,7 +459,7 @@ TEST_CASE("Conditions", "[parser]")
 	}
 }
 
-
+//
 
 TEST_CASE("def function", "[parser]")
 {
@@ -504,7 +504,7 @@ TEST_CASE("def function", "[parser]")
 
 	SECTION("function with multi parameters, witout return type")
 	{
-		reader->setSourceString("function test3(Turtle zolw, ColorVar color, Integer int) {}");
+		reader->setSourceString("function test3(Turtle zolw, Color color, Integer int) {}");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
 		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
@@ -720,6 +720,45 @@ TEST_CASE("call function", "[parser]")
 }
 
 
+TEST_CASE("Var declartion", "[parser]")
+{
+	SourceReader* reader = new SourceReader();
+	Lexer* lexer = new Lexer(reader);
+	Logger* logger = new Logger();
+	Parser parser(lexer, logger);
+
+	SECTION("simple def var")
+	{
+		reader->setSourceString("Integer test;");
+
+		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
+
+		REQUIRE(firstNode->getNodeType() == NodeType::DeclareVarStatement);
+
+		std::shared_ptr<DeclareVarStatement> varDeclare = std::static_pointer_cast<DeclareVarStatement>(firstNode);
+		REQUIRE(varDeclare->getIdentifier() == "test");
+		REQUIRE(varDeclare->getAssignStatemnt() == nullptr);
+		REQUIRE(varDeclare->getType() == TokenType::Integer);
+	}
+
+
+	SECTION("def var with assign")
+	{
+		reader->setSourceString("Integer test2 =  2 + 2;");
+
+		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
+		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
+
+		REQUIRE(firstNode->getNodeType() == NodeType::DeclareVarStatement);
+
+		std::shared_ptr<DeclareVarStatement> varDeclare = std::static_pointer_cast<DeclareVarStatement>(firstNode);
+		REQUIRE(varDeclare->getIdentifier() == "test2");
+		REQUIRE(varDeclare->getAssignStatemnt() != nullptr);
+		REQUIRE(varDeclare->getType() == TokenType::Integer);
+	}
+}
+
 TEST_CASE("assign", "[parser]")
 {
 	SourceReader* reader = new SourceReader();
@@ -778,46 +817,211 @@ TEST_CASE("assign", "[parser]")
 	}
 }
 
-
-TEST_CASE("Var declartion", "[parser]")
+TEST_CASE("declare class-type", "[parser]")
 {
 	SourceReader* reader = new SourceReader();
 	Lexer* lexer = new Lexer(reader);
 	Logger* logger = new Logger();
 	Parser parser(lexer, logger);
 
-	SECTION("simple def var")
+	SECTION("simple declare")
 	{
-		reader->setSourceString("Integer test;");
+		reader->setSourceString("Point point; Turtle zolw;");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
+		std::shared_ptr<Node> node = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode->getNodeType() == NodeType::DeclareVarStatement);
+		REQUIRE(node->getNodeType() == NodeType::DeclareVarStatement);
+		std::shared_ptr<DeclareVarStatement> decVar = std::static_pointer_cast<DeclareVarStatement>(node);
+		REQUIRE(decVar->getType() == TokenType::Point);
+		REQUIRE(decVar->getAssignStatemnt() == nullptr);
+		REQUIRE(decVar->getAssignClassStatement() == nullptr);
+		REQUIRE(decVar->getIdentifier() == "point");
 
-		std::shared_ptr<DeclareVarStatement> varDeclare = std::static_pointer_cast<DeclareVarStatement>(firstNode);
-		REQUIRE(varDeclare->getIdentifier() == "test");
-		REQUIRE(varDeclare->getAssignStatemnt() == nullptr);
-		REQUIRE(varDeclare->getType() == TokenType::Integer);
+		node = rootNode->getNextInstruction();
+		REQUIRE(node->getNodeType() == NodeType::DeclareVarStatement);
+		decVar = std::static_pointer_cast<DeclareVarStatement>(node);
+		REQUIRE(decVar->getType() == TokenType::Turtle);
+		REQUIRE(decVar->getAssignStatemnt() == nullptr);
+		REQUIRE(decVar->getAssignClassStatement() == nullptr);
+		REQUIRE(decVar->getIdentifier() == "zolw");
 	}
 
-
-	SECTION("def var with assign")
+	SECTION("declare class with one argument")
 	{
-		reader->setSourceString("Integer test2 =  2 + 2;");
+		reader->setSourceString("Point point(20); Turtle zolw(-10);");
 
 		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
-		std::shared_ptr<Node> firstNode = rootNode->getNextInstruction();
+		std::shared_ptr<Node> node = rootNode->getNextInstruction();
 
-		REQUIRE(firstNode->getNodeType() == NodeType::DeclareVarStatement);
+		std::shared_ptr<AssignClassStatement> assignClass;
+		std::shared_ptr<Expression> expression;
+		std::shared_ptr<ExpressionTerm> expressionTerm;
+		std::shared_ptr<ExpressionFactor> expressionFactor;
 
-		std::shared_ptr<DeclareVarStatement> varDeclare = std::static_pointer_cast<DeclareVarStatement>(firstNode);
-		REQUIRE(varDeclare->getIdentifier() == "test2");
-		REQUIRE(varDeclare->getAssignStatemnt() != nullptr);
-		REQUIRE(varDeclare->getType() == TokenType::Integer);
+		REQUIRE(node->getNodeType() == NodeType::DeclareVarStatement);
+		std::shared_ptr<DeclareVarStatement> decVar = std::static_pointer_cast<DeclareVarStatement>(node);
+		REQUIRE(decVar->getType() == TokenType::Point);
+		REQUIRE(decVar->getAssignStatemnt() == nullptr);
+		REQUIRE(decVar->getAssignClassStatement() != nullptr);
+		REQUIRE(decVar->getIdentifier() == "point");
+
+		assignClass = decVar->getAssignClassStatement();
+		REQUIRE(assignClass->getExpressionsSize() == 1);
+		expression = assignClass->getExpression(0);
+		REQUIRE(expression->getTermsSize() == 1);
+
+		expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
+
+		expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 20);
+		REQUIRE(!expressionFactor->getNegativeOp());
+
+		node = rootNode->getNextInstruction();
+		REQUIRE(node->getNodeType() == NodeType::DeclareVarStatement);
+		decVar = std::static_pointer_cast<DeclareVarStatement>(node);
+		REQUIRE(decVar->getType() == TokenType::Turtle);
+		REQUIRE(decVar->getAssignStatemnt() == nullptr);
+		REQUIRE(decVar->getAssignClassStatement() != nullptr);
+		REQUIRE(decVar->getIdentifier() == "zolw");
+
+		assignClass = decVar->getAssignClassStatement();
+		REQUIRE(assignClass->getExpressionsSize() == 1);
+		expression = assignClass->getExpression(0);
+		REQUIRE(expression->getTermsSize() == 1);
+
+		expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
+
+		expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 10);
+		REQUIRE(expressionFactor->getNegativeOp());
+	}
+
+	SECTION("declare with multi args")
+	{
+		reader->setSourceString("Point point(20, 10, 0); Turtle zolw(-10, -20);");
+
+		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
+		std::shared_ptr<Node> node = rootNode->getNextInstruction();
+
+		std::shared_ptr<AssignClassStatement> assignClass;
+		std::shared_ptr<Expression> expression;
+		std::shared_ptr<ExpressionTerm> expressionTerm;
+		std::shared_ptr<ExpressionFactor> expressionFactor;
+
+		REQUIRE(node->getNodeType() == NodeType::DeclareVarStatement);
+		std::shared_ptr<DeclareVarStatement> decVar = std::static_pointer_cast<DeclareVarStatement>(node);
+		REQUIRE(decVar->getType() == TokenType::Point);
+		REQUIRE(decVar->getAssignStatemnt() == nullptr);
+		REQUIRE(decVar->getAssignClassStatement() != nullptr);
+		REQUIRE(decVar->getIdentifier() == "point");
+
+		assignClass = decVar->getAssignClassStatement();
+		REQUIRE(assignClass->getExpressionsSize() == 3);
+		expression = assignClass->getExpression(0);
+		REQUIRE(expression->getTermsSize() == 1);
+
+		expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
+
+		expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 20);
+		REQUIRE(!expressionFactor->getNegativeOp());
+
+		expression = assignClass->getExpression(1);
+		REQUIRE(expression->getTermsSize() == 1);
+
+		expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
+
+		expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 10);
+		REQUIRE(!expressionFactor->getNegativeOp());
+
+		expression = assignClass->getExpression(2);
+		REQUIRE(expression->getTermsSize() == 1);
+
+		expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
+
+		expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 0);
+		REQUIRE(!expressionFactor->getNegativeOp());
+
+		node = rootNode->getNextInstruction();
+		REQUIRE(node->getNodeType() == NodeType::DeclareVarStatement);
+		decVar = std::static_pointer_cast<DeclareVarStatement>(node);
+		REQUIRE(decVar->getType() == TokenType::Turtle);
+		REQUIRE(decVar->getAssignStatemnt() == nullptr);
+		REQUIRE(decVar->getAssignClassStatement() != nullptr);
+		REQUIRE(decVar->getIdentifier() == "zolw");
+
+		assignClass = decVar->getAssignClassStatement();
+		REQUIRE(assignClass->getExpressionsSize() == 2);
+		expression = assignClass->getExpression(0);
+		REQUIRE(expression->getTermsSize() == 1);
+
+		expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
+
+		expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 10);
+		REQUIRE(expressionFactor->getNegativeOp());
+
+		expression = assignClass->getExpression(1);
+		REQUIRE(expression->getTermsSize() == 1);
+
+		expressionTerm = expression->getExpressionTerm(0);
+		REQUIRE(expressionTerm->getFactorsSize() == 1);
+
+		expressionFactor = expressionTerm->getExpressionFactor(0);
+		REQUIRE(expressionFactor->getIntVal() == 20);
+		REQUIRE(expressionFactor->getNegativeOp());
 	}
 }
 
+TEST_CASE("color var decl")
+{
+	SourceReader* reader = new SourceReader();
+	Lexer* lexer = new Lexer(reader);
+	Logger* logger = new Logger();
+	Parser parser(lexer, logger);
+
+	SECTION("simple declare")
+	{
+		reader->setSourceString("Color col1;");
+
+		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
+		std::shared_ptr<Node> node = rootNode->getNextInstruction();
+
+		REQUIRE(node->getNodeType() == NodeType::DeclareVarStatement);
+		std::shared_ptr<DeclareVarStatement> decVar = std::static_pointer_cast<DeclareVarStatement>(node);
+		REQUIRE(decVar->getType() == TokenType::ColorVar);
+		REQUIRE(decVar->getAssignStatemnt() == nullptr);
+		REQUIRE(decVar->getAssignClassStatement() == nullptr);
+		REQUIRE(decVar->getIdentifier() == "col1");
+		REQUIRE(decVar->getColorVal() == "");
+	}
+
+	SECTION("declare with assign")
+	{
+		reader->setSourceString("Color col2 = \"#123456\";");
+
+		std::unique_ptr<ProgramRootNode> rootNode = parser.parse();
+		std::shared_ptr<Node> node = rootNode->getNextInstruction();
+
+		REQUIRE(node->getNodeType() == NodeType::DeclareVarStatement);
+		std::shared_ptr<DeclareVarStatement> decVar = std::static_pointer_cast<DeclareVarStatement>(node);
+		REQUIRE(decVar->getType() == TokenType::ColorVar);
+		REQUIRE(decVar->getAssignStatemnt() == nullptr);
+		REQUIRE(decVar->getAssignClassStatement() == nullptr);
+		REQUIRE(decVar->getIdentifier() == "col2");
+		REQUIRE(decVar->getColorVal() == "#123456");
+	}
+
+}
 
 TEST_CASE("Block of instructions", "[parser]")
 {

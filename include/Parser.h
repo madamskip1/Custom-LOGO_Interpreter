@@ -15,6 +15,7 @@
 #include "AssignStatement.h"
 #include "DeclareVarStatement.h"
 #include "Logger.h"
+#include "AssignClassStatement.h"
 
 class Parser
 {
@@ -43,6 +44,8 @@ private:
 	std::shared_ptr<Node> parseAssignOrCallFuncStatement();
 	std::shared_ptr<CallFuncStatement> parseCallFunc(std::vector<std::string> idNames);
 	std::shared_ptr<AssignStatement> parseAssignStatement(std::vector<std::string> idNames);
+	std::shared_ptr<AssignClassStatement> parseAssignClassStatement();
+
 
 	std::shared_ptr<DeclareVarStatement> parseDeclareVarStatement(TokenType type);
 
@@ -61,10 +64,13 @@ private:
 	
 	const bool checkNextTokenType(const TokenType& type);
 	const bool checkNextTokenType(const std::vector<TokenType>& types);
-	const bool consumeNextTokenIfIsType(const TokenType& type);
-	const bool consumeNextTokenIfIsType(const std::vector<TokenType>& types);
+	const bool consumeNextTokenIfType(const TokenType& type);
+	const bool consumeNextTokenIfType(const std::vector<TokenType>& types);
 	const bool checkIfTokenTypeIsOneOf(const TokenType& type, const std::vector<TokenType>& types) const;
 	const bool checkIfTokenTypeEqual(const TokenType& tokenType, const TokenType& type) const;
 	const bool checkIfTokenTypeEqual(const Token& token, const TokenType& type) const;
+
+	const bool consumeNextTokenIfType_Otherwise_AddLog(const TokenType& type, const LogType& logType, const Token& token);
+	const bool consumeNextTokenIfType_Otherwise_AddLog(const TokenType& type, const LogType& logType);
 };
 

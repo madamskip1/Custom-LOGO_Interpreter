@@ -46,7 +46,7 @@ private:
 		{ LogType::NotRecognizedToken, "Nie udalo sie rozponac tokenu." },
 		{ LogType::MissingRoundBracketOpen, "Oczekiwano nawiasu otwierajacego." },
 		{ LogType::MissingRoundBracketClose, "Oczekiwano nawiasu zamykajacego." },
-		{ LogType::MissingCurlyBracketClose, "Oczekiwano klamre zamykaj¹ca." },
+		{ LogType::MissingCurlyBracketClose, "Oczekiwano klamre zamykajaca." },
 		{ LogType::MissingIdentifier, "Oczekiwano identyfikatora." },
 		{ LogType::MissingIdentifierOrFunctionKeyword, "Oczekiwano identyfikatora lub slowa kluczowego \"function\"." },
 		{ LogType::CantDefFuncInBlock, "Definiowanie funkcji w bloku jest niedozowlone." },

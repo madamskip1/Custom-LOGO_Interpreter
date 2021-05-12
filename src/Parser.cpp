@@ -39,64 +39,58 @@ std::shared_ptr<Node> Parser::parseInstructions()
 {
 	Token curToken = peekToken();
 
-	if (checkIfTokenTypeIsOneOf(curToken.type, { TokenType::ColorVar, TokenType::Integer, TokenType::Turtle, TokenType::Point, TokenType::Boolean }))
+	if (consumeNextTokenIfType({ TokenType::ColorVar, TokenType::Integer, TokenType::Turtle, TokenType::Point, TokenType::Boolean }))
 	{
-		getNextToken();
-
 		if (checkNextTokenType(TokenType::Function))
 		{
-			// Definicja Funkcji
 			return parseDefFuncStatement(curToken.type);
 		}
 		else
 		{
-			// Deklaracja lub definicja zmiennych
 			std::shared_ptr<Node> declareVar = parseDeclareVarStatement(curToken.type);
 
-			if (!consumeNextTokenIfIsType(TokenType::Semicolon))
+			if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::Semicolon, LogType::MissingSemicolon, curToken))
 			{
-				logger->newLog(LogType::MissingSemicolon, curToken);
 				return nullptr;
 			}
 
 			return declareVar;
 		}
 	}
-	
+
 	if (checkIfTokenTypeEqual(curToken, TokenType::Function))
 	{
 		return parseDefFuncStatement();
 	}
-	
+
 	if (checkIfTokenTypeEqual(curToken, TokenType::If))
 	{
 		return parseIfStatement();
 	}
-	
+
 	if (checkIfTokenTypeEqual(curToken, TokenType::Repeat))
 	{
 		return parseRepeatStatement();
 	}
-	
+
 	if (checkIfTokenTypeEqual(curToken, TokenType::RepeatTime))
 	{
 		return parseRepeatTimeStatement();
 	}
-	
+
 	if (checkIfTokenTypeEqual(curToken, TokenType::Identifier))
 	{
 		std::shared_ptr<Node> assignOrCallFuncStatement = parseAssignOrCallFuncStatement();
 
-		if (!consumeNextTokenIfIsType(TokenType::Semicolon))
+		if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::Semicolon, LogType::MissingSemicolon, curToken))
 		{
-			// Brakuje œrednika
-			// TO DO ERROR
+			return nullptr;
 		}
 
 		return assignOrCallFuncStatement;
 	}
 
-	return nullptr; // coœ posz³o Ÿle
+	return nullptr;
 }
 
 
@@ -104,15 +98,15 @@ std::shared_ptr<InstructionsBlock> Parser::parseInstructionsBlock()
 {
 	std::shared_ptr<InstructionsBlock> instructionsBlock = std::make_shared<InstructionsBlock>();
 
-	if (!consumeNextTokenIfIsType(TokenType::CurlyBracketOpen))
+	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::CurlyBracketOpen, LogType::MissingCurlyBracketOpen))
+	{
 		return nullptr;
-
-
-	std::shared_ptr<Node> node;
+	}
 
 	while (!checkNextTokenType(TokenType::CurlyBracketClose) && !checkNextTokenType(TokenType::EndOfFile))
 	{
-		node = parseInstructions();
+		std::shared_ptr<Node> node = parseInstructions();
+
 		if (node != nullptr && node->getNodeType() == NodeType::DefFuncStatement)
 		{
 			logger->newLog(LogType::CantDefFuncInBlock, peekToken());
@@ -122,13 +116,11 @@ std::shared_ptr<InstructionsBlock> Parser::parseInstructionsBlock()
 			instructionsBlock->addInstruction(node);
 		}
 	}
-
-	if (!consumeNextTokenIfIsType(TokenType::CurlyBracketClose))
+	
+	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::CurlyBracketClose, LogType::MissingCurlyBracketClose))
 	{
-		logger->newLog(LogType::MissingCurlyBracketClose, peekToken());
 		return nullptr;
 	}
-
 
 	return instructionsBlock;
 }
@@ -136,8 +128,10 @@ std::shared_ptr<InstructionsBlock> Parser::parseInstructionsBlock()
 
 std::shared_ptr<DefFuncStatement> Parser::parseDefFuncStatement(TokenType returnType)
 {
-	if (!consumeNextTokenIfIsType(TokenType::Function))
+	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::Function, LogType::MissingIdentifierOrFunctionKeyword))
+	{
 		return nullptr;
+	}
 
 	std::shared_ptr<DefFuncStatement> defFuncStatement = std::make_shared<DefFuncStatement>();
 
@@ -147,41 +141,40 @@ std::shared_ptr<DefFuncStatement> Parser::parseDefFuncStatement(TokenType return
 	}
 	
 	std::string name = peekToken().getStringValue();
-
-	if (!consumeNextTokenIfIsType(TokenType::Identifier))
-	{
-		logger->newLog(LogType::MissingIdentifier, peekToken());
-		return nullptr;
-	}
-
 	defFuncStatement->setName(name);
-	
-	if (!consumeNextTokenIfIsType(TokenType::RoundBracketOpen))
+
+	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::Identifier, LogType::MissingIdentifier))
 	{
-		logger->newLog(LogType::MissingRoundBracketOpen, peekToken());
+		return nullptr;
+	}
+
+	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
+	{
 		return nullptr;
 	}
 	
-	if (!consumeNextTokenIfIsType(TokenType::RoundBracketClose))
+	if (!consumeNextTokenIfType(TokenType::RoundBracketClose))
 	{
 		defFuncStatement->addParameter(parseParameter());
-		Token nextToken = peekToken();
 
-		while (consumeNextTokenIfIsType(TokenType::Comma))
+		while (consumeNextTokenIfType(TokenType::Comma))
 		{
+			if (checkNextTokenType(TokenType::RoundBracketClose))
+			{
+				logger->newLog(LogType::MissingParameter, peekToken());
+				return nullptr;
+			}
+
 			defFuncStatement->addParameter(parseParameter());
-			nextToken = peekToken();
 		}
 
-		if(!consumeNextTokenIfIsType(TokenType::RoundBracketClose))
+		if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
 		{
-			logger->newLog(LogType::MissingParameter, peekToken());
 			return nullptr;
 		}
 	}
 
-	std::shared_ptr<InstructionsBlock> block = parseInstructionsBlock();
-	defFuncStatement->setInstructionsBlock(block);
+	defFuncStatement->setInstructionsBlock(parseInstructionsBlock());
 
 	return defFuncStatement;
 }
@@ -191,142 +184,124 @@ std::shared_ptr<Parameter> Parser::parseParameter()
 {
 	std::shared_ptr<Parameter> parameter = std::make_shared<Parameter>();
 
-	TokenType tokenType = peekToken().type;
+	parameter->setType(peekToken().type);
 
-	if (!consumeNextTokenIfIsType({ TokenType::ColorVar, TokenType::Integer, TokenType::Turtle, TokenType::Point, TokenType::Boolean }))
+	if (!consumeNextTokenIfType({ TokenType::ColorVar, TokenType::Integer, TokenType::Turtle, TokenType::Point, TokenType::Boolean }))
 	{
 		logger->newLog(LogType::BadSyntaxParameter, peekToken());
 		return nullptr;
 	}
-
-	parameter->setType(tokenType);
-
+	
 	if (!checkNextTokenType(TokenType::Identifier))
 	{
 		logger->newLog(LogType::MissingIdentifier, peekToken());
 		return nullptr;
 	}
 
-	Token id = getNextToken();
-	std::string name = id.getStringValue();
-
-	parameter->setName(name);
+	Token token = getNextToken();
+	parameter->setName(token.getStringValue());
 
 	return parameter;
 }
 
 
-
 std::shared_ptr<IfStatement> Parser::parseIfStatement()
 {
-	if (!consumeNextTokenIfIsType(TokenType::If))
+	if (!consumeNextTokenIfType(TokenType::If))
 		return nullptr;
 
 	std::shared_ptr<IfStatement> ifStatement = std::make_shared<IfStatement>();
 
-	if (!consumeNextTokenIfIsType(TokenType::RoundBracketOpen))
+	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
 	{
-		logger->newLog(LogType::MissingRoundBracketOpen, peekToken());
 		return nullptr;
 	}
 
 	ifStatement->setCondition(parseCondition());
 
-	if (!consumeNextTokenIfIsType(TokenType::RoundBracketClose))
-	{	
-		logger->newLog(LogType::MissingRoundBracketClose, peekToken());
+	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
+	{
 		return nullptr;
 	}
 
-	std::shared_ptr<InstructionsBlock> trueBlock = parseInstructionsBlock();
-	ifStatement->setTrueBlockNode(trueBlock);
+	ifStatement->setTrueBlockNode(parseInstructionsBlock());
 
-	if (consumeNextTokenIfIsType(TokenType::Else))
+	if (consumeNextTokenIfType(TokenType::Else))
 	{
-		std::shared_ptr<InstructionsBlock> elseBlock = parseInstructionsBlock();
-		ifStatement->setElseBlockNode(elseBlock);
+		ifStatement->setElseBlockNode(parseInstructionsBlock());
 	}
 
 	return ifStatement;
 }
 
+
 std::shared_ptr<RepeatStatement> Parser::parseRepeatStatement()
 {
-	if (!consumeNextTokenIfIsType(TokenType::Repeat))
+	if (!consumeNextTokenIfType(TokenType::Repeat))
 		return nullptr;
 
 	std::shared_ptr<RepeatStatement> repeatStatement = std::make_shared<RepeatStatement>();
 
-	if (!consumeNextTokenIfIsType(TokenType::RoundBracketOpen))
+	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
 	{
-		logger->newLog(LogType::MissingRoundBracketOpen, peekToken());
 		return nullptr;
 	}
 
-	std::shared_ptr<Expression> expression = parseExpression();
-	repeatStatement->setHowManyTime(expression);
+	repeatStatement->setHowManyTime(parseExpression());
 
-
-	if (!consumeNextTokenIfIsType(TokenType::RoundBracketClose))
+	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
 	{
-		logger->newLog(LogType::MissingRoundBracketClose, peekToken());
 		return nullptr;
 	}
 
-	std::shared_ptr<InstructionsBlock> block = parseInstructionsBlock();
-	repeatStatement->setInstructionsBlock(block);
+	repeatStatement->setInstructionsBlock(parseInstructionsBlock());
 
 	return repeatStatement;
 }
 
+
 std::shared_ptr<RepeatTimeStatement> Parser::parseRepeatTimeStatement()
 {
-	if (!consumeNextTokenIfIsType(TokenType::RepeatTime))
+	if (!consumeNextTokenIfType(TokenType::RepeatTime))
 		return nullptr;
 
 	std::shared_ptr<RepeatTimeStatement> repeatTimeStatement = std::make_shared<RepeatTimeStatement>();
 
-	if (!consumeNextTokenIfIsType(TokenType::RoundBracketOpen))
+	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
 	{
-		logger->newLog(LogType::MissingRoundBracketOpen, peekToken());
 		return nullptr;
 	}
 
-	std::shared_ptr<Expression> period = parseExpression();
-	repeatTimeStatement->setPeriod(period);
+	repeatTimeStatement->setPeriod(parseExpression());
 
-	if (consumeNextTokenIfIsType(TokenType::Comma))
+	if (consumeNextTokenIfType(TokenType::Comma))
 	{
 		std::shared_ptr<Expression> howManyTime = parseExpression();
 		repeatTimeStatement->setHowManyTime(howManyTime);
 	}
 
-	if (!consumeNextTokenIfIsType(TokenType::RoundBracketClose))
+	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
 	{
-		logger->newLog(LogType::MissingRoundBracketClose, peekToken());
 		return nullptr;
 	}
 
-	std::shared_ptr<InstructionsBlock> block = parseInstructionsBlock();
-	repeatTimeStatement->setInstructionsBlock(block);
+	repeatTimeStatement->setInstructionsBlock(parseInstructionsBlock());
 
 	return repeatTimeStatement;
 }
 
 std::shared_ptr<Node> Parser::parseAssignOrCallFuncStatement()
 {
-	Token idToken = getNextToken();
-
-	if (!checkIfTokenTypeEqual(idToken, TokenType::Identifier))
+	Token idToken = peekToken();
+	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::Identifier, LogType::MissingIdentifier))
 	{
-		logger->newLog(LogType::MissingIdentifier, peekToken());
 		return nullptr;
 	}
 
 	std::vector<std::string> idNames;
 	idNames.push_back(idToken.getStringValue());
 
-	while (consumeNextTokenIfIsType(TokenType::Dot))
+	while (consumeNextTokenIfType(TokenType::Dot))
 	{
 		if (checkNextTokenType(TokenType::Identifier))
 		{
@@ -355,26 +330,22 @@ std::shared_ptr<Node> Parser::parseAssignOrCallFuncStatement()
 
 std::shared_ptr<CallFuncStatement> Parser::parseCallFunc(std::vector<std::string> idNames)
 {
-	if (!consumeNextTokenIfIsType(TokenType::RoundBracketOpen))
+	if (!consumeNextTokenIfType(TokenType::RoundBracketOpen))
 		return nullptr;
 
 	std::shared_ptr<CallFuncStatement> callFunc = std::make_shared<CallFuncStatement>();
 
-	if (!consumeNextTokenIfIsType(TokenType::RoundBracketClose))
+	if (!consumeNextTokenIfType(TokenType::RoundBracketClose))
 	{
 		callFunc->addArgument(parseExpression());
 
-		Token nextToken = peekToken();
-
-		while (consumeNextTokenIfIsType(TokenType::Comma))
+		while (consumeNextTokenIfType(TokenType::Comma))
 		{
 			callFunc->addArgument(parseExpression());
-			nextToken = peekToken();
 		}
 
-		if (!consumeNextTokenIfIsType(TokenType::RoundBracketClose))
+		if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
 		{
-			logger->newLog(LogType::MissingRoundBracketClose, peekToken());
 			return nullptr;
 		}
 	}
@@ -384,9 +355,10 @@ std::shared_ptr<CallFuncStatement> Parser::parseCallFunc(std::vector<std::string
 	return callFunc;
 }
 
+
 std::shared_ptr<AssignStatement> Parser::parseAssignStatement(std::vector<std::string> idNames)
 {
-	if (!consumeNextTokenIfIsType(TokenType::AssignOperator))
+	if (!consumeNextTokenIfType(TokenType::AssignOperator))
 		return nullptr;
 
 	std::shared_ptr<AssignStatement> assign = std::make_shared<AssignStatement>();
@@ -397,6 +369,35 @@ std::shared_ptr<AssignStatement> Parser::parseAssignStatement(std::vector<std::s
 	return assign;
 }
 
+std::shared_ptr<AssignClassStatement> Parser::parseAssignClassStatement()
+{
+	if (!consumeNextTokenIfType(TokenType::RoundBracketOpen))
+	{
+		return nullptr;
+	}
+
+	std::shared_ptr<AssignClassStatement> assignClass = std::make_shared<AssignClassStatement>();
+	assignClass->addExpression(parseExpression());
+
+	while (consumeNextTokenIfType(TokenType::Comma))
+	{
+		if (checkNextTokenType(TokenType::RoundBracketClose))
+		{
+			logger->newLog(LogType::MissingParameter, peekToken());
+		}
+
+		assignClass->addExpression(parseExpression());
+	}
+
+	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
+	{
+		return nullptr;
+	}
+	
+	return assignClass;
+}
+
+
 std::shared_ptr<DeclareVarStatement> Parser::parseDeclareVarStatement(TokenType type)
 {
 	if (!checkIfTokenTypeIsOneOf(type, { TokenType::ColorVar, TokenType::Integer, TokenType::Turtle, TokenType::Point, TokenType::Boolean }))
@@ -404,33 +405,52 @@ std::shared_ptr<DeclareVarStatement> Parser::parseDeclareVarStatement(TokenType 
 
 	std::string identifier = peekToken().getStringValue();
 
-	if (!consumeNextTokenIfIsType(TokenType::Identifier))
+	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::Identifier, LogType::MissingIdentifierOrFunctionKeyword))
 	{
-		logger->newLog(LogType::MissingIdentifierOrFunctionKeyword, peekToken());
 		return nullptr;
 	}
-
 
 	std::shared_ptr<DeclareVarStatement> varStatement = std::make_shared<DeclareVarStatement>();
 	varStatement->setIdentifier(identifier);
 	varStatement->setType(type);
 
-	if (!checkIfTokenTypeIsOneOf(type, { TokenType::Point, TokenType::Turtle }))
+	if (checkIfTokenTypeEqual(type, TokenType::Integer))
 	{
 		if (checkNextTokenType(TokenType::AssignOperator))
 		{
 			varStatement->setAssignStatement(parseAssignStatement({ identifier }));
 		}
+		
+		return varStatement;
 	}
-	else
+
+	if (checkIfTokenTypeIsOneOf (type, { TokenType::Turtle, TokenType::Point }))
 	{
-		// TO DO
-		// Point, Turtle troche inaczej mo¿e?, bo test(2, 2)
+		if (checkNextTokenType(TokenType::RoundBracketOpen))
+		{
+			varStatement->setAssignClassStatement(parseAssignClassStatement());
+		}
+
+		return varStatement;
 	}
+
+	if (checkIfTokenTypeEqual(type, TokenType::ColorVar))
+	{
+		if (consumeNextTokenIfType(TokenType::AssignOperator))
+		{
+			if (checkNextTokenType(TokenType::ColorValue))
+			{
+				Token colorVal = getNextToken();
+				varStatement->setColorVal(colorVal.getStringValue());
+
+				return varStatement;
+			}
+		}
+	}
+	// todo color boolean
 
 	return varStatement;
 }
-
 
 
 std::shared_ptr<Expression> Parser::parseExpression()
@@ -440,7 +460,7 @@ std::shared_ptr<Expression> Parser::parseExpression()
 
 	TokenType addOperator = peekToken().type;
 
-	while (consumeNextTokenIfIsType({ TokenType::Plus, TokenType::Minus }))
+	while (consumeNextTokenIfType({ TokenType::Plus, TokenType::Minus }))
 	{
 		expression->addNextExpressionTerm(parseExpressionTerm(), addOperator);
 		addOperator = peekToken().type;
@@ -449,17 +469,18 @@ std::shared_ptr<Expression> Parser::parseExpression()
 	return expression;
 }
 
+
 std::shared_ptr<ExpressionTerm> Parser::parseExpressionTerm()
 {
 	std::shared_ptr<ExpressionTerm> term = std::make_shared<ExpressionTerm>();
 	term->addExpressionFactor(parseExpressionFactor());
 
-	TokenType addOperator = peekToken().type;
+	TokenType multiplyOperator = peekToken().type;
 
-	while (consumeNextTokenIfIsType({ TokenType::Divide, TokenType::Multiply }))
+	while (consumeNextTokenIfType({ TokenType::Divide, TokenType::Multiply }))
 	{
-		term->addNextExpressionFactor(parseExpressionFactor(), addOperator);
-		addOperator = peekToken().type;
+		term->addNextExpressionFactor(parseExpressionFactor(), multiplyOperator);
+		multiplyOperator = peekToken().type;
 	}
 
 	return term;
@@ -470,29 +491,30 @@ std::shared_ptr<ExpressionFactor> Parser::parseExpressionFactor()
 	std::shared_ptr<ExpressionFactor> factor = std::make_shared<ExpressionFactor>();
 	
 
-	if (consumeNextTokenIfIsType(TokenType::Minus))
+	if (consumeNextTokenIfType(TokenType::Minus))
 	{
 		factor->setNegativeOp(true);
 	}
 
 	Token token = peekToken();
 
-	if (consumeNextTokenIfIsType(TokenType::RoundBracketOpen))
+	if (consumeNextTokenIfType(TokenType::RoundBracketOpen))
 	{
+		// expression in bracket
 		factor->setExpression(parseExpression());
 
-		if (!consumeNextTokenIfIsType(TokenType::RoundBracketClose))
+		if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
 		{
-			logger->newLog(LogType::MissingRoundBracketClose, peekToken());
-			return nullptr;
+			return nullptr;	
 		}
 	}
-	else if (consumeNextTokenIfIsType(TokenType::Identifier))
+	else if (consumeNextTokenIfType(TokenType::Identifier))
 	{
+		// id var or call function
 		std::vector<std::string> names;
 		names.push_back(token.getStringValue());
 
-		while (consumeNextTokenIfIsType(TokenType::Dot))
+		while (consumeNextTokenIfType(TokenType::Dot))
 		{
 			if (peekToken().type == TokenType::Identifier)
 			{
@@ -506,6 +528,7 @@ std::shared_ptr<ExpressionFactor> Parser::parseExpressionFactor()
 			}
 		}
 
+		// call function
 		if (checkNextTokenType(TokenType::RoundBracketOpen))
 		{
 			std::shared_ptr<CallFuncStatement> callFunc = parseCallFunc(names);
@@ -520,17 +543,17 @@ std::shared_ptr<ExpressionFactor> Parser::parseExpressionFactor()
 		}
 		else
 		{
-			// TO IDENTYFIKATOR
-			// TO DO
+			factor->setVariable(names);
 		}
 	}
-	else if (consumeNextTokenIfIsType(TokenType::Digit))
+	else if (consumeNextTokenIfType(TokenType::Digit))
 	{
 		factor->setIntVal(token.getIntValue());
 	}
 	else
 	{
 		logger->newLog(LogType::BadExpression, token);
+		return nullptr;
 	}
 
 	return factor;
@@ -541,7 +564,7 @@ std::shared_ptr<Condition> Parser::parseCondition()
 	std::shared_ptr<Condition> condition = std::make_shared<Condition>();
 	condition->addAndCondition(parseAndCondition());
 
-	while(consumeNextTokenIfIsType(TokenType::Or))
+	while(consumeNextTokenIfType(TokenType::Or))
 	{
 		condition->addAndCondition(parseAndCondition());
 	}
@@ -554,7 +577,7 @@ std::shared_ptr<AndCondition> Parser::parseAndCondition()
 	std::shared_ptr<AndCondition> andCondition = std::make_shared<AndCondition>();
 	andCondition->addRelationCondition(parseRelationCondition());
 
-	while (consumeNextTokenIfIsType(TokenType::And))
+	while (consumeNextTokenIfType(TokenType::And))
 	{
 		andCondition->addRelationCondition(parseRelationCondition());
 	}
@@ -566,30 +589,28 @@ std::shared_ptr<RelationCondition> Parser::parseRelationCondition()
 {
 	std::shared_ptr<RelationCondition> relationCondition = std::make_shared<RelationCondition>();
 	
-	if (consumeNextTokenIfIsType(TokenType::NotOperator))
+	if (consumeNextTokenIfType(TokenType::NotOperator))
 	{
 		relationCondition->setNotOperator(true);
 	}
 
 	Token token = peekToken();
 
-	if (consumeNextTokenIfIsType({ TokenType::True, TokenType::False }))
+	if (consumeNextTokenIfType({ TokenType::True, TokenType::False }))
 	{
 		relationCondition->setBooleanWord(token.type == TokenType::True);
 
 		return relationCondition;
 	}
 
-	if (consumeNextTokenIfIsType(TokenType::RoundBracketOpen))
+	if (consumeNextTokenIfType(TokenType::RoundBracketOpen))
 	{
 		relationCondition->setCondition(parseCondition());
 
-		if (!checkIfTokenTypeEqual(peekToken(), TokenType::RoundBracketClose))
+		if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
 		{
-			logger->newLog(LogType::MissingRoundBracketClose, peekToken());
 			return nullptr;
 		}
-		getNextToken();
 
 		return relationCondition;
 	}
@@ -597,7 +618,7 @@ std::shared_ptr<RelationCondition> Parser::parseRelationCondition()
 	relationCondition->setExpression(parseExpression());
 	token = peekToken();
 
-	if (consumeNextTokenIfIsType({ TokenType::Equal, TokenType::NotEqual, TokenType::Less, TokenType::Greater, TokenType::LessOrEqual, TokenType::GreaterOrEqual }))
+	if (consumeNextTokenIfType({ TokenType::Equal, TokenType::NotEqual, TokenType::Less, TokenType::Greater, TokenType::LessOrEqual, TokenType::GreaterOrEqual }))
 	{
 		relationCondition->setRelationOperator(token.type);
 		relationCondition->setExpression(parseExpression(), 2);
@@ -635,12 +656,12 @@ const bool Parser::hasBufferedToken() const
 	return nextToken.has_value();
 }
 
-const bool Parser::consumeNextTokenIfIsType(const TokenType& type)
+const bool Parser::consumeNextTokenIfType(const TokenType& type)
 {
-	return consumeNextTokenIfIsType(std::vector<TokenType>({ type }));
+	return consumeNextTokenIfType(std::vector<TokenType>({ type }));
 }
 
-const bool Parser::consumeNextTokenIfIsType(const std::vector<TokenType>& types)
+const bool Parser::consumeNextTokenIfType(const std::vector<TokenType>& types)
 {
 	if (checkNextTokenType(types))
 	{
@@ -674,4 +695,19 @@ const bool Parser::checkIfTokenTypeEqual(const TokenType& tokenType, const Token
 const bool Parser::checkIfTokenTypeEqual(const Token& token, const TokenType& type) const
 {
 	return checkIfTokenTypeEqual(token.type, type);
+}
+
+const bool Parser::consumeNextTokenIfType_Otherwise_AddLog(const TokenType& type, const LogType& logType, const Token& token)
+{
+	if (consumeNextTokenIfType(type))
+		return true;
+
+	logger->newLog(logType, token);
+
+	return false;
+}
+
+const bool Parser::consumeNextTokenIfType_Otherwise_AddLog(const TokenType& type, const LogType& logType)
+{
+	return consumeNextTokenIfType_Otherwise_AddLog(type, logType, peekToken());
 }

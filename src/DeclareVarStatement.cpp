@@ -15,6 +15,16 @@ const void DeclareVarStatement::setAssignStatement(std::shared_ptr<AssignStateme
     assignStatement = assign;
 }
 
+const void DeclareVarStatement::setAssignClassStatement(std::shared_ptr<AssignClassStatement> assignClass)
+{
+    assignClassStatement = assignClass;
+}
+
+const void DeclareVarStatement::setColorVal(std::string color)
+{
+    colorVal = color;
+}
+
 TokenType DeclareVarStatement::getType() const
 {
     return type;
@@ -28,4 +38,14 @@ std::string DeclareVarStatement::getIdentifier() const
 std::shared_ptr<AssignStatement> DeclareVarStatement::getAssignStatemnt() const
 {
     return assignStatement;
+}
+
+std::shared_ptr<AssignClassStatement> DeclareVarStatement::getAssignClassStatement() const
+{
+    return assignClassStatement;
+}
+
+std::string DeclareVarStatement::getColorVal() const
+{
+    return colorVal;
 }
