@@ -695,7 +695,7 @@ TEST_CASE("def function", "[parser]")
 
 	SECTION("function without parameters, with return type")
 	{
-		reader->setSourceString("Turtle function test4() {}");
+		reader->setSourceString("Turtle function test4() { Turtle test; return test;}");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -706,6 +706,21 @@ TEST_CASE("def function", "[parser]")
 		REQUIRE(defFunction->getParametersSize() == 0);
 		REQUIRE(defFunction->hasReturnType());
 		REQUIRE(defFunction->getReturnType() == TokenType::Turtle);
+		REQUIRE(defFunction->getInstructionsBlock() != nullptr);
+
+		InstructionsBlock* instructionsBlock = defFunction->getInstructionsBlock();
+		REQUIRE(instructionsBlock->getChildrenSize() == 2);
+		REQUIRE(instructionsBlock->getChild(1)->getNodeType() == NodeType::ReturnStatement);
+
+		ReturnStatement* returnStatement = static_cast<ReturnStatement*>(instructionsBlock->getChild(1));
+		Expression* expression = static_cast<Expression*>(returnStatement->getReturn());
+		REQUIRE(expression->getChildrenExpressionSize() == 1);
+
+		Expression* termExpression = expression->getChildExpression(0);
+		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
+		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::Variable);
+		Variable* variable = static_cast<Variable*>(termExpression->getChildExpression(0));
+		REQUIRE(variable->getIdentifier(0) == "test");
 	}
 
 	SECTION("function witn parameters, with return type")

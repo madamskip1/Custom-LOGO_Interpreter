@@ -15,6 +15,7 @@
 #include "Variable.h"
 #include "Color.h"
 
+
 Parser::Parser(Lexer* lex, Logger* logger) : lexer(lex), logger(logger)
 {
 }
@@ -95,7 +96,12 @@ std::unique_ptr<InstructionsBlock> Parser::parseInstructionsBlock()
     {
         if (getToken().type == TokenType::Return)
         {
-            // TODO
+            consumeToken();
+            std::unique_ptr<ReturnStatement> returnStatement = parseReturnStatement();
+            if (!returnStatement)
+                return nullptr;
+
+            instructionsBlock->addChild(std::move(returnStatement));
         }
         else
         {
@@ -381,20 +387,7 @@ std::unique_ptr<AssignmentStatement> Parser::parseAssignment(std::vector<std::st
     //if (!consumeTokenIfType_Otherwise_AddLog(TokenType::AssignOperator, LogType::BadSyntax))
     //    return nullptr;
 
-    std::unique_ptr<Assignable> assignable;
-    if (checkCurTokenType({ TokenType::True, TokenType::False }))
-    {
-        assignable = std::make_unique<Boolean>(checkCurTokenType(TokenType::True));
-        consumeToken();
-    }
-    else if (checkCurTokenType(TokenType::ColorValue))
-    {
-        assignable = std::make_unique<Color>(getAndConsumeToken().getStringValue());
-    }
-    else
-    {
-        assignable = parseExpression();
-    }
+    std::unique_ptr<Assignable> assignable = parseAssignable();
 
     if (!assignable)
         return nullptr;
@@ -403,6 +396,31 @@ std::unique_ptr<AssignmentStatement> Parser::parseAssignment(std::vector<std::st
     assign->addIdentifiers(identifiers);
     assign->setAssign(std::move(assignable));
     return assign;
+}
+
+std::unique_ptr<Assignable> Parser::parseAssignable()
+{
+    if (checkCurTokenType({ TokenType::True, TokenType::False }))
+    {
+        std::unique_ptr<Assignable> assignable = std::make_unique<Boolean>(checkCurTokenType(TokenType::True));
+        consumeToken();
+
+        return assignable;
+    }
+
+    if (checkCurTokenType(TokenType::ColorValue))
+    {
+        std::unique_ptr<Assignable> assignable = std::make_unique<Color>(getAndConsumeToken().getStringValue());
+        
+        return assignable;
+    }
+
+    std::unique_ptr<Assignable> assignable = parseExpression();
+    
+    if (assignable)
+        return assignable;
+
+    return nullptr;
 }
 
 std::unique_ptr<ClassAssignment> Parser::parseClassAssignment()
@@ -657,6 +675,21 @@ std::unique_ptr<Node> Parser::parseRelationCondition()
     relationCondition->setCondition(std::move(expression));
 
     return relationCondition;
+}
+
+std::unique_ptr<ReturnStatement> Parser::parseReturnStatement()
+{
+    std::unique_ptr<Assignable> assignable = parseAssignable();
+
+    if (!assignable)
+        return nullptr;
+
+    std::unique_ptr<ReturnStatement> returnStatement = std::make_unique<ReturnStatement>();
+    returnStatement->setReturn(std::move(assignable));
+
+    consumeTokenIfType_Otherwise_AddLog(TokenType::Semicolon, LogType::MissingSemicolon);
+
+    return returnStatement;
 }
 
 std::vector<std::string> Parser::parseIdentifiers()

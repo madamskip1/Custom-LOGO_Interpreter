@@ -17,6 +17,7 @@
 #include "CallFuncStatement.h"
 #include "AssignmentStatement.h"
 #include "ClassAssignment.h"
+#include "ReturnStatement.h"
 
 
 class Parser
@@ -47,6 +48,7 @@ private:
 	std::unique_ptr<Node> parseDefFuncStatement(const TokenType& returnType = TokenType::UNKNOWN);
 
 	std::unique_ptr<AssignmentStatement> parseAssignment(std::vector<std::string> identifiers);
+	std::unique_ptr<Assignable> parseAssignable();
 	std::unique_ptr<ClassAssignment> parseClassAssignment();
 
 	std::unique_ptr<Parameter> parseParameter();
@@ -58,6 +60,8 @@ private:
 	std::unique_ptr<Node> parseCondition();
 	std::unique_ptr<Node> parseAndCondition();
 	std::unique_ptr<Node> parseRelationCondition();
+
+	std::unique_ptr<ReturnStatement> parseReturnStatement();
 
 	std::vector<std::string> parseIdentifiers();
 
