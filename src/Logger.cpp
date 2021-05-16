@@ -17,8 +17,15 @@ const void Logger::newLog(const LogType& logType, const Token& token)
 
 const void Logger::newLog(const LogType& logType, const int& line, const int& firstCharPos, const std::streampos& streamPos, const TokenType& type)
 {
-	std::shared_ptr<Log> newLog = std::make_shared<Log>(logType, line, firstCharPos, streamPos, type);
-	logs.push_back(newLog);
+	std::unique_ptr<Log> newLog = std::make_unique<Log>(logType, line, firstCharPos, streamPos, type);
+	logs.push_back(std::move(newLog));
+}
+
+const void Logger::addNewError(const LogType& logType, const Token& token)
+{
+	std::unique_ptr<Log> newLog = std::make_unique<Log>(logType, token.line, token.firstCharPos, token.tokenPos, token.type);
+	newLog->setIsError(true);
+	logs.push_back(std::move(newLog));
 }
 
 const std::size_t Logger::getLogsSize() const
@@ -26,13 +33,20 @@ const std::size_t Logger::getLogsSize() const
 	return logs.size();
 }
 
-std::vector<std::shared_ptr<Log>> Logger::getLogs() const
+Log* Logger::getLog(int index) const
 {
-	return logs;
+	return logs[index].get();
 }
 
-std::shared_ptr<Log> Logger::getLog(int index) const
+const bool Logger::hasAnyError() const
 {
-	return logs[index];
+	int logsSize = logs.size();
+	for (int i = 0; i < logsSize; i++)
+	{
+		if (logs[i]->isError())
+			return true;
+	}
+
+	return false;
 }
 

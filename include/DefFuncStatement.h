@@ -6,6 +6,7 @@
 #include "InstructionsBlock.h"
 #include "Parameter.h"
 #include "TokenType.h"
+#include "Assignable.h"
 
 class DefFuncStatement :
 	public Node

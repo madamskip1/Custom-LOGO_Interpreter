@@ -73,6 +73,7 @@ private:
 	const bool consumeTokenIfType(const std::vector<TokenType>& types);
 
 	const bool consumeTokenIfType_Otherwise_AddLog(const TokenType& tokenType, const LogType& logType);
+	const bool consumeTokenIfType_Otherwise_AddError(const TokenType& tokenType, const LogType& logType);
 
 	const bool checkCurTokenType(const TokenType& type);
 	const bool checkCurTokenType(const std::vector<TokenType>& types);

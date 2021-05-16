@@ -28,15 +28,17 @@ std::unique_ptr<Node> Parser::parse()
 std::unique_ptr<Node> Parser::parseProgram()
 {
     std::unique_ptr<ProgramRootNode> rootNode = std::make_unique<ProgramRootNode>();
-    std::unique_ptr<Node> node;
 
     bool wasError = false;
     do {
-        node = parseInstruction();
+        std::unique_ptr<Node> node = parseInstruction();
 
         if (node)
         {
             rootNode->addChild(std::move(node));
+
+            if (logger->hasAnyError())
+                wasError = true;
         }
         else
         {
@@ -47,7 +49,7 @@ std::unique_ptr<Node> Parser::parseProgram()
 
     if (!checkCurTokenType(TokenType::EndOfFile))
     {
-        // Nie przetworzono do konca, byl blad
+        logger->addNewError(LogType::NotEndOfFile, getToken());
     }
     return rootNode;
 }
@@ -86,11 +88,10 @@ std::unique_ptr<Node> Parser::parseInstruction()
 
 std::unique_ptr<InstructionsBlock> Parser::parseInstructionsBlock()
 {
-    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::CurlyBracketOpen, LogType::MissingCurlyBracketOpen))
+    if (!consumeTokenIfType_Otherwise_AddError(TokenType::CurlyBracketOpen, LogType::MissingCurlyBracketOpen))
         return nullptr;
 
     std::unique_ptr<InstructionsBlock> instructionsBlock = std::make_unique<InstructionsBlock>();
-    std::unique_ptr<Node> instruction;
 
     while (!checkCurTokenType({ TokenType::CurlyBracketClose, TokenType::EndOfFile }))
     {
@@ -98,6 +99,7 @@ std::unique_ptr<InstructionsBlock> Parser::parseInstructionsBlock()
         {
             consumeToken();
             std::unique_ptr<ReturnStatement> returnStatement = parseReturnStatement();
+
             if (!returnStatement)
                 return nullptr;
 
@@ -105,17 +107,24 @@ std::unique_ptr<InstructionsBlock> Parser::parseInstructionsBlock()
         }
         else
         {
+            Token token = getToken();
+            std::unique_ptr<Node> instruction;
             instruction = parseInstruction();
+
             if (!instruction)
                 return nullptr;
+
             if (instruction->getNodeType() == NodeType::DefFuncStatement)
-                return nullptr; // Nie mozna definiowac funkcji w bloku. Dodaæ log
+            {
+                logger->addNewError(LogType::CantDefFuncInBlock, token);
+                return nullptr; 
+            }
 
             instructionsBlock->addChild(std::move(instruction));
         }
     }
 
-    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::CurlyBracketClose, LogType::MissingCurlyBracketClose))
+    if (!consumeTokenIfType_Otherwise_AddError(TokenType::CurlyBracketClose, LogType::MissingCurlyBracketClose))
         return nullptr;
 
     return instructionsBlock;
@@ -126,14 +135,17 @@ std::unique_ptr<Node> Parser::parseIfStatement()
     if (!consumeTokenIfType(TokenType::If))
         return nullptr;
 
-    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
+
+    if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
         return nullptr;
 
+    Token token = getToken();
     std::unique_ptr<Node> condition = parseCondition();
+
     if (!condition)
         return nullptr;
 
-    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
+    if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
         return nullptr;
 
     std::unique_ptr<InstructionsBlock> trueBlock = parseInstructionsBlock();
@@ -163,14 +175,14 @@ std::unique_ptr<Node> Parser::parseRepeatStatement()
     if (!consumeTokenIfType(TokenType::Repeat))
         return nullptr;
 
-    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
+    if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
         return nullptr;
 
     std::unique_ptr<Expression> howManyTime = parseExpression();
     if (!howManyTime)
         return nullptr;
 
-    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
+    if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
         return nullptr;
 
     std::unique_ptr<InstructionsBlock> block = parseInstructionsBlock();
@@ -188,10 +200,9 @@ std::unique_ptr<Node> Parser::parseRepeatTimeStatement()
     if (!consumeTokenIfType(TokenType::RepeatTime))
         return nullptr;
 
-    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
+    if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
         return nullptr;
 
-    // expression period
     std::unique_ptr<Expression> period = parseExpression();
     if (!period)
         return nullptr;
@@ -199,13 +210,12 @@ std::unique_ptr<Node> Parser::parseRepeatTimeStatement()
     std::unique_ptr<Expression> howManyTime = nullptr;
     if (consumeTokenIfType(TokenType::Comma))
     {
-        // expression how many time
         howManyTime = parseExpression();
         if (!howManyTime)
             return nullptr;
     }
 
-    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
+    if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
         return nullptr;
 
     std::unique_ptr<InstructionsBlock> block = parseInstructionsBlock();
@@ -257,10 +267,11 @@ std::unique_ptr<CallFuncStatement> Parser::parseCallFunctionStatement(std::vecto
     if (!consumeTokenIfType(TokenType::RoundBracketClose))
     {
         do {
+            Token token = getToken();
             std::unique_ptr<Expression> arg = parseExpression();
             if (!arg)
             {
-                // add log
+                logger->addNewError(LogType::MissingParameter, token);
                 return nullptr;
             }
 
@@ -268,7 +279,7 @@ std::unique_ptr<CallFuncStatement> Parser::parseCallFunctionStatement(std::vecto
 
         } while (consumeTokenIfType(TokenType::Comma));
 
-        if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
+        if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
             return nullptr;
     }
 
@@ -291,7 +302,7 @@ std::unique_ptr<Node> Parser::parseVarDeclareORDefFuncWithReturStatement()
         return decVarOrDefFunc;
 
     decVarOrDefFunc = parseVarDeclare(token.type);
-    //consumeTokenIfType_Otherwise_AddLog(TokenType::Semicolon, LogType::MissingSemicolon, token);
+
     return decVarOrDefFunc;
 }
 
@@ -299,7 +310,7 @@ std::unique_ptr<VarDeclare> Parser::parseVarDeclare(const TokenType& type)
 {
 	std::string identifier = getToken().getStringValue();
 
-	if (!consumeTokenIfType_Otherwise_AddLog(TokenType::Identifier, LogType::MissingIdentifierOrFunctionKeyword))
+	if (!consumeTokenIfType_Otherwise_AddError(TokenType::Identifier, LogType::MissingIdentifierOrFunctionKeyword))
 		return nullptr;
 
     std::unique_ptr<ClassAssignment> classAssign;
@@ -335,38 +346,34 @@ std::unique_ptr<VarDeclare> Parser::parseVarDeclare(const TokenType& type)
 
 std::unique_ptr<Node> Parser::parseDefFuncStatement(const TokenType& returnType)
 {
-	/*
-		functionDef = [allTypes], "function", id, "(", [ parameters ], ")", block;
-		parameters = parameter, { ",", parameter };
-	*/
-
     if (!consumeTokenIfType(TokenType::Function))
         return nullptr;
 
     std::string name = getToken().getStringValue();
 
-    if (name == "" || !consumeTokenIfType_Otherwise_AddLog(TokenType::Identifier, LogType::MissingIdentifier))
+    if (name == "" || !consumeTokenIfType_Otherwise_AddError(TokenType::Identifier, LogType::MissingIdentifier))
         return nullptr;
 
-    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
+    if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
         return nullptr;
 
     std::unique_ptr<DefFuncStatement> defFunc = std::make_unique<DefFuncStatement>();
     if (!consumeTokenIfType(TokenType::RoundBracketClose))
     {
         do {
+            Token token = getToken();
             std::unique_ptr<Parameter> parameter = parseParameter();
 
             if (!parameter)
             {
-                // add log
+                logger->newLog(LogType::MissingParameter, token);
                 return nullptr;
             }
 
             defFunc->addParameter(std::move(parameter));
         } while (consumeTokenIfType(TokenType::Comma));
         
-        if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
+        if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
             return nullptr;
 
     }
@@ -384,9 +391,6 @@ std::unique_ptr<Node> Parser::parseDefFuncStatement(const TokenType& returnType)
 
 std::unique_ptr<AssignmentStatement> Parser::parseAssignment(std::vector<std::string> identifiers)
 {
-    //if (!consumeTokenIfType_Otherwise_AddLog(TokenType::AssignOperator, LogType::BadSyntax))
-    //    return nullptr;
-
     std::unique_ptr<Assignable> assignable = parseAssignable();
 
     if (!assignable)
@@ -400,6 +404,8 @@ std::unique_ptr<AssignmentStatement> Parser::parseAssignment(std::vector<std::st
 
 std::unique_ptr<Assignable> Parser::parseAssignable()
 {
+    Token token = getToken();
+
     if (checkCurTokenType({ TokenType::True, TokenType::False }))
     {
         std::unique_ptr<Assignable> assignable = std::make_unique<Boolean>(checkCurTokenType(TokenType::True));
@@ -420,6 +426,7 @@ std::unique_ptr<Assignable> Parser::parseAssignable()
     if (assignable)
         return assignable;
 
+    logger->addNewError(LogType::UnknownAssignable, token);
     return nullptr;
 }
 
@@ -427,18 +434,22 @@ std::unique_ptr<ClassAssignment> Parser::parseClassAssignment()
 {
     if (!consumeTokenIfType(TokenType::RoundBracketOpen))
         return nullptr;
-
-    if (consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::BadExpression))
+    
+    if (checkCurTokenType(TokenType::RoundBracketClose))
+    {
+        logger->addNewError(LogType::BadExpression, getToken());
         return nullptr;
+    }
 
     std::unique_ptr<ClassAssignment> classAssign = std::make_unique<ClassAssignment>();
 
     do {
+        Token token = getToken();
         std::unique_ptr<Expression> expression = parseExpression();
         
         if (!expression)
         {
-            // add log
+            logger->addNewError(LogType::BadExpression, token);
             return nullptr;
         }
 
@@ -446,7 +457,7 @@ std::unique_ptr<ClassAssignment> Parser::parseClassAssignment()
 
     } while (consumeTokenIfType(TokenType::Comma));
 
-    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingCurlyBracketClose))
+    if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketClose, LogType::MissingCurlyBracketClose))
         return nullptr;
 
     return classAssign;
@@ -458,13 +469,13 @@ std::unique_ptr<Parameter> Parser::parseParameter()
     
     if (!consumeTokenIfType({ TokenType::ColorVar, TokenType::Integer, TokenType::Turtle, TokenType::Point, TokenType::Boolean }))
     {
-        // add log
+        logger->newLog(LogType::BadSyntaxParameter, getToken());
         return nullptr;
     }
 
     std::string identifier = getToken().getStringValue();
 
-    if (identifier == "" || !consumeTokenIfType_Otherwise_AddLog(TokenType::Identifier, LogType::MissingIdentifier))
+    if (identifier == "" || !consumeTokenIfType_Otherwise_AddError(TokenType::Identifier, LogType::MissingIdentifier))
         return nullptr;
 
     std::unique_ptr<Parameter> parameter = std::make_unique<Parameter>();
@@ -476,9 +487,6 @@ std::unique_ptr<Parameter> Parser::parseParameter()
 
 std::unique_ptr<Expression> Parser::parseExpression()
 {
-    /*
-        expression = term, { addOperator, term };
-    */
     std::unique_ptr<Expression> termExpression = parseTermExpression();
     
     if (!termExpression)
@@ -549,7 +557,7 @@ std::unique_ptr<Expression> Parser::parseFactorExpression()
         if (!factorExpression)
             return nullptr;
 
-        if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
+        if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
             return nullptr;
 
         factorExpression->setNegativeOp(negativeOp);
@@ -580,6 +588,7 @@ std::unique_ptr<Expression> Parser::parseFactorExpression()
         return var;
     }
 
+    logger->addNewError(LogType::BadExpression, getToken());
     return nullptr;
 }
 
@@ -646,7 +655,7 @@ std::unique_ptr<Node> Parser::parseRelationCondition()
         if (!condition)
             return nullptr;
 
-        if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingCurlyBracketClose))
+        if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketClose, LogType::MissingCurlyBracketClose))
             return nullptr;
 
         Condition* tempCon = static_cast<Condition*>(condition.get());
@@ -711,7 +720,7 @@ std::vector<std::string> Parser::parseIdentifiers()
         }
         else
         {
-            logger->newLog(LogType::MissingIdentifier, getToken());
+            logger->addNewError(LogType::MissingIdentifier, getToken());
             return std::vector<std::string>();
         }
 
@@ -771,8 +780,16 @@ const bool Parser::consumeTokenIfType_Otherwise_AddLog(const TokenType& tokenTyp
     if (consumeTokenIfType(tokenType))
         return true;
 
-    Token token = getToken();
-    // add Log
+    logger->newLog(logType, getToken());
+    return false;
+}
+
+const bool Parser::consumeTokenIfType_Otherwise_AddError(const TokenType& tokenType, const LogType& logType)
+{
+    if (consumeTokenIfType(tokenType))
+        return true;
+
+    logger->addNewError(logType, getToken());
     return false;
 }
 

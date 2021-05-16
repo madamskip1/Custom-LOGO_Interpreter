@@ -18,6 +18,16 @@ LogType Log::getLogType() const
 	return logType;
 }
 
+const void Log::setIsError(const bool& error)
+{
+	this->error = error;
+}
+
+const bool Log::isError() const
+{
+	return error;
+}
+
 std::string Log::lineAndPos_toString() const
 {
 	std::string string = "Linia ";

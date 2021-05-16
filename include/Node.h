@@ -25,8 +25,8 @@ enum class NodeType
 	Number,
 	Boolean,
 	Variable,
-	Color
-
+	Color,
+	ReturnStatement
 };
 
 class Node

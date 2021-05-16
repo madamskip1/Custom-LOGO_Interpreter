@@ -18,7 +18,10 @@ enum class LogType
 	MissingParameter,
 	BadSyntaxParameter,
 	BadExpression,
-	BadSyntax
+	BadSyntax,
+	NotEndOfFile,
+	BadReturnStatement,
+	UnknownAssignable
 };
 
 class Log
@@ -29,6 +32,9 @@ public:
 	std::string toString() const;
 	LogType getLogType() const;
 
+	const void setIsError(const bool& error);
+	const bool isError() const;
+
 private:
 	TokenType type = TokenType::UNKNOWN;
 	int line = 0;
@@ -36,6 +42,8 @@ private:
 	std::streampos streamPos;
 	LogType logType;
 
+	bool error = false;
+	
 	std::string lineAndPos_toString() const;
 
 	const std::map<LogType, std::string> LogTypeToMsg =
@@ -52,6 +60,10 @@ private:
 		{ LogType::MissingParameter, "Uzyto przecinka, ale nie podano kolejnego parametru." },
 		{ LogType::BadSyntaxParameter, "Brakuje deklaracji typu przed nazwa parametru." },
 		{ LogType::BadExpression, "Zle wyrazenie." },
-		{ LogType::MissingCurlyBracketOpen, "Oczekiwano klamre otwierajaca." }
+		{ LogType::MissingCurlyBracketOpen, "Oczekiwano klamre otwierajaca." },
+		{ LogType::BadSyntax, "Blad skladniowy." },
+		{ LogType::NotEndOfFile, "Nie udalo sie przetworzyc do konca. Wystapil blad krytyczny." },
+		{ LogType::BadReturnStatement, "Blad skladniowy w klauzyli Return" },
+		{ LogType::UnknownAssignable, "Nie rozpoznanu rodzaju przypisania wartosci" }
 	};
 };
