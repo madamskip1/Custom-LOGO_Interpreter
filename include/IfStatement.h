@@ -1,5 +1,5 @@
 #pragma once
-#include <memory>
+
 #include "Node.h"
 #include "InstructionsBlock.h"
 #include "Condition.h"
@@ -10,18 +10,17 @@ class IfStatement :
 public:
     IfStatement();
 
-    const void setTrueBlockNode(std::shared_ptr<InstructionsBlock> block);
-    const void setElseBlockNode(std::shared_ptr<InstructionsBlock> block);
-    const void setCondition(std::shared_ptr<Condition> cond);
+    const void setTrueBlockNode(std::unique_ptr<InstructionsBlock> block);
+    const void setElseBlockNode(std::unique_ptr<InstructionsBlock> block);
+    const void setCondition(std::unique_ptr<Node> cond);
 
     const bool hasElseBlock() const;
-    std::shared_ptr<InstructionsBlock> getTrueBlockNode() const;
-    std::shared_ptr<InstructionsBlock> getElseBlockNode() const;
-    std::shared_ptr<Condition> getCondition() const;
+    InstructionsBlock* getTrueBlockNode() const;
+    InstructionsBlock* getElseBlockNode() const;
+    Node* getCondition() const;
 
 private:
-    std::shared_ptr<Condition> condition = nullptr;
-    std::shared_ptr<InstructionsBlock> trueBlockNode = nullptr;
-    std::shared_ptr<InstructionsBlock> elseBlockNode = nullptr;
+    std::unique_ptr<Node> condition = nullptr;
+    std::unique_ptr<InstructionsBlock> trueBlockNode = nullptr;
+    std::unique_ptr<InstructionsBlock> elseBlockNode = nullptr;
 };
-

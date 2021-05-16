@@ -1,34 +1,69 @@
 #include "Expression.h"
 
-Expression::Expression() : Node(NodeType::Expression) {};
-
-const void Expression::addExpressionTerm(std::shared_ptr<TermExpression> term)
+Expression::Expression() 
 {
-	expressionTerms.push_back(term);
+    nodeType = NodeType::Expression;
 }
 
-const void Expression::addAddOperartor(const TokenType& addOperator)
+int Expression::evaluate() const
 {
-	addOperators.push_back(addOperator);
+    int val = childrenExpressions[0]->evaluate();
+    int val2 = 0;
+    TokenType op;
+
+    for (int i = 1; i < childrenExpressions.size(); i++)
+    {
+        val2 = childrenExpressions[i]->evaluate();
+        op = operators[i - 1];
+
+        if (op == TokenType::Plus)
+            val += val2;
+        else if (op == TokenType::Minus)
+            val -= val2;
+        else if (op == TokenType::Multiply)
+            val *= val2;
+        else if (op == TokenType::Divide)
+            val /= val2;
+    }
+
+    if (negativeOperator)
+        val *= -1;
+
+    return val;
 }
 
-const void Expression::addNextExpressionTerm(std::shared_ptr<TermExpression> term, const TokenType& addOperator)
+
+const void Expression::addChildExpression(std::unique_ptr<Expression> child)
 {
-	expressionTerms.push_back(term);
-	addOperators.push_back(addOperator);
+    childrenExpressions.push_back(std::move(child));
 }
 
-const std::size_t Expression::getTermsSize() const
+const void Expression::addOperator(const TokenType& op)
 {
-	return expressionTerms.size();
+    operators.push_back(op);
 }
 
-std::shared_ptr<TermExpression> Expression::getExpressionTerm(const int& index) const
+const void Expression::setNegativeOp(const bool& negative)
 {
-	return expressionTerms[index];
+    negativeOperator = negative;
 }
 
-TokenType Expression::getOperator(const int& index) const
+const std::size_t Expression::getChildrenExpressionSize() const
 {
-	return addOperators[index];
+    return childrenExpressions.size();
+}
+
+Expression* Expression::getChildExpression(const int& index) const
+{
+    return childrenExpressions[index].get();
+}
+
+const bool Expression::getNegativeOperator() const
+{
+    return negativeOperator;
+}
+
+const TokenType Expression::getOperator(const int& index) const
+{
+    return operators[index];
 }

@@ -1,21 +1,23 @@
 #pragma once
 #include <optional>
+#include <memory>
 #include <vector>
+#include <string>
 #include "Lexer.h"
-#include "Token.h"
-#include "TokenType.h"
-#include "ProgramRootNode.h"
-#include "IfStatement.h"
-#include "RepeatStatement.h"
-#include "RepeatTimeStatement.h"
-#include "Expression.h"
-#include "DefFuncStatement.h"
-#include "Parameter.h"
-#include "Condition.h"
-#include "AssignStatement.h"
-#include "DeclareVarStatement.h"
 #include "Logger.h"
-#include "AssignClassStatement.h"
+#include "Token.h"
+
+#include "ProgramRootNode.h"
+#include "Node.h"
+#include "InstructionsBlock.h"
+#include "Expression.h"
+#include "Condition.h"
+#include "Parameter.h"
+#include "VarDeclare.h"
+#include "CallFuncStatement.h"
+#include "AssignmentStatement.h"
+#include "ClassAssignment.h"
+
 
 class Parser
 {
@@ -23,56 +25,54 @@ public:
 	Parser() = delete;
 	Parser(Lexer* lex, Logger* logger);
 
-	std::unique_ptr<ProgramRootNode> parse();
+	std::unique_ptr<Node> parse();
 
 private:
 	Lexer* lexer;
 	Logger* logger;
-	std::optional<Token> nextToken;
+	std::optional<Token> token;
+	
+	std::unique_ptr<Node> parseProgram();
 
+	std::unique_ptr<Node> parseInstruction();
+	std::unique_ptr<InstructionsBlock> parseInstructionsBlock();
+	std::unique_ptr<Node> parseIfStatement();
+	std::unique_ptr<Node> parseRepeatStatement();
+	std::unique_ptr<Node> parseRepeatTimeStatement();
+	std::unique_ptr<Node> parseAssignOrCallFunctionStatement();
+	std::unique_ptr<CallFuncStatement> parseCallFunctionStatement(std::vector<std::string> identifiers);
 
-	std::unique_ptr<ProgramRootNode> parseProgram();
+	std::unique_ptr<Node> parseVarDeclareORDefFuncWithReturStatement();
+	std::unique_ptr<VarDeclare> parseVarDeclare(const TokenType& type);
+	std::unique_ptr<Node> parseDefFuncStatement(const TokenType& returnType = TokenType::UNKNOWN);
 
-	std::shared_ptr<Node> parseInstruction();
+	std::unique_ptr<AssignmentStatement> parseAssignment(std::vector<std::string> identifiers);
+	std::unique_ptr<ClassAssignment> parseClassAssignment();
 
-	std::shared_ptr<InstructionsBlock> parseInstructionsBlock();
-	std::shared_ptr<Node> parseDeclareVarORDefFuncWithReturStatement();
-	std::shared_ptr<DefFuncStatement> parseDefFuncStatement(TokenType returnType = TokenType::UNKNOWN);
-	std::shared_ptr<Parameter> parseParameter();
-	std::shared_ptr<IfStatement> parseIfStatement();
-	std::shared_ptr<RepeatStatement> parseRepeatStatement();
-	std::shared_ptr<RepeatTimeStatement> parseRepeatTimeStatement();
+	std::unique_ptr<Parameter> parseParameter();
 
-	std::shared_ptr<Node> parseAssignOrCallFuncStatement();
-	std::shared_ptr<CallFuncStatement> parseCallFunc(std::vector<std::string> idNames);
-	std::shared_ptr<AssignStatement> parseAssignStatement(std::vector<std::string> idNames);
-	std::shared_ptr<AssignClassStatement> parseAssignClassStatement();
-	std::shared_ptr<DeclareVarStatement> parseDeclareVarStatement(TokenType type);
+	std::unique_ptr<Expression> parseExpression();
+	std::unique_ptr<Expression> parseTermExpression();
+	std::unique_ptr<Expression> parseFactorExpression();
+
+	std::unique_ptr<Node> parseCondition();
+	std::unique_ptr<Node> parseAndCondition();
+	std::unique_ptr<Node> parseRelationCondition();
 
 	std::vector<std::string> parseIdentifiers();
 
-	std::shared_ptr<Expression> parseExpression();
-	std::shared_ptr<TermExpression> parseExpressionTerm();
-	std::shared_ptr<FactorExpression> parseExpressionFactor();
+	Token getToken();
+	Token getAndConsumeToken();
+	const void consumeToken();
 
-	std::shared_ptr<Condition> parseCondition();
-	std::shared_ptr<AndCondition> parseAndCondition();
-	std::shared_ptr<RelationCondition> parseRelationCondition();
+	const bool consumeTokenIfType(const TokenType& type);
+	const bool consumeTokenIfType(const std::vector<TokenType>& types);
 
-	Token peekToken();
-	Token getNextToken();
-	const bool hasBufferedToken() const;
+	const bool consumeTokenIfType_Otherwise_AddLog(const TokenType& tokenType, const LogType& logType);
 
-	
-	const bool checkNextTokenType(const TokenType& type);
-	const bool checkNextTokenType(const std::vector<TokenType>& types);
-	const bool consumeNextTokenIfType(const TokenType& type);
-	const bool consumeNextTokenIfType(const std::vector<TokenType>& types);
-	const bool checkIfTokenTypeIsOneOf(const TokenType& type, const std::vector<TokenType>& types) const;
-	const bool checkIfTokenTypeEqual(const TokenType& tokenType, const TokenType& type) const;
-	const bool checkIfTokenTypeEqual(const Token& token, const TokenType& type) const;
+	const bool checkCurTokenType(const TokenType& type);
+	const bool checkCurTokenType(const std::vector<TokenType>& types);
 
-	const bool consumeNextTokenIfType_Otherwise_AddLog(const TokenType& type, const LogType& logType, const Token& token);
-	const bool consumeNextTokenIfType_Otherwise_AddLog(const TokenType& type, const LogType& logType);
+	const bool checkTokenType(const TokenType& tokenType, const TokenType& type);
+	const bool checkTokenType(const TokenType& tokenType, const std::vector<TokenType>& types);
 };
-

@@ -2,32 +2,32 @@
 
 RepeatTimeStatement::RepeatTimeStatement() : Node(NodeType::RepeatTimeStatement) {};
 
-const void RepeatTimeStatement::setPeriod(std::shared_ptr<Expression> time)
+const void RepeatTimeStatement::setPeriod(std::unique_ptr<Expression> time)
 {
-	period = time;
+	period = std::move(time);
 }
 
-const void RepeatTimeStatement::setHowManyTime(std::shared_ptr<Expression> howMany)
+const void RepeatTimeStatement::setHowManyTime(std::unique_ptr<Expression> howMany)
 {
-	howManyTime = howMany;
+	howManyTime = std::move(howMany);
 }
 
-std::shared_ptr<Expression> RepeatTimeStatement::getPeriod() const
+Expression* RepeatTimeStatement::getPeriod() const
 {
-	return period;
+	return period.get();
 }
 
-std::shared_ptr<Expression> RepeatTimeStatement::getHowManyTime() const
+Expression* RepeatTimeStatement::getHowManyTime() const
 {
-	return howManyTime;
+	return howManyTime.get();
 }
 
-const void RepeatTimeStatement::setInstructionsBlock(std::shared_ptr<InstructionsBlock> block)
+const void RepeatTimeStatement::setInstructionsBlock(std::unique_ptr<InstructionsBlock> block)
 {
-	instructionsBlock = block;
+	instructionsBlock = std::move(block);
 }
 
-std::shared_ptr<InstructionsBlock> RepeatTimeStatement::getInstructuionsBlock() const
+InstructionsBlock* RepeatTimeStatement::getInstructuionsBlock() const
 {
-	return instructionsBlock;
+	return instructionsBlock.get();
 }

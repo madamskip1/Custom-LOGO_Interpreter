@@ -1,8 +1,8 @@
 #pragma once
 #include <memory>
 #include "Node.h"
-#include "Expression.h"
 #include "InstructionsBlock.h"
+#include "Expression.h"
 
 class RepeatTimeStatement :
     public Node
@@ -10,18 +10,18 @@ class RepeatTimeStatement :
 public:
     RepeatTimeStatement();
 
-    const void setPeriod(std::shared_ptr<Expression> time);
-    const void setHowManyTime(std::shared_ptr<Expression> howMany);
+    const void setPeriod(std::unique_ptr<Expression> time);
+    const void setHowManyTime(std::unique_ptr<Expression> howMany);
 
-    std::shared_ptr<Expression> getPeriod() const;
-    std::shared_ptr<Expression> getHowManyTime() const;
+    Expression* getPeriod() const;
+    Expression* getHowManyTime() const;
 
-    const void setInstructionsBlock(std::shared_ptr<InstructionsBlock> block);
-    std::shared_ptr<InstructionsBlock> getInstructuionsBlock() const;
+    const void setInstructionsBlock(std::unique_ptr<InstructionsBlock> block);
+    InstructionsBlock* getInstructuionsBlock() const;
 
 private:
-    std::shared_ptr<Expression> howManyTime = nullptr;
-    std::shared_ptr<Expression> period = nullptr;
-    std::shared_ptr<InstructionsBlock> instructionsBlock = nullptr;
+    std::unique_ptr<Expression> period = nullptr;
+    std::unique_ptr<Expression> howManyTime = nullptr;
+    std::unique_ptr<InstructionsBlock> instructionsBlock = nullptr;
 };
 

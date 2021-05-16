@@ -3,7 +3,6 @@
 #include "Node.h"
 #include "TokenType.h"
 
-
 class Parameter :
     public Node
 {

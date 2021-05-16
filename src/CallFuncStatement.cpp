@@ -1,10 +1,13 @@
 #include "CallFuncStatement.h"
 
-CallFuncStatement::CallFuncStatement() : Node(NodeType::CallFuncStatement) {};
-
-const void CallFuncStatement::addArgument(std::shared_ptr<Expression> arg)
+CallFuncStatement::CallFuncStatement()
 {
-    arguments.push_back(arg);
+	nodeType = NodeType::CallFuncStatement;
+}
+
+const void CallFuncStatement::addArgument(std::unique_ptr<Expression> arg)
+{
+    arguments.push_back(std::move(arg));
 }
 
 const void CallFuncStatement::addIdentifier(const std::string id)
@@ -23,9 +26,9 @@ const std::size_t CallFuncStatement::getArgumentsSize() const
     return arguments.size();
 }
 
-std::shared_ptr<Expression> CallFuncStatement::getArgument(int index) const
+Expression* CallFuncStatement::getArgument(int index) const
 {
-    return arguments[index];
+    return arguments[index].get();
 }
 
 const std::size_t CallFuncStatement::getIdentifiersSize() const

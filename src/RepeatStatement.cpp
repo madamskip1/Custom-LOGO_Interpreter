@@ -2,22 +2,22 @@
 
 RepeatStatement::RepeatStatement() : Node(NodeType::RepeatStatement) {};
 
-const void RepeatStatement::setHowManyTime(std::shared_ptr<Expression> howMany)
+const void RepeatStatement::setHowManyTime(std::unique_ptr<Expression> howMany)
 {
-	howManyTime = howMany;
+	howManyTime = std::move(howMany);
 }
 
-std::shared_ptr<Expression> RepeatStatement::getHowManyTime() const
+Expression* RepeatStatement::getHowManyTime() const
 {
-	return howManyTime;
+	return howManyTime.get();
 }
 
-const void RepeatStatement::setInstructionsBlock(std::shared_ptr<InstructionsBlock> block)
+const void RepeatStatement::setInstructionsBlock(std::unique_ptr<InstructionsBlock> block)
 {
-	instructionsBlock = block;
+	instructionsBlock = std::move(block);
 }
 
-std::shared_ptr<InstructionsBlock> RepeatStatement::getInstructuionsBlock() const
+InstructionsBlock* RepeatStatement::getInstructuionsBlock() const
 {
-	return instructionsBlock;
+	return instructionsBlock.get();
 }

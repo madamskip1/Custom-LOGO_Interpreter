@@ -1,28 +1,29 @@
 #pragma once
 #include <vector>
 #include <memory>
-#include "Node.h"
 #include "TokenType.h"
-#include "TermExpression.h"
-
-class TermExpression;
+#include "Node.h"
+#include "Assignable.h"
 
 class Expression :
-    public Node
+    public Assignable
 {
 public:
     Expression();
+    virtual int evaluate() const;
 
-    const void addExpressionTerm(std::shared_ptr<TermExpression> term);
-    const void addAddOperartor(const TokenType& addOperator);
-    const void addNextExpressionTerm(std::shared_ptr<TermExpression> term, const TokenType& addOperator);
+    const void addChildExpression(std::unique_ptr<Expression> child);
+    const void addOperator(const TokenType& op);
+    const void setNegativeOp(const bool& negative);
+    const std::size_t getChildrenExpressionSize() const;
 
-    const std::size_t getTermsSize() const;
-    std::shared_ptr<TermExpression> getExpressionTerm(const int& index) const;
-    TokenType getOperator(const int& index) const;
+    Expression* getChildExpression(const int& index) const;
+    const bool getNegativeOperator() const;
+    const TokenType getOperator(const int& index) const;
 
-private:
-    std::vector<std::shared_ptr<TermExpression>> expressionTerms;
-    std::vector<TokenType> addOperators;
+protected:
+    bool negativeOperator = false;
+    std::vector<std::unique_ptr<Expression>> childrenExpressions;
+    std::vector<TokenType> operators;
 };
 

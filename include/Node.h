@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+#include <memory>
 
 enum class NodeType
 {
@@ -17,9 +19,13 @@ enum class NodeType
 	Condition,
 	AndCondition,
 	RelationCondition,
-	AssignStatement,
+	AssignmentStatement,
 	AssignClassStatement,
-	DeclareVarStatement,
+	VarDeclare,
+	Number,
+	Boolean,
+	Variable,
+	Color
 
 };
 
@@ -28,10 +34,18 @@ class Node
 public:
 	Node();
 	Node(NodeType type);
+	virtual ~Node() {};
+
 
 	NodeType getNodeType() const;
+	
+	const void addChild(std::unique_ptr<Node> child);
+	Node* getChild(const int& index) const;
+	const std::size_t getChildrenSize() const;
 
 protected:
 	NodeType nodeType;
+
+	std::vector<std::unique_ptr<Node>> children;
 };
 

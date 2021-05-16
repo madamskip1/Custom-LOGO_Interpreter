@@ -2,19 +2,19 @@
 
 IfStatement::IfStatement() : Node(NodeType::IfStatement) {};
 
-const void IfStatement::setTrueBlockNode(std::shared_ptr<InstructionsBlock> block)
+const void IfStatement::setTrueBlockNode(std::unique_ptr<InstructionsBlock> block)
 {
-	trueBlockNode = block;
+	trueBlockNode = std::move(block);
 }
 
-const void IfStatement::setElseBlockNode(std::shared_ptr<InstructionsBlock> block)
+const void IfStatement::setElseBlockNode(std::unique_ptr<InstructionsBlock> block)
 {
-	elseBlockNode = block;
+	elseBlockNode = std::move(block);
 }
 
-const void IfStatement::setCondition(std::shared_ptr<Condition> cond)
+const void IfStatement::setCondition(std::unique_ptr<Node> cond)
 {
-	condition = cond;
+	condition = std::move(cond);
 }
 
 const bool IfStatement::hasElseBlock() const
@@ -22,17 +22,17 @@ const bool IfStatement::hasElseBlock() const
 	return elseBlockNode != nullptr;
 }
 
-std::shared_ptr<InstructionsBlock> IfStatement::getTrueBlockNode() const
+InstructionsBlock* IfStatement::getTrueBlockNode() const
 {
-	return trueBlockNode;
+	return trueBlockNode.get();
 }
 
-std::shared_ptr<InstructionsBlock> IfStatement::getElseBlockNode() const
+InstructionsBlock* IfStatement::getElseBlockNode() const
 {
-	return elseBlockNode;
+	return elseBlockNode.get();
 }
 
-std::shared_ptr<Condition> IfStatement::getCondition() const
+Node* IfStatement::getCondition() const
 {
-	return condition;
+	return condition.get();
 }

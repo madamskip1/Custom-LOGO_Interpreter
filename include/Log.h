@@ -17,7 +17,8 @@ enum class LogType
 	CantDefFuncInBlock,
 	MissingParameter,
 	BadSyntaxParameter,
-	BadExpression
+	BadExpression,
+	BadSyntax
 };
 
 class Log

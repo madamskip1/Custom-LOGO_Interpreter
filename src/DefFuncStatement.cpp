@@ -1,35 +1,36 @@
 #include "DefFuncStatement.h"
 
-DefFuncStatement::DefFuncStatement() : Node(NodeType::DefFuncStatement) {};
+DefFuncStatement::DefFuncStatement() : Node(NodeType::DefFuncStatement) 
+{
+}
 
 const void DefFuncStatement::setName(std::string name)
 {
 	this->name = name;
 }
 
-const void DefFuncStatement::setInstructionsBlock(std::shared_ptr<InstructionsBlock> block)
+const void DefFuncStatement::setInstructionsBlock(std::unique_ptr<InstructionsBlock> block)
 {
-	instructionsBlock = block;
+	instructionsBlock = std::move(block);
 }
 
-const void DefFuncStatement::addParameter(std::shared_ptr<Parameter> parameter)
+const void DefFuncStatement::addParameter(std::unique_ptr<Parameter> parameter)
 {
-	parameters.push_back(parameter);
+	parameters.push_back(std::move(parameter));
 }
 
 const void DefFuncStatement::setReturnType(const TokenType& retType)
 {
 	returnType = retType;
 }
-
 std::string DefFuncStatement::getName() const
 {
 	return name;
 }
 
-std::shared_ptr<InstructionsBlock> DefFuncStatement::getInstructionsBlock() const
+InstructionsBlock* DefFuncStatement::getInstructionsBlock() const
 {
-	return instructionsBlock;
+	return instructionsBlock.get();
 }
 
 std::size_t DefFuncStatement::getParametersSize() const
@@ -37,9 +38,9 @@ std::size_t DefFuncStatement::getParametersSize() const
 	return parameters.size();
 }
 
-std::shared_ptr<Parameter> DefFuncStatement::getParameter(const int& index) const
+Parameter* DefFuncStatement::getParameter(const int& index) const
 {
-	return parameters[index];
+	return parameters[index].get();
 }
 
 const bool DefFuncStatement::hasReturnType() const
@@ -51,3 +52,4 @@ TokenType DefFuncStatement::getReturnType() const
 {
 	return returnType;
 }
+

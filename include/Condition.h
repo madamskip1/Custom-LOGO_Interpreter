@@ -1,10 +1,7 @@
 #pragma once
-#include <vector>
 #include <memory>
 #include "Node.h"
-#include "AndCondition.h"
-
-class AndCondition;
+#include "TokenType.h"
 
 class Condition :
     public Node
@@ -12,11 +9,22 @@ class Condition :
 public:
     Condition();
 
-    const void addAndCondition(std::shared_ptr<AndCondition> condition);
+    virtual bool evaluate();
+   
+    const void setCondition(std::unique_ptr<Node> condition);
+    const void setRightCondition(std::unique_ptr<Node> condition);
+    const void setNotOperator(const bool& notOp);
+    const void setRelationOperator(const TokenType& relOp);
 
-    const std::size_t getAndConditionSize() const;
-    std::shared_ptr<AndCondition> getAndCondition(const int& index = 0) const;
+    Node* getLeftCondition() const;
+    Node* getRightCondition() const;
+    const bool getNotOperator() const;
+    const TokenType getRelationOperator() const;
 
 private:
-    std::vector<std::shared_ptr<AndCondition>> andConditions;
+    std::unique_ptr<Node> leftCondition = nullptr;
+    std::unique_ptr<Node> rightCondition = nullptr;
+    TokenType relationOperator;
+    bool notOperator;
 };
+

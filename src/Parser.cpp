@@ -1,854 +1,766 @@
 #include "Parser.h"
+#include "TokenType.h"
+
+#include "InstructionsBlock.h"
+#include "IfStatement.h"
+#include "RepeatStatement.h"
+#include "RepeatTimeStatement.h"
+#include "Expression.h"
+#include "Number.h"
+#include "Condition.h"
+#include "Boolean.h"
+#include "DefFuncStatement.h"
 #include "CallFuncStatement.h"
-#include <iostream>
-#include "Logger.h"
+#include "VarDeclare.h"
+#include "Variable.h"
+#include "Color.h"
 
 Parser::Parser(Lexer* lex, Logger* logger) : lexer(lex), logger(logger)
 {
-	nextToken = std::nullopt;
 }
 
-std::unique_ptr<ProgramRootNode> Parser::parse()
+std::unique_ptr<Node> Parser::parse()
 {
-	return parseProgram();
+    return parseProgram();
 }
 
-std::unique_ptr<ProgramRootNode> Parser::parseProgram()
+std::unique_ptr<Node> Parser::parseProgram()
 {
-	std::unique_ptr<ProgramRootNode> rootNode = std::make_unique<ProgramRootNode>();
-	std::shared_ptr<Node> tempNode;
+    std::unique_ptr<ProgramRootNode> rootNode = std::make_unique<ProgramRootNode>();
+    std::unique_ptr<Node> node;
 
-	while (!checkNextTokenType(TokenType::EndOfFile))
-	{
-		tempNode = parseInstruction();
+    bool wasError = false;
+    do {
+        node = parseInstruction();
 
-		if (tempNode != nullptr)
-		{
-			rootNode->addInstruction(tempNode);
-		}
-		else
-		{
-			getNextToken();
-		}
-	}
+        if (node)
+        {
+            rootNode->addChild(std::move(node));
+        }
+        else
+        {
+            wasError = true;
+        }
 
-	return rootNode;
+    } while (!checkCurTokenType(TokenType::EndOfFile) && !wasError);
+
+    if (!checkCurTokenType(TokenType::EndOfFile))
+    {
+        // Nie przetworzono do konca, byl blad
+    }
+    return rootNode;
 }
 
-std::shared_ptr<Node> Parser::parseInstruction()
+std::unique_ptr<Node> Parser::parseInstruction()
 {
-	Token curToken = peekToken();
+    std::unique_ptr<Node> node;
 
-	if (checkIfTokenTypeIsOneOf(curToken.type, { TokenType::ColorVar, TokenType::Integer, TokenType::Turtle, TokenType::Point, TokenType::Boolean }))
-	{
-		return parseDeclareVarORDefFuncWithReturStatement();
-	}
+    node = parseIfStatement();
+    if (node)
+        return node;
 
-	if (checkIfTokenTypeEqual(curToken, TokenType::Function))
-	{
-		return parseDefFuncStatement();
-	}
+    node = parseRepeatStatement();
+    if (node)
+        return node;
 
-	if (checkIfTokenTypeEqual(curToken, TokenType::If))
-	{
-		return parseIfStatement();
-	}
+    node = parseRepeatTimeStatement();
+    if (node)
+        return node;
 
-	if (checkIfTokenTypeEqual(curToken, TokenType::Repeat))
-	{
-		return parseRepeatStatement();
-	}
+    node = parseVarDeclareORDefFuncWithReturStatement();
+    if (node)
+        return node;
 
-	if (checkIfTokenTypeEqual(curToken, TokenType::RepeatTime))
-	{
-		return parseRepeatTimeStatement();
-	}
+    node = parseDefFuncStatement(TokenType::UNKNOWN);
+    if (node)
+        return node;
 
-	if (checkIfTokenTypeEqual(curToken, TokenType::Identifier))
-	{
-		std::shared_ptr<Node> assignOrCallFuncStatement = parseAssignOrCallFuncStatement();
+    node = parseAssignOrCallFunctionStatement();
+    if (node)
+        return node;
 
-		if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::Semicolon, LogType::MissingSemicolon, curToken))
-		{
-			return nullptr;
-		}
 
-		return assignOrCallFuncStatement;
-	}
-
-	return nullptr;
+    return nullptr;
 }
 
-/////////////////////////////////////////////////////
-//				  Instruction Block				   //
-/////////////////////////////////////////////////////
-
-std::shared_ptr<InstructionsBlock> Parser::parseInstructionsBlock()
+std::unique_ptr<InstructionsBlock> Parser::parseInstructionsBlock()
 {
-	/*
-		block = "{", { instruction }, [ return ]"}";
-	*/
-	std::shared_ptr<InstructionsBlock> instructionsBlock = std::make_shared<InstructionsBlock>();
+    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::CurlyBracketOpen, LogType::MissingCurlyBracketOpen))
+        return nullptr;
 
-	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::CurlyBracketOpen, LogType::MissingCurlyBracketOpen))
-	{
+    std::unique_ptr<InstructionsBlock> instructionsBlock = std::make_unique<InstructionsBlock>();
+    std::unique_ptr<Node> instruction;
+
+    while (!checkCurTokenType({ TokenType::CurlyBracketClose, TokenType::EndOfFile }))
+    {
+        if (getToken().type == TokenType::Return)
+        {
+            // TODO
+        }
+        else
+        {
+            instruction = parseInstruction();
+            if (!instruction)
+                return nullptr;
+            if (instruction->getNodeType() == NodeType::DefFuncStatement)
+                return nullptr; // Nie mozna definiowac funkcji w bloku. Dodaæ log
+
+            instructionsBlock->addChild(std::move(instruction));
+        }
+    }
+
+    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::CurlyBracketClose, LogType::MissingCurlyBracketClose))
+        return nullptr;
+
+    return instructionsBlock;
+}
+
+std::unique_ptr<Node> Parser::parseIfStatement()
+{
+    if (!consumeTokenIfType(TokenType::If))
+        return nullptr;
+
+    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
+        return nullptr;
+
+    std::unique_ptr<Node> condition = parseCondition();
+    if (!condition)
+        return nullptr;
+
+    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
+        return nullptr;
+
+    std::unique_ptr<InstructionsBlock> trueBlock = parseInstructionsBlock();
+    if (!trueBlock)
+        return nullptr;
+
+    std::unique_ptr<InstructionsBlock> elseBlock;
+    if (consumeTokenIfType(TokenType::Else))
+    {
+        elseBlock = parseInstructionsBlock();
+        if (!trueBlock)
+            return elseBlock;
+    }
+
+    std::unique_ptr<IfStatement> ifStatement = std::make_unique<IfStatement>();
+    ifStatement->setCondition(std::move(condition));
+    ifStatement->setTrueBlockNode(std::move(trueBlock));
+    
+    if (elseBlock)
+        ifStatement->setElseBlockNode(std::move(elseBlock));
+
+    return ifStatement;
+}
+
+std::unique_ptr<Node> Parser::parseRepeatStatement()
+{
+    if (!consumeTokenIfType(TokenType::Repeat))
+        return nullptr;
+
+    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
+        return nullptr;
+
+    std::unique_ptr<Expression> howManyTime = parseExpression();
+    if (!howManyTime)
+        return nullptr;
+
+    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
+        return nullptr;
+
+    std::unique_ptr<InstructionsBlock> block = parseInstructionsBlock();
+    if (!block)
+        return nullptr;
+
+    std::unique_ptr<RepeatStatement> repeatStatement = std::make_unique<RepeatStatement>();
+    repeatStatement->setHowManyTime(std::move(howManyTime));
+    repeatStatement->setInstructionsBlock(std::move(block));
+    return repeatStatement;
+}
+
+std::unique_ptr<Node> Parser::parseRepeatTimeStatement()
+{
+    if (!consumeTokenIfType(TokenType::RepeatTime))
+        return nullptr;
+
+    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
+        return nullptr;
+
+    // expression period
+    std::unique_ptr<Expression> period = parseExpression();
+    if (!period)
+        return nullptr;
+
+    std::unique_ptr<Expression> howManyTime = nullptr;
+    if (consumeTokenIfType(TokenType::Comma))
+    {
+        // expression how many time
+        howManyTime = parseExpression();
+        if (!howManyTime)
+            return nullptr;
+    }
+
+    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
+        return nullptr;
+
+    std::unique_ptr<InstructionsBlock> block = parseInstructionsBlock();
+    if (!block)
+        return nullptr;
+
+    std::unique_ptr<RepeatTimeStatement> repeatTimeStatement = std::make_unique<RepeatTimeStatement>();
+    repeatTimeStatement->setPeriod(std::move(period));
+    if (howManyTime)
+    {
+        repeatTimeStatement->setHowManyTime(std::move(howManyTime));
+    }
+    repeatTimeStatement->setInstructionsBlock(std::move(block));
+    return repeatTimeStatement;
+}
+
+std::unique_ptr<Node> Parser::parseAssignOrCallFunctionStatement()
+{
+    std::vector<std::string> identifiers = parseIdentifiers();
+
+    if (identifiers.empty())
+        return nullptr;
+
+    std::unique_ptr<Node> assignOrCall = parseCallFunctionStatement(identifiers);
+    if (assignOrCall)
+    {
+        consumeTokenIfType_Otherwise_AddLog(TokenType::Semicolon, LogType::MissingSemicolon);
+        return assignOrCall;
+    }
+
+    if (consumeTokenIfType(TokenType::AssignOperator))
+    {
+        assignOrCall = parseAssignment(identifiers);
+        if (assignOrCall)
+            return assignOrCall;
+    }
+    
+    return nullptr;
+
+}
+
+std::unique_ptr<CallFuncStatement> Parser::parseCallFunctionStatement(std::vector<std::string> identifiers)
+{
+    if (!consumeTokenIfType(TokenType::RoundBracketOpen))
+        return nullptr;
+    
+    std::unique_ptr<CallFuncStatement> callFunc = std::make_unique<CallFuncStatement>();
+
+    if (!consumeTokenIfType(TokenType::RoundBracketClose))
+    {
+        do {
+            std::unique_ptr<Expression> arg = parseExpression();
+            if (!arg)
+            {
+                // add log
+                return nullptr;
+            }
+
+            callFunc->addArgument(std::move(arg));
+
+        } while (consumeTokenIfType(TokenType::Comma));
+
+        if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
+            return nullptr;
+    }
+
+    callFunc->addIdentifiers(identifiers);
+
+    return callFunc;
+}
+
+std::unique_ptr<Node> Parser::parseVarDeclareORDefFuncWithReturStatement()
+{
+    Token token = getToken();
+    
+    if (!consumeTokenIfType({ { TokenType::ColorVar, TokenType::Integer, TokenType::Turtle, TokenType::Point, TokenType::Boolean } }))
+        return nullptr;
+
+    std::unique_ptr<Node> decVarOrDefFunc;
+    decVarOrDefFunc = parseDefFuncStatement(token.type);
+
+    if (decVarOrDefFunc)
+        return decVarOrDefFunc;
+
+    decVarOrDefFunc = parseVarDeclare(token.type);
+    //consumeTokenIfType_Otherwise_AddLog(TokenType::Semicolon, LogType::MissingSemicolon, token);
+    return decVarOrDefFunc;
+}
+
+std::unique_ptr<VarDeclare> Parser::parseVarDeclare(const TokenType& type)
+{
+	std::string identifier = getToken().getStringValue();
+
+	if (!consumeTokenIfType_Otherwise_AddLog(TokenType::Identifier, LogType::MissingIdentifierOrFunctionKeyword))
 		return nullptr;
-	}
 
-	while (!checkNextTokenType(TokenType::CurlyBracketClose) && !checkNextTokenType(TokenType::EndOfFile))
-	{
-		std::shared_ptr<Node> node;
-		if (checkNextTokenType(TokenType::Return))
-		{
-			// node = parseReturn() TODO
-		}
-		else
-		{
-			node = parseInstruction();
-		}
+    std::unique_ptr<ClassAssignment> classAssign;
+    std::unique_ptr<AssignmentStatement> assign;
 
-		if (node != nullptr && node->getNodeType() == NodeType::DefFuncStatement)
-		{
-			logger->newLog(LogType::CantDefFuncInBlock, peekToken());
-		}
-		else
-		{
-			instructionsBlock->addInstruction(node);
-		}
-	}
-	
-	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::CurlyBracketClose, LogType::MissingCurlyBracketClose))
-	{
-		return nullptr;
-	}
+    if (checkCurTokenType(TokenType::AssignOperator))
+    {
+        consumeToken();
+        assign = parseAssignment(std::vector<std::string>());
+        if (!assign)
+            return nullptr;
+    }
+    else if (checkTokenType(type, { TokenType::Point, TokenType::Turtle }) && checkCurTokenType(TokenType::RoundBracketOpen))
+    {
+        classAssign = parseClassAssignment();
+        if (!classAssign)
+            return nullptr;
+    }
 
-	return instructionsBlock;
+    consumeTokenIfType_Otherwise_AddLog(TokenType::Semicolon, LogType::MissingSemicolon);
+
+    std::unique_ptr<VarDeclare> varDeclare = std::make_unique<VarDeclare>();
+    varDeclare->setType(type);
+    varDeclare->setIdentifier(identifier);
+
+    if (classAssign)
+        varDeclare->setClassAssignment(std::move(classAssign));
+    else if (assign)
+        varDeclare->setAssignment(std::move(assign));
+
+    return varDeclare;
 }
 
-std::shared_ptr<Node> Parser::parseDeclareVarORDefFuncWithReturStatement()
-{
-	Token token = peekToken();
-
-	if (!consumeNextTokenIfType({ TokenType::ColorVar, TokenType::Integer, TokenType::Turtle, TokenType::Point, TokenType::Boolean }))
-	{
-		return nullptr;
-	}
-
-	if (checkNextTokenType(TokenType::Function))
-	{
-		return parseDefFuncStatement(token.type);
-	}
-
-	std::shared_ptr<Node> declareVar = parseDeclareVarStatement(token.type);
-
-	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::Semicolon, LogType::MissingSemicolon, token))
-	{
-		return nullptr;
-	}
-
-	return declareVar;
-}
-
-/////////////////////////////////////////////////////
-//					  Def Func					   //
-/////////////////////////////////////////////////////
-
-std::shared_ptr<DefFuncStatement> Parser::parseDefFuncStatement(TokenType returnType)
+std::unique_ptr<Node> Parser::parseDefFuncStatement(const TokenType& returnType)
 {
 	/*
 		functionDef = [allTypes], "function", id, "(", [ parameters ], ")", block;
 		parameters = parameter, { ",", parameter };
 	*/
-	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::Function, LogType::MissingIdentifierOrFunctionKeyword))
-	{
-		return nullptr;
-	}
 
-	std::shared_ptr<DefFuncStatement> defFuncStatement = std::make_shared<DefFuncStatement>();
+    if (!consumeTokenIfType(TokenType::Function))
+        return nullptr;
 
-	if (returnType != TokenType::UNKNOWN)
-	{
-		defFuncStatement->setReturnType(returnType);
-	}
-	
-	std::string name = peekToken().getStringValue();
-	defFuncStatement->setName(name);
+    std::string name = getToken().getStringValue();
 
-	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::Identifier, LogType::MissingIdentifier))
-	{
-		return nullptr;
-	}
+    if (name == "" || !consumeTokenIfType_Otherwise_AddLog(TokenType::Identifier, LogType::MissingIdentifier))
+        return nullptr;
 
-	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
-	{
-		return nullptr;
-	}
-	
-	if (!consumeNextTokenIfType(TokenType::RoundBracketClose))
-	{
-		defFuncStatement->addParameter(parseParameter());
+    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
+        return nullptr;
 
-		while (consumeNextTokenIfType(TokenType::Comma))
-		{
-			defFuncStatement->addParameter(parseParameter());
-		}
+    std::unique_ptr<DefFuncStatement> defFunc = std::make_unique<DefFuncStatement>();
+    if (!consumeTokenIfType(TokenType::RoundBracketClose))
+    {
+        do {
+            std::unique_ptr<Parameter> parameter = parseParameter();
 
-		if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
-		{
-			return nullptr;
-		}
-	}
+            if (!parameter)
+            {
+                // add log
+                return nullptr;
+            }
 
-	defFuncStatement->setInstructionsBlock(parseInstructionsBlock());
+            defFunc->addParameter(std::move(parameter));
+        } while (consumeTokenIfType(TokenType::Comma));
+        
+        if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
+            return nullptr;
 
-	return defFuncStatement;
+    }
+
+    std::unique_ptr<InstructionsBlock> instructionsBlock = parseInstructionsBlock();
+
+    if (!instructionsBlock)
+        return nullptr;
+
+    defFunc->setInstructionsBlock(std::move(instructionsBlock));
+    defFunc->setName(name);
+    defFunc->setReturnType(returnType);
+    return defFunc;
 }
 
-/////////////////////////////////////////////////////
-//					  Parameter					   //
-/////////////////////////////////////////////////////
-
-std::shared_ptr<Parameter> Parser::parseParameter()
+std::unique_ptr<AssignmentStatement> Parser::parseAssignment(std::vector<std::string> identifiers)
 {
-	/*
-		parameter = varDec;
-		varDec = allTypes, id;
-	*/
-	std::shared_ptr<Parameter> parameter = std::make_shared<Parameter>();
+    //if (!consumeTokenIfType_Otherwise_AddLog(TokenType::AssignOperator, LogType::BadSyntax))
+    //    return nullptr;
 
-	parameter->setType(peekToken().type);
+    std::unique_ptr<Assignable> assignable;
+    if (checkCurTokenType({ TokenType::True, TokenType::False }))
+    {
+        assignable = std::make_unique<Boolean>(checkCurTokenType(TokenType::True));
+        consumeToken();
+    }
+    else if (checkCurTokenType(TokenType::ColorValue))
+    {
+        assignable = std::make_unique<Color>(getAndConsumeToken().getStringValue());
+    }
+    else
+    {
+        assignable = parseExpression();
+    }
 
-	if (!consumeNextTokenIfType({ TokenType::ColorVar, TokenType::Integer, TokenType::Turtle, TokenType::Point, TokenType::Boolean }))
-	{
-		logger->newLog(LogType::BadSyntaxParameter, peekToken());
-		return nullptr;
-	}
-	
-	if (!checkNextTokenType(TokenType::Identifier))
-	{
-		logger->newLog(LogType::MissingIdentifier, peekToken());
-		return nullptr;
-	}
+    if (!assignable)
+        return nullptr;
 
-	Token token = getNextToken();
-	parameter->setName(token.getStringValue());
-
-	return parameter;
+    std::unique_ptr<AssignmentStatement> assign = std::make_unique<AssignmentStatement>();
+    assign->addIdentifiers(identifiers);
+    assign->setAssign(std::move(assignable));
+    return assign;
 }
 
-/////////////////////////////////////////////////////
-//						 IF						   //
-/////////////////////////////////////////////////////
-
-std::shared_ptr<IfStatement> Parser::parseIfStatement()
+std::unique_ptr<ClassAssignment> Parser::parseClassAssignment()
 {
-	/*
-		if = "if", "(", condition, ")", block, ["else", block];
-	*/
-	if (!consumeNextTokenIfType(TokenType::If))
-		return nullptr;
+    if (!consumeTokenIfType(TokenType::RoundBracketOpen))
+        return nullptr;
 
-	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
-	{
-		return nullptr;
-	}
+    if (consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::BadExpression))
+        return nullptr;
 
-	std::shared_ptr<IfStatement> ifStatement = std::make_shared<IfStatement>();
+    std::unique_ptr<ClassAssignment> classAssign = std::make_unique<ClassAssignment>();
 
-	ifStatement->setCondition(parseCondition());
+    do {
+        std::unique_ptr<Expression> expression = parseExpression();
+        
+        if (!expression)
+        {
+            // add log
+            return nullptr;
+        }
 
-	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
-	{
-		return nullptr;
-	}
+        classAssign->addExpression(std::move(expression));
 
-	ifStatement->setTrueBlockNode(parseInstructionsBlock());
+    } while (consumeTokenIfType(TokenType::Comma));
 
-	if (consumeNextTokenIfType(TokenType::Else))
-	{
-		ifStatement->setElseBlockNode(parseInstructionsBlock());
-	}
+    if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingCurlyBracketClose))
+        return nullptr;
 
-	return ifStatement;
+    return classAssign;
 }
 
-/////////////////////////////////////////////////////
-//						Repeat					   //
-/////////////////////////////////////////////////////
-
-std::shared_ptr<RepeatStatement> Parser::parseRepeatStatement()
+std::unique_ptr<Parameter> Parser::parseParameter()
 {
-	/*
-		repeat = "repeat", "(", expression, ")", block;
-	*/
-	if (!consumeNextTokenIfType(TokenType::Repeat))
-	{
-		return nullptr;
-	}
+    TokenType paramType = getToken().type;
+    
+    if (!consumeTokenIfType({ TokenType::ColorVar, TokenType::Integer, TokenType::Turtle, TokenType::Point, TokenType::Boolean }))
+    {
+        // add log
+        return nullptr;
+    }
 
-	std::shared_ptr<RepeatStatement> repeatStatement = std::make_shared<RepeatStatement>();
+    std::string identifier = getToken().getStringValue();
 
-	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
-	{
-		return nullptr;
-	}
+    if (identifier == "" || !consumeTokenIfType_Otherwise_AddLog(TokenType::Identifier, LogType::MissingIdentifier))
+        return nullptr;
 
-	repeatStatement->setHowManyTime(parseExpression());
+    std::unique_ptr<Parameter> parameter = std::make_unique<Parameter>();
+    parameter->setName(identifier);
+    parameter->setType(paramType);
 
-	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
-	{
-		return nullptr;
-	}
-
-	repeatStatement->setInstructionsBlock(parseInstructionsBlock());
-
-	return repeatStatement;
+    return parameter;
 }
 
-/////////////////////////////////////////////////////
-//					Repeat Time					   //
-/////////////////////////////////////////////////////
-
-std::shared_ptr<RepeatTimeStatement> Parser::parseRepeatTimeStatement()
+std::unique_ptr<Expression> Parser::parseExpression()
 {
-	/*
-		repeatTime = "repeatTime", "(", expression, [",", expression ], ")",block;
-	*/
-	if (!consumeNextTokenIfType(TokenType::RepeatTime))
-	{
-		return nullptr;
-	}
+    /*
+        expression = term, { addOperator, term };
+    */
+    std::unique_ptr<Expression> termExpression = parseTermExpression();
+    
+    if (!termExpression)
+        return nullptr;
 
-	std::shared_ptr<RepeatTimeStatement> repeatTimeStatement = std::make_shared<RepeatTimeStatement>();
+    std::unique_ptr<Expression> expression = std::make_unique<Expression>();
+    expression->addChildExpression(std::move(termExpression));
+    
+    Token token = getToken();
 
-	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
-	{
-		return nullptr;
-	}
+    while (consumeTokenIfType({ TokenType::Plus, TokenType::Minus }))
+    {
+        termExpression = parseTermExpression();
+        if (!termExpression)
+            return nullptr;
 
-	repeatTimeStatement->setPeriod(parseExpression());
+        expression->addChildExpression(std::move(termExpression));
+        expression->addOperator(token.type);
+        token = getToken();
+    }
 
-	if (consumeNextTokenIfType(TokenType::Comma))
-	{
-		std::shared_ptr<Expression> howManyTime = parseExpression();
-		repeatTimeStatement->setHowManyTime(howManyTime);
-	}
-
-	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
-	{
-		return nullptr;
-	}
-
-	repeatTimeStatement->setInstructionsBlock(parseInstructionsBlock());
-
-	return repeatTimeStatement;
+    return expression;
 }
 
-/////////////////////////////////////////////////////
-//				Assign or Call Func 			   //
-/////////////////////////////////////////////////////
-
-std::shared_ptr<Node> Parser::parseAssignOrCallFuncStatement()
+std::unique_ptr<Expression> Parser::parseTermExpression()
 {
-	std::vector<std::string> identifiers = parseIdentifiers();
-	if (identifiers.empty())
-	{
-		return nullptr;
-	}
+    std::unique_ptr<Expression> factorExpression = parseFactorExpression();
 
-	if (checkNextTokenType(TokenType::RoundBracketOpen))
-	{
-		return parseCallFunc(identifiers);
-	}
-	
-	if (checkNextTokenType(TokenType::AssignOperator))
-	{
-		return parseAssignStatement(identifiers);
-	}
+    if (!factorExpression)
+        return nullptr;
 
-	return nullptr;
+    std::unique_ptr<Expression> termExpression = std::make_unique<Expression>();
+    termExpression->addChildExpression(std::move(factorExpression));
+
+    Token token = getToken();
+
+    while (consumeTokenIfType({ TokenType::Divide, TokenType::Multiply }))
+    {
+        factorExpression = parseFactorExpression();
+        if (!factorExpression)
+            return nullptr;
+
+        termExpression->addChildExpression(std::move(factorExpression));
+        termExpression->addOperator(token.type);
+        token = getToken();
+    }
+
+    return termExpression;
 }
 
-/////////////////////////////////////////////////////
-//					  Call Func					   //
-/////////////////////////////////////////////////////
-
-std::shared_ptr<CallFuncStatement> Parser::parseCallFunc(std::vector<std::string> idNames)
+std::unique_ptr<Expression> Parser::parseFactorExpression()
 {
-	if (!consumeNextTokenIfType(TokenType::RoundBracketOpen))
-	{
-		return nullptr;
-	}
+    bool negativeOp = consumeTokenIfType(TokenType::Minus);
 
-	std::shared_ptr<CallFuncStatement> callFunc = std::make_shared<CallFuncStatement>();
 
-	if (!consumeNextTokenIfType(TokenType::RoundBracketClose))
-	{
-		callFunc->addArgument(parseExpression());
+    if (checkCurTokenType(TokenType::Digit))
+    {
+        std::unique_ptr<Number> factorExpression = std::make_unique<Number>(getToken().getIntValue());
+        factorExpression->setNegativeOp(negativeOp);
+        consumeToken();
+        return factorExpression;
+    }
 
-		while (consumeNextTokenIfType(TokenType::Comma))
-		{
-			callFunc->addArgument(parseExpression());
-		}
+    if (consumeTokenIfType(TokenType::RoundBracketOpen))
+    {
+        std::unique_ptr<Expression> factorExpression = parseExpression();
+        
+        if (!factorExpression)
+            return nullptr;
 
-		if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
-		{
-			return nullptr;
-		}
-	}
+        if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
+            return nullptr;
 
-	callFunc->addIdentifiers(idNames);
+        factorExpression->setNegativeOp(negativeOp);
+        return factorExpression;
+    }
 
-	return callFunc;
+    if (checkCurTokenType(TokenType::Identifier))
+    {
+        std::vector<std::string> identifiers = parseIdentifiers();
+
+        if (identifiers.empty())
+            return nullptr;
+
+        if (checkCurTokenType(TokenType::RoundBracketOpen))
+        {
+            std::unique_ptr<CallFuncStatement> callFunc = parseCallFunctionStatement(identifiers);
+            
+            if (!callFunc)
+                return nullptr;
+
+            return callFunc;
+        }
+
+        std::unique_ptr<Variable> var = std::make_unique<Variable>();
+        var->setIdentfiers(identifiers);
+        var->setNegativeOp(negativeOp);
+
+        return var;
+    }
+
+    return nullptr;
 }
 
-/////////////////////////////////////////////////////
-//					   Assign					   //
-/////////////////////////////////////////////////////
-
-std::shared_ptr<AssignStatement> Parser::parseAssignStatement(std::vector<std::string> idNames)
+std::unique_ptr<Node> Parser::parseCondition()
 {
-	/*
-		assign = anyMemberLevel, simpleAssign;
-		simpleAssign = assignOperator, ( expression | string | booleanWord );
-	*/
-	if (!consumeNextTokenIfType(TokenType::AssignOperator))
-		return nullptr;
+    std::unique_ptr<Node> andCondition = parseAndCondition();
+    if (!andCondition)
+        return nullptr;
 
-	std::shared_ptr<AssignStatement> assign = std::make_shared<AssignStatement>();
+    std::unique_ptr<Condition> condition = std::make_unique<Condition>();
+    condition->setCondition(std::move(andCondition));
 
-	// TODO assign new color
+    while (consumeTokenIfType(TokenType::Or))
+    {
+        andCondition = parseAndCondition();
+        if (!andCondition)
+            return nullptr;
 
-	assign->setExpression(parseExpression());
-	assign->addIdentifiers(idNames);
+        condition->setRightCondition(std::move(andCondition));
+    }
 
-	return assign;
+    return condition;
 }
 
-/////////////////////////////////////////////////////
-//					Assign Class				   //
-/////////////////////////////////////////////////////
-
-std::shared_ptr<AssignClassStatement> Parser::parseAssignClassStatement()
+std::unique_ptr<Node> Parser::parseAndCondition()
 {
-	/*
-		classAssign = "(", [ expression, { ",", expression } ], ")";
-	*/
-	if (!consumeNextTokenIfType(TokenType::RoundBracketOpen))
-	{
-		return nullptr;
-	}
+    std::unique_ptr<Node> relationCondition = parseRelationCondition();
+    if (!relationCondition)
+        return nullptr;
 
-	std::shared_ptr<AssignClassStatement> assignClass = std::make_shared<AssignClassStatement>();
-	assignClass->addExpression(parseExpression());
+    std::unique_ptr<Condition> andCondition = std::make_unique<Condition>();
+    andCondition->setCondition(std::move(relationCondition));
+    
+    while (consumeTokenIfType(TokenType::And))
+    {
+        relationCondition = parseRelationCondition();
+        if (!relationCondition)
+            return nullptr;
+        andCondition->setRightCondition(std::move(relationCondition));
+    }
 
-	while (consumeNextTokenIfType(TokenType::Comma))
-	{
-		assignClass->addExpression(parseExpression());
-	}
-
-	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
-	{
-		return nullptr;
-	}
-	
-	return assignClass;
+    return andCondition;
 }
 
-/////////////////////////////////////////////////////
-//				Declare Variable				   //
-/////////////////////////////////////////////////////
-
-std::shared_ptr<DeclareVarStatement> Parser::parseDeclareVarStatement(TokenType type)
+std::unique_ptr<Node> Parser::parseRelationCondition()
 {
-	/*
-		varDef = allTypes, id, [ classAssign | simpleAssign ];
-		classAssign = "(", [ expression, { ",", expression } ], ")";
-		simpleAssign = assignOperator, ( expression | string | booleanWord );
-	*/
+    bool notOperator = consumeTokenIfType(TokenType::NotOperator);
 
-	if (!checkIfTokenTypeIsOneOf(type, { TokenType::ColorVar, TokenType::Integer, TokenType::Turtle, TokenType::Point, TokenType::Boolean }))
-	{
-		return nullptr;
-	}
+    if (checkCurTokenType({ TokenType::True, TokenType::False }))
+    {
+        bool boolean = getAndConsumeToken().type == TokenType::True;
+        std::unique_ptr<Boolean> booleanWord = std::make_unique<Boolean>(boolean);
+        std::unique_ptr<Condition> conditionBoolean = std::make_unique<Condition>();
 
-	std::string identifier = peekToken().getStringValue();
+        conditionBoolean->setCondition(std::move(booleanWord));
+        conditionBoolean->setNotOperator(notOperator);
 
-	if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::Identifier, LogType::MissingIdentifierOrFunctionKeyword))
-	{
-		return nullptr;
-	}
+        return conditionBoolean;
+    }
 
-	std::shared_ptr<DeclareVarStatement> varStatement = std::make_shared<DeclareVarStatement>();
-	varStatement->setIdentifier(identifier);
-	varStatement->setType(type);
+    if (consumeTokenIfType(TokenType::RoundBracketOpen))
+    {
+        std::unique_ptr<Node> condition = parseCondition();
+        if (!condition)
+            return nullptr;
 
-	if (checkNextTokenType(TokenType::AssignOperator))
-	{
-		if (checkIfTokenTypeEqual(type, TokenType::Integer))
-		{
-			varStatement->setAssignStatement(parseAssignStatement({ identifier }));
+        if (!consumeTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingCurlyBracketClose))
+            return nullptr;
 
-			return varStatement;
-		}
+        Condition* tempCon = static_cast<Condition*>(condition.get());
+        tempCon->setNotOperator(notOperator);
+        return condition;
+    }
+    
+    std::unique_ptr<Node> expression = parseExpression();
+    if (!expression)
+        return nullptr;
 
-		if (checkIfTokenTypeEqual(type, TokenType::ColorVar))
-		{
-			getNextToken(); // consume AssignOperator
 
-			if (checkNextTokenType(TokenType::ColorValue))
-			{
-				Token colorVal = getNextToken();
-				varStatement->setColorVal(colorVal.getStringValue());
+    std::unique_ptr<Condition> relationCondition = std::make_unique<Condition>();
+    if (checkCurTokenType({ TokenType::Equal, TokenType::NotEqual, TokenType::Less, TokenType::Greater, TokenType::LessOrEqual, TokenType::GreaterOrEqual }))
+    {
+        TokenType relOp = getAndConsumeToken().type;
+        std::unique_ptr<Node> secondExpression = parseExpression();
 
-				return varStatement;
-			}
+        if(!secondExpression)
+            return nullptr;
 
-			return nullptr;
-		}
+        relationCondition->setRelationOperator(relOp);
+        relationCondition->setRightCondition(std::move(secondExpression));
+    }
 
-		if (checkIfTokenTypeEqual(type, TokenType::Boolean))
-		{
-			// TOOD
-		}
+    relationCondition->setCondition(std::move(expression));
 
-		return varStatement;
-	}
-
-	if (checkIfTokenTypeIsOneOf (type, { TokenType::Turtle, TokenType::Point }))
-	{
-		if (checkNextTokenType(TokenType::RoundBracketOpen))
-		{
-			varStatement->setAssignClassStatement(parseAssignClassStatement());
-		}
-
-		return varStatement;
-	}
-
-	return varStatement;
+    return relationCondition;
 }
-
-/////////////////////////////////////////////////////
-//					Identifiers					   //
-/////////////////////////////////////////////////////
 
 std::vector<std::string> Parser::parseIdentifiers()
 {
-	if (!checkNextTokenType(TokenType::Identifier))
-	{
-		return std::vector<std::string>();
-	}
+    if (!checkCurTokenType(TokenType::Identifier))
+    {
+        return std::vector<std::string>();
+    }
+        
+    std::vector<std::string> identifiers;
+    std::string identifier;
 
-	std::vector<std::string> identifiers;
+    do {
+        identifier = getToken().getStringValue();
 
-	Token token = getNextToken();
-	identifiers.push_back(token.getStringValue());
+        if (identifier != "" && consumeTokenIfType(TokenType::Identifier))
+        {
+            identifiers.push_back(identifier);
+        }
+        else
+        {
+            logger->newLog(LogType::MissingIdentifier, getToken());
+            return std::vector<std::string>();
+        }
 
-	while (consumeNextTokenIfType(TokenType::Dot))
-	{
-		if (peekToken().type == TokenType::Identifier)
-		{
-			token = getNextToken();
-			identifiers.push_back(token.getStringValue());
-		}
-		else
-		{
-			logger->newLog(LogType::MissingIdentifier, peekToken());
-			return std::vector<std::string>();
-		}
-	}
+    } while (consumeTokenIfType(TokenType::Dot));
 
-	return identifiers;
+    return identifiers;
 }
 
-/////////////////////////////////////////////////////
-//					 Expression					   //
-/////////////////////////////////////////////////////
 
-std::shared_ptr<Expression> Parser::parseExpression()
+
+Token Parser::getToken()
 {
-	/*
-		expression = term, { addOperator, term };
-	*/
-	std::shared_ptr<Expression> expression = std::make_shared<Expression>();
-	expression->addExpressionTerm(parseExpressionTerm());
+    if (token)
+        return *token;
 
-	TokenType addOperator = peekToken().type;
-
-	while (consumeNextTokenIfType({ TokenType::Plus, TokenType::Minus }))
-	{
-		expression->addNextExpressionTerm(parseExpressionTerm(), addOperator);
-		addOperator = peekToken().type;
-	}
-
-	return expression;
+    token = lexer->getNextToken();
+    return *token;
 }
 
-/////////////////////////////////////////////////////
-//					Term Expression				   //
-/////////////////////////////////////////////////////
-
-std::shared_ptr<TermExpression> Parser::parseExpressionTerm()
+Token Parser::getAndConsumeToken()
 {
-	/*
-		term = factor, { multiOperator, factor };
-	*/
-	std::shared_ptr<TermExpression> term = std::make_shared<TermExpression>();
-	term->addExpressionFactor(parseExpressionFactor());
+    Token token = getToken();
+    consumeToken();
 
-	TokenType multiplyOperator = peekToken().type;
-
-	while (consumeNextTokenIfType({ TokenType::Divide, TokenType::Multiply }))
-	{
-		term->addNextExpressionFactor(parseExpressionFactor(), multiplyOperator);
-		multiplyOperator = peekToken().type;
-	}
-
-	return term;
+    return token;
 }
 
-/////////////////////////////////////////////////////
-//				Factor Expression				   //
-/////////////////////////////////////////////////////
-
-std::shared_ptr<FactorExpression> Parser::parseExpressionFactor()
+const void Parser::consumeToken()
 {
-	/*
-		factor = [ "-" ], ( ( "(", expression, ")" ) | id | int |functionCall );
-	*/
-	std::shared_ptr<FactorExpression> factor = std::make_shared<FactorExpression>();
-
-	if (consumeNextTokenIfType(TokenType::Minus))
-	{
-		factor->setNegativeOp(true);
-	}
-
-	if (consumeNextTokenIfType(TokenType::RoundBracketOpen))
-	{
-		// expression in bracket
-		factor->setExpression(parseExpression());
-
-		if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
-		{
-			return nullptr;	
-		}
-
-		return factor;
-	}
-
-	Token token = peekToken();
-
-	if (consumeNextTokenIfType(TokenType::Digit))
-	{
-		// TODO: s¹ tokeny na b³êdy w liczbie - napisaæ do nich logi i tutaj dodaæ
-
-		factor->setIntVal(token.getIntValue());
-		return factor;
-	}
-
-	if (checkNextTokenType(TokenType::Identifier))
-	{
-		std::vector<std::string> identifiers = parseIdentifiers();
-		if (identifiers.empty())
-		{
-			return nullptr;
-		}
-
-		if (checkNextTokenType(TokenType::RoundBracketOpen))
-		{
-			std::shared_ptr<CallFuncStatement> callFunc = parseCallFunc(identifiers);
-
-			if (callFunc == nullptr)
-			{
-				// Jakiœ error
-				return nullptr;
-			}
-
-			factor->setCallFunc(callFunc);
-
-			return factor;
-		}
-		
-		factor->setVariable(identifiers);
-
-		return factor;
-	}
-
-	logger->newLog(LogType::BadExpression, token);
-	return nullptr;
+    token = std::nullopt;
 }
 
-/////////////////////////////////////////////////////
-//					  Conditiion				   //
-/////////////////////////////////////////////////////
-
-std::shared_ptr<Condition> Parser::parseCondition()
+const bool Parser::consumeTokenIfType(const TokenType& type)
 {
-	/*
-		condition = andCondition, { orOperator, andCondition };
-	*/
-	std::shared_ptr<Condition> condition = std::make_shared<Condition>();
-	condition->addAndCondition(parseAndCondition());
+    if (checkCurTokenType(type))
+    {
+        consumeToken();
+        return true;
+    }
 
-	while(consumeNextTokenIfType(TokenType::Or))
-	{
-		condition->addAndCondition(parseAndCondition());
-	}
-
-	return condition;
+    return false;
 }
 
-/////////////////////////////////////////////////////
-//					And Conditiion				   //
-/////////////////////////////////////////////////////
-
-std::shared_ptr<AndCondition> Parser::parseAndCondition()
+const bool Parser::consumeTokenIfType(const std::vector<TokenType>& types)
 {
-	/*
-		andCondition = relationCondition, { andOperator, relationCondition };
-	*/
-	std::shared_ptr<AndCondition> andCondition = std::make_shared<AndCondition>();
-	andCondition->addRelationCondition(parseRelationCondition());
+    if (checkCurTokenType(types))
+    {
+        consumeToken();
+        return true;
+    }
 
-	while (consumeNextTokenIfType(TokenType::And))
-	{
-		andCondition->addRelationCondition(parseRelationCondition());
-	}
-
-	return andCondition;
+    return false;
 }
 
-/////////////////////////////////////////////////////
-//				Relation Conditiion				   //
-/////////////////////////////////////////////////////
-
-std::shared_ptr<RelationCondition> Parser::parseRelationCondition()
+const bool Parser::consumeTokenIfType_Otherwise_AddLog(const TokenType& tokenType, const LogType& logType)
 {
-	/*
-		relationCondition = [ notOperator ], ( ( expression, [relationOperator, expression ] )
-							| booleanWord | ( "(",condition, ")" ) )
-	*/
-	std::shared_ptr<RelationCondition> relationCondition = std::make_shared<RelationCondition>();
-	
-	if (consumeNextTokenIfType(TokenType::NotOperator))
-	{
-		relationCondition->setNotOperator(true);
-	}
+    if (consumeTokenIfType(tokenType))
+        return true;
 
-	Token token = peekToken();
-
-	if (consumeNextTokenIfType({ TokenType::True, TokenType::False }))
-	{
-		relationCondition->setBooleanWord(token.type == TokenType::True);
-
-		return relationCondition;
-	}
-
-	if (consumeNextTokenIfType(TokenType::RoundBracketOpen))
-	{
-		relationCondition->setCondition(parseCondition());
-
-		if (!consumeNextTokenIfType_Otherwise_AddLog(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
-		{
-			return nullptr;
-		}
-
-		return relationCondition;
-	}
-
-	relationCondition->setExpression(parseExpression());
-	token = peekToken();
-
-	if (consumeNextTokenIfType({ TokenType::Equal, TokenType::NotEqual, TokenType::Less, TokenType::Greater, TokenType::LessOrEqual, TokenType::GreaterOrEqual }))
-	{
-		relationCondition->setRelationOperator(token.type);
-		relationCondition->setExpression(parseExpression(), 2);
-	}
-
-	return relationCondition;
+    Token token = getToken();
+    // add Log
+    return false;
 }
 
-Token Parser::peekToken()
+const bool Parser::checkCurTokenType(const TokenType& type)
 {
-	if (hasBufferedToken())
-		return *nextToken;
-
-	nextToken = lexer->getNextToken();
-
-	return *nextToken;
+    return (getToken().type == type);
 }
 
-Token Parser::getNextToken()
+const bool Parser::checkCurTokenType(const std::vector<TokenType>& types)
 {
-	if (hasBufferedToken())
-	{
-		Token temp;
-		temp = *nextToken;
-		nextToken = std::nullopt;
-
-		return temp;
-	}
-
-	return lexer->getNextToken();
+    return checkTokenType(getToken().type, types);
 }
 
-const bool Parser::hasBufferedToken() const
+const bool Parser::checkTokenType(const TokenType& tokenType, const TokenType& type)
 {
-	return nextToken.has_value();
+    return tokenType == type;
 }
 
-const bool Parser::consumeNextTokenIfType(const TokenType& type)
+const bool Parser::checkTokenType(const TokenType& tokenType, const std::vector<TokenType>& types)
 {
-	return consumeNextTokenIfType(std::vector<TokenType>({ type }));
+    return (std::find(types.cbegin(), types.cend(), tokenType) != types.cend());
 }
 
-const bool Parser::consumeNextTokenIfType(const std::vector<TokenType>& types)
-{
-	if (checkNextTokenType(types))
-	{
-		getNextToken();
-		return true;
-	}
-	
-	return false;
-}
 
-const bool Parser::checkNextTokenType(const TokenType& type)
-{
-	return checkNextTokenType(std::vector<TokenType>({ type }));
-}
-
-const bool Parser::checkNextTokenType(const std::vector<TokenType>& types)
-{
-	return checkIfTokenTypeIsOneOf(peekToken().type, types);
-}
-
-const bool Parser::checkIfTokenTypeIsOneOf(const TokenType& type, const std::vector<TokenType>& types) const
-{
-	return (std::find(types.cbegin(), types.cend(), type) != types.cend());
-}
-
-const bool Parser::checkIfTokenTypeEqual(const TokenType& tokenType, const TokenType& type) const
-{
-	return tokenType == type;
-}
-
-const bool Parser::checkIfTokenTypeEqual(const Token& token, const TokenType& type) const
-{
-	return checkIfTokenTypeEqual(token.type, type);
-}
-
-const bool Parser::consumeNextTokenIfType_Otherwise_AddLog(const TokenType& type, const LogType& logType, const Token& token)
-{
-	if (consumeNextTokenIfType(type))
-		return true;
-
-	logger->newLog(logType, token);
-
-	return false;
-}
-
-const bool Parser::consumeNextTokenIfType_Otherwise_AddLog(const TokenType& type, const LogType& logType)
-{
-	return consumeNextTokenIfType_Otherwise_AddLog(type, logType, peekToken());
-}
