@@ -27,7 +27,11 @@ MainWindow::MainWindow(QWidget *parent)
 
   //  this->ui->turtleboard->show();
     turtle = new Turtle(this->ui->drawingBoard);
+    Turtle* turtle2 = new Turtle(this->ui->drawingBoard);
     this->ui->turtleBoard->addTurtle(turtle);
+    this->ui->turtleBoard->addTurtle(turtle2);
+    turtle->go(200);
+    delete turtle2;
 }
 
 MainWindow::~MainWindow()

@@ -14,6 +14,7 @@ class Turtle
     Q_OBJECT
 public:
     Turtle(DrawingBoard* drawingBoardPtr);
+    ~Turtle();
     void setTurtleBoard(TurtleBoard* turtleBoardPtr);
 
     void go(const int& distance);

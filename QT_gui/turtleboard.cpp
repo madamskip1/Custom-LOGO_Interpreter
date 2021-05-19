@@ -25,6 +25,12 @@ void TurtleBoard::drawTurtle(QPoint top, QPoint bottomLeft, QPoint bottomRight, 
     update();
 }
 
+void TurtleBoard::setAllToStart()
+{
+    for (const auto turtle : turtles)
+        turtle->toStart();
+}
+
 void TurtleBoard::addTurtle(Turtle *turtle)
 {
     turtles.push_back(turtle);
@@ -33,10 +39,20 @@ void TurtleBoard::addTurtle(Turtle *turtle)
     redrawTurtles();
 }
 
+void TurtleBoard::removeTurtle(Turtle *turtle)
+{
+    auto iterator = std::find(turtles.begin(), turtles.end(), turtle);
+    if (iterator != turtles.end())
+    {
+        turtles.erase(iterator);
+    }
+    redrawTurtles();
+}
+
 void TurtleBoard::redrawTurtles()
 {
     board.fill(Qt::transparent);
-    for (auto turtle : turtles)
+    for (const auto turtle : turtles)
         turtle->draw();
 }
 

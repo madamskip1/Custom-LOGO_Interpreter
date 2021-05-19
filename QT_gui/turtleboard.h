@@ -15,8 +15,9 @@ class TurtleBoard : public QWidget
 public:
     TurtleBoard(QWidget * parent = nullptr);
     void drawTurtle(QPoint top, QPoint bottomLeft, QPoint bottomRight, QColor color);
-
+    void setAllToStart();
     void addTurtle(Turtle* turtle);
+    void removeTurtle(Turtle* turtle);
 
 public slots:
     void redrawTurtles();

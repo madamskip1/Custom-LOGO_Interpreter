@@ -9,6 +9,11 @@ Turtle::Turtle(DrawingBoard* drawingBoardPtr)
     board = drawingBoardPtr;
 }
 
+Turtle::~Turtle()
+{
+    turtleBoard->removeTurtle(this);
+}
+
 void Turtle::setTurtleBoard(TurtleBoard *turtleBoardPtr)
 {
     turtleBoard = turtleBoardPtr;
