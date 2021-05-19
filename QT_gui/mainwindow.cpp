@@ -2,6 +2,10 @@
 #include "ui_mainwindow.h"
 
 #include "turtle.h"
+#include "Parser/Parser.h"
+#include "Parser/Lexer.h"
+#include "Parser/Logger.h"
+#include "Parser/SourceReader.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -46,9 +50,20 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-    for(int i = 0; i < 60; i++)
-    {
-        turtle->go(20);
-        turtle->right(360/60);
-    }
+    QString input = this->ui->inputBox->toPlainText();
+
+    SourceReader* reader = new SourceReader();
+    Lexer* lexer = new Lexer(reader);
+    Logger* logger = new Logger();
+    Parser parser(lexer, logger);
+
+    reader->setSourceString(input.toStdString());
+    parser.parse();
+
+    QString output = QString::fromStdString(logger->toString());
+
+    this->ui->outputBox->setText(output);
+
+    // tutaj interpretować
+
 }

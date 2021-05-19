@@ -9,6 +9,32 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    Parser/Assignable.cpp \
+    Parser/AssignmentStatement.cpp \
+    Parser/Boolean.cpp \
+    Parser/CallFuncStatement.cpp \
+    Parser/ClassAssignment.cpp \
+    Parser/Color.cpp \
+    Parser/Condition.cpp \
+    Parser/DefFuncStatement.cpp \
+    Parser/Expression.cpp \
+    Parser/IfStatement.cpp \
+    Parser/InstructionsBlock.cpp \
+    Parser/Lexer.cpp \
+    Parser/Log.cpp \
+    Parser/Logger.cpp \
+    Parser/Node.cpp \
+    Parser/Number.cpp \
+    Parser/Parameter.cpp \
+    Parser/Parser.cpp \
+    Parser/ProgramRootNode.cpp \
+    Parser/RepeatStatement.cpp \
+    Parser/RepeatTimeStatement.cpp \
+    Parser/ReturnStatement.cpp \
+    Parser/SourceReader.cpp \
+    Parser/Token.cpp \
+    Parser/VarDeclare.cpp \
+    Parser/Variable.cpp \
     drawingboard.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -16,6 +42,33 @@ SOURCES += \
     turtleboard.cpp
 
 HEADERS += \
+    Parser/Assignable.h \
+    Parser/AssignmentStatement.h \
+    Parser/Boolean.h \
+    Parser/CallFuncStatement.h \
+    Parser/ClassAssignment.h \
+    Parser/Color.h \
+    Parser/Condition.h \
+    Parser/DefFuncStatement.h \
+    Parser/Expression.h \
+    Parser/IfStatement.h \
+    Parser/InstructionsBlock.h \
+    Parser/Lexer.h \
+    Parser/Log.h \
+    Parser/Logger.h \
+    Parser/Node.h \
+    Parser/Number.h \
+    Parser/Parameter.h \
+    Parser/Parser.h \
+    Parser/ProgramRootNode.h \
+    Parser/RepeatStatement.h \
+    Parser/RepeatTimeStatement.h \
+    Parser/ReturnStatement.h \
+    Parser/SourceReader.h \
+    Parser/Token.h \
+    Parser/TokenType.h \
+    Parser/VarDeclare.h \
+    Parser/Variable.h \
     drawingboard.h \
     mainwindow.h \
     turtle.h \

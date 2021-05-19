@@ -23,7 +23,6 @@ void Turtle::go(const int &distance)
 {
     QPoint end = movePoint(position, direction, distance);
     board->drawLine(position, end, Qt::blue, 2);
-    qDebug() << position << " -> " << end;
     position = end;
 
     emit turtleMoved();
@@ -38,7 +37,6 @@ void Turtle::left(const int &angle)
 void Turtle::right(const int &angle)
 {
     direction += angle;
-    20 % 360;
     direction = direction % 360;
     emit turtleMoved();
 }
