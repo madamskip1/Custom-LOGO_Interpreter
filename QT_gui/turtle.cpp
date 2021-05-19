@@ -58,8 +58,29 @@ void Turtle::move(int x, int y)
     emit turtleMoved();
 }
 
+void Turtle::toggleVisible()
+{
+    hidden = !hidden;
+    emit turtleMoved();
+}
+
+void Turtle::hide()
+{
+    hidden = true;
+    emit turtleMoved();
+}
+
+void Turtle::show()
+{
+    hidden = false;
+    emit turtleMoved();
+}
+
 void Turtle::draw()
 {
+    if (hidden)
+        return;
+
     QPoint top = movePoint(position, direction, 30);
     QPoint bottomLeft = movePoint(position, direction + 135, 15);
     QPoint bottomRight = movePoint(position, direction - 135, 15);

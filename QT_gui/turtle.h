@@ -23,9 +23,13 @@ public:
     void toStart();
     void move(int x, int y);
 
+    void toggleVisible();
+    void hide();
+    void show();
+
     void draw();
 
-    bool hidden = true;
+    bool hidden = false;
     int direction;
 
 signals:
