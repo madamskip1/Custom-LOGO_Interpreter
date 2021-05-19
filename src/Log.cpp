@@ -6,8 +6,19 @@ Log::Log(LogType logType, const int& line, const int& firstCharPos, const std::s
 
 std::string Log::toString() const
 {
-	std::string string = lineAndPos_toString();
+	std::string string;
 	
+	if (isError())
+	{
+		string = "Blad krytyczny! ";
+	}
+	else
+	{
+		string = "Ostrzezenie. ";
+	}
+
+	
+	string += lineAndPos_toString();	
 	string += LogTypeToMsg.at(logType);
 
 	return string;
