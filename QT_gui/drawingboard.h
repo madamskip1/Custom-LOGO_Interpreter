@@ -12,7 +12,7 @@ public:
     static const int BOARD_WIDTH = 480;
     static const int BOARD_HEIGHT = 620;
     void drawLine(const QPoint& start, const QPoint& end, const QColor color, const int& penwidth);
-
+    void clean();
 
 signals:
 

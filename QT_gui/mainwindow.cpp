@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->ui->turtleBoard->addTurtle(turtle2);
     turtle->go(200);
     delete turtle2;
+    this->ui->drawingBoard->clean();
 }
 
 MainWindow::~MainWindow()
