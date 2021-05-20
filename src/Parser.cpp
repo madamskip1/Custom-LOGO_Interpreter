@@ -16,7 +16,7 @@
 #include "Color.h"
 
 
-Parser::Parser(Lexer* lex, Logger* logger) : lexer(lex), logger(logger)
+Parser::Parser(Lexer& lex, Logger& logger) : lexer(lex), logger(logger)
 {
 }
 
@@ -31,14 +31,14 @@ std::unique_ptr<Node> Parser::parseProgram()
 
     std::unique_ptr<Node> node;
 
-    while ((node = parseInstruction()) && !logger->hasAnyError())
+    while ((node = parseInstruction()) && !logger.hasAnyError())
     {
         rootNode->addChild(std::move(node));
     }
 
     if (!checkCurTokenType(TokenType::EndOfFile))
     {
-        logger->addNewError(LogType::NotEndOfFile, getToken());
+        logger.addNewError(LogType::NotEndOfFile, getToken());
     }
 
     return rootNode;
@@ -90,7 +90,7 @@ std::unique_ptr<InstructionsBlock> Parser::parseInstructionsBlock()
     {
         if (node->getNodeType() == NodeType::DefFuncStatement)
         {
-            logger->addNewError(LogType::CantDefFuncInBlock, token);
+            logger.addNewError(LogType::CantDefFuncInBlock, token);
             return nullptr;
         }
 
@@ -249,7 +249,7 @@ std::unique_ptr<CallFuncStatement> Parser::parseCallFunctionStatement(std::vecto
             std::unique_ptr<Expression> arg = parseExpression();
             if (!arg)
             {
-                logger->addNewError(LogType::MissingParameter, token);
+                logger.addNewError(LogType::MissingParameter, token);
                 return nullptr;
             }
 
@@ -408,7 +408,7 @@ std::unique_ptr<Assignable> Parser::parseAssignable()
     if (assignable)
         return assignable;
 
-    logger->addNewError(LogType::UnknownAssignable, token);
+    logger.addNewError(LogType::UnknownAssignable, token);
     return nullptr;
 }
 
@@ -419,7 +419,7 @@ std::unique_ptr<ClassAssignment> Parser::parseClassAssignment()
     
     if (checkCurTokenType(TokenType::RoundBracketClose))
     {
-        logger->addNewError(LogType::BadExpression, getToken());
+        logger.addNewError(LogType::BadExpression, getToken());
         return nullptr;
     }
 
@@ -448,7 +448,7 @@ std::unique_ptr<Parameter> Parser::parseParameter()
     
     if (!consumeTokenIfType({ TokenType::ColorVar, TokenType::Integer, TokenType::Turtle, TokenType::Point, TokenType::Boolean }))
     {
-        logger->newLog(LogType::BadSyntaxParameter, getToken());
+        logger.newLog(LogType::BadSyntaxParameter, getToken());
         return nullptr;
     }
 
@@ -568,7 +568,7 @@ std::unique_ptr<Expression> Parser::parseFactorExpression()
         return var;
     }
 
-    logger->addNewError(LogType::BadExpression, getToken());
+    logger.addNewError(LogType::BadExpression, getToken());
     return nullptr;
 }
 
@@ -647,7 +647,7 @@ std::unique_ptr<Node> Parser::parseRelationCondition()
     std::unique_ptr<Node> expression = parseExpression();
     if (!expression)
     {
-        logger->addNewError(LogType::BadCondition, token);
+        logger.addNewError(LogType::BadCondition, token);
         return nullptr;
     }
 
@@ -706,7 +706,7 @@ std::vector<std::string> Parser::parseIdentifiers()
         }
         else
         {
-            logger->addNewError(LogType::MissingIdentifier, getToken());
+            logger.addNewError(LogType::MissingIdentifier, getToken());
             return std::vector<std::string>();
         }
 
@@ -722,7 +722,7 @@ Token Parser::getToken()
     if (token)
         return *token;
 
-    token = lexer->getNextToken();
+    token = lexer.getNextToken();
     return *token;
 }
 
@@ -766,7 +766,7 @@ const bool Parser::consumeTokenIfType_Otherwise_AddLog(const TokenType& tokenTyp
     if (consumeTokenIfType(tokenType))
         return true;
 
-    logger->newLog(logType, getToken());
+    logger.newLog(logType, getToken());
     return false;
 }
 
@@ -775,7 +775,7 @@ const bool Parser::consumeTokenIfType_Otherwise_AddError(const TokenType& tokenT
     if (consumeTokenIfType(tokenType))
         return true;
 
-    logger->addNewError(logType, getToken());
+    logger.addNewError(logType, getToken());
     return false;
 }
 

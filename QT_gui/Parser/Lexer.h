@@ -8,12 +8,12 @@ class Lexer
 {
 public:
 	Lexer() = delete;
-	Lexer(SourceReader* source);
+	Lexer(SourceReader& source);
 
 	Token getNextToken();
 
 private:
-	SourceReader* source;
+	SourceReader& source;
 	Token curToken;
 	char firstCharacter;
 

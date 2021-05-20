@@ -21,14 +21,14 @@
 
 TEST_CASE("IFStatement", "[parser]")
 {
-	SourceReader* reader = new SourceReader();
-	Lexer* lexer = new Lexer(reader);
-	Logger* logger = new Logger();
+	SourceReader reader;
+	Lexer lexer(reader);
+	Logger logger;
 	Parser parser(lexer, logger);
 
 	SECTION("without else")
 	{
-		reader->setSourceString("if (!false) {}");
+		reader.setSourceString("if (!false) {}");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -59,7 +59,7 @@ TEST_CASE("IFStatement", "[parser]")
 
 	SECTION("with else")
 	{
-		reader->setSourceString("if (true) {} else {}");
+		reader.setSourceString("if (true) {} else {}");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -95,12 +95,12 @@ TEST_CASE("IFStatement", "[parser]")
 
 TEST_CASE("RepeatStatement", "[parser]")
 {
-	SourceReader* reader = new SourceReader();
-	Lexer* lexer = new Lexer(reader);
-	Logger* logger = new Logger();
+	SourceReader reader;
+	Lexer lexer(reader);
+	Logger logger;
 	Parser parser(lexer, logger);
 
-	reader->setSourceString("repeat(50) {}");
+	reader.setSourceString("repeat(50) {}");
 
 	std::unique_ptr<Node> rootNode = parser.parse();
 	Node* firstNode = rootNode->getChild(0);
@@ -125,14 +125,14 @@ TEST_CASE("RepeatStatement", "[parser]")
 
 TEST_CASE("RepeatTimeStatement", "[parser]")
 {
-	SourceReader* reader = new SourceReader();
-	Lexer* lexer = new Lexer(reader);
-	Logger* logger = new Logger();
+	SourceReader reader;
+	Lexer lexer(reader);
+	Logger logger;
 	Parser parser(lexer, logger);
 
 	SECTION("only period")
 	{
-		reader->setSourceString("repeatTime(22) {}");
+		reader.setSourceString("repeatTime(22) {}");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -156,7 +156,7 @@ TEST_CASE("RepeatTimeStatement", "[parser]")
 
 	SECTION("period and how many time")
 	{
-		reader->setSourceString("repeatTime(22, 50) {}");
+		reader.setSourceString("repeatTime(22, 50) {}");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -194,14 +194,14 @@ TEST_CASE("RepeatTimeStatement", "[parser]")
 
 TEST_CASE("Expressions", "[parser]")
 {
-	SourceReader* reader = new SourceReader();
-	Lexer* lexer = new Lexer(reader);
-	Logger* logger = new Logger();
+	SourceReader reader;
+	Lexer lexer(reader);
+	Logger logger;
 	Parser parser(lexer, logger);
 
 	SECTION("Simple expression - just digit (zero)")
 	{
-		reader->setSourceString("repeat(0) {}");
+		reader.setSourceString("repeat(0) {}");
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
 		REQUIRE(firstNode->getNodeType() == NodeType::RepeatStatement);
@@ -222,7 +222,7 @@ TEST_CASE("Expressions", "[parser]")
 	
 	SECTION("Simple expression - negative digit")
 	{
-		reader->setSourceString("repeat(-95) {}");
+		reader.setSourceString("repeat(-95) {}");
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
 		REQUIRE(firstNode->getNodeType() == NodeType::RepeatStatement);
@@ -242,7 +242,7 @@ TEST_CASE("Expressions", "[parser]")
 
 	SECTION("math operation (+, -, *, /) without bracket")
 	{
-		reader->setSourceString("repeat(-95 + 20 * -20 / -30 - 20) {}");
+		reader.setSourceString("repeat(-95 + 20 * -20 / -30 - 20) {}");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -306,7 +306,7 @@ TEST_CASE("Expressions", "[parser]")
 
 	SECTION("expression with brackets")
 	{
-		reader->setSourceString("repeat(-(1 + -2) * 3) {}");
+		reader.setSourceString("repeat(-(1 + -2) * 3) {}");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -348,7 +348,7 @@ TEST_CASE("Expressions", "[parser]")
 
 	SECTION("expression fun call")
 	{
-		reader->setSourceString("repeat(callFunc(20)) {}");
+		reader.setSourceString("repeat(callFunc(20)) {}");
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
 		REQUIRE(firstNode->getNodeType() == NodeType::RepeatStatement);
@@ -378,7 +378,7 @@ TEST_CASE("Expressions", "[parser]")
 
 	SECTION("expression identifier")
 	{
-		reader->setSourceString("repeat(identifier) {}");
+		reader.setSourceString("repeat(identifier) {}");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -400,14 +400,14 @@ TEST_CASE("Expressions", "[parser]")
 
 TEST_CASE("Conditions", "[parser]")
 {
-	SourceReader* reader = new SourceReader();
-	Lexer* lexer = new Lexer(reader);
-	Logger* logger = new Logger();
+	SourceReader reader;
+	Lexer lexer(reader);
+	Logger logger;
 	Parser parser(lexer, logger);
 
 	SECTION("simple condition - boolean word")
 	{
-		reader->setSourceString("if(true) {}");
+		reader.setSourceString("if(true) {}");
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
 		REQUIRE(firstNode->getNodeType() == NodeType::IfStatement);
@@ -440,7 +440,7 @@ TEST_CASE("Conditions", "[parser]")
 
 	SECTION("simple relation Operator")
 	{
-		reader->setSourceString("if (2 < -3) {}");
+		reader.setSourceString("if (2 < -3) {}");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -483,7 +483,7 @@ TEST_CASE("Conditions", "[parser]")
 
 	SECTION("AND and OR operators, not ")
 	{
-		reader->setSourceString("if (!true && false || true) {}");
+		reader.setSourceString("if (!true && false || true) {}");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -536,7 +536,7 @@ TEST_CASE("Conditions", "[parser]")
 
 	SECTION("Brackets")
 	{
-		reader->setSourceString("if (!(callFunc() || 2 == -2) && true) {}");
+		reader.setSourceString("if (!(callFunc() || 2 == -2) && true) {}");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -630,14 +630,14 @@ TEST_CASE("Conditions", "[parser]")
 
 TEST_CASE("def function", "[parser]")
 {
-	SourceReader* reader = new SourceReader();
-	Lexer* lexer = new Lexer(reader);
-	Logger* logger = new Logger();
+	SourceReader reader;
+	Lexer lexer(reader);
+	Logger logger;
 	Parser parser(lexer, logger);
 
 	SECTION("simple function, without parameters, without return type")
 	{
-		reader->setSourceString("function test() {}");
+		reader.setSourceString("function test() {}");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -651,7 +651,7 @@ TEST_CASE("def function", "[parser]")
 
 	SECTION("function with one parameters, without return type")
 	{
-		reader->setSourceString("function test2(Turtle zolw) {}");
+		reader.setSourceString("function test2(Turtle zolw) {}");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -669,7 +669,7 @@ TEST_CASE("def function", "[parser]")
 
 	SECTION("function with multi parameters, witout return type")
 	{
-		reader->setSourceString("function test3(Turtle zolw, Color color, Integer int) {}");
+		reader.setSourceString("function test3(Turtle zolw, Color color, Integer int) {}");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -695,7 +695,7 @@ TEST_CASE("def function", "[parser]")
 
 	SECTION("function without parameters, with return type")
 	{
-		reader->setSourceString("Turtle function test4() { Turtle test; return test;}");
+		reader.setSourceString("Turtle function test4() { Turtle test; return test;}");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -725,7 +725,7 @@ TEST_CASE("def function", "[parser]")
 
 	SECTION("function witn parameters, with return type")
 	{
-		reader->setSourceString("Integer function test5(Point point, Integer int) {}");
+		reader.setSourceString("Integer function test5(Point point, Integer int) {}");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -749,14 +749,14 @@ TEST_CASE("def function", "[parser]")
 
 TEST_CASE("call function", "[parser]")
 {
-	SourceReader* reader = new SourceReader();
-	Lexer* lexer = new Lexer(reader);
-	Logger* logger = new Logger();
+	SourceReader reader;
+	Lexer lexer(reader);
+	Logger logger;
 	Parser parser(lexer, logger);
 
 	SECTION("simple call function")
 	{
-		reader->setSourceString("test();");
+		reader.setSourceString("test();");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -770,7 +770,7 @@ TEST_CASE("call function", "[parser]")
 
 	SECTION("call function with one argument, int")
 	{
-		reader->setSourceString("test2(153);");
+		reader.setSourceString("test2(153);");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -797,7 +797,7 @@ TEST_CASE("call function", "[parser]")
 
 	SECTION("call function with more arguments")
 	{
-		reader->setSourceString("test3(160, -20, 10);");
+		reader.setSourceString("test3(160, -20, 10);");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -845,7 +845,7 @@ TEST_CASE("call function", "[parser]")
 
 	SECTION("call function multi level ID")
 	{
-		reader->setSourceString("test4.test44.test444();");
+		reader.setSourceString("test4.test44.test444();");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -861,7 +861,7 @@ TEST_CASE("call function", "[parser]")
 
 	SECTION("call function multi level ID and multi args")
 	{
-		reader->setSourceString("test5.test55.test555(1, -2, 3);");
+		reader.setSourceString("test5.test55.test555(1, -2, 3);");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -913,14 +913,14 @@ TEST_CASE("call function", "[parser]")
 
 TEST_CASE("Var declartion", "[parser]")
 {
-	SourceReader* reader = new SourceReader();
-	Lexer* lexer = new Lexer(reader);
-	Logger* logger = new Logger();
+	SourceReader reader;
+	Lexer lexer(reader);
+	Logger logger;
 	Parser parser(lexer, logger);
 
 	SECTION("simple declare var")
 	{
-		reader->setSourceString("Integer test;");
+		reader.setSourceString("Integer test;");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -936,7 +936,7 @@ TEST_CASE("Var declartion", "[parser]")
 
 	SECTION("def var with assign")
 	{
-		reader->setSourceString("Integer test2 =  2 + 2;");
+		reader.setSourceString("Integer test2 =  2 + 2;");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -958,14 +958,14 @@ TEST_CASE("Var declartion", "[parser]")
 
 TEST_CASE("assign", "[parser]")
 {
-	SourceReader* reader = new SourceReader();
-	Lexer* lexer = new Lexer(reader);
-	Logger* logger = new Logger();
+	SourceReader reader;
+	Lexer lexer(reader);
+	Logger logger;
 	Parser parser(lexer, logger);
 
 	SECTION("simple assign")
 	{
-		reader->setSourceString("test = -20;");
+		reader.setSourceString("test = -20;");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -981,7 +981,7 @@ TEST_CASE("assign", "[parser]")
 
 	SECTION("multi level id assign and calc Func")
 	{
-		reader->setSourceString("test2.test22.test222 = callFunc();");
+		reader.setSourceString("test2.test22.test222 = callFunc();");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -1007,7 +1007,7 @@ TEST_CASE("assign", "[parser]")
 
 	SECTION("assign boolean")
 	{
-		reader->setSourceString("testBoolean = true;");
+		reader.setSourceString("testBoolean = true;");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -1023,7 +1023,7 @@ TEST_CASE("assign", "[parser]")
 
 	SECTION("assign color")
 	{
-		reader->setSourceString("testColor = \"#654321\";");
+		reader.setSourceString("testColor = \"#654321\";");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -1039,14 +1039,14 @@ TEST_CASE("assign", "[parser]")
 
 TEST_CASE("declare class-type", "[parser]")
 {
-	SourceReader* reader = new SourceReader();
-	Lexer* lexer = new Lexer(reader);
-	Logger* logger = new Logger();
+	SourceReader reader;
+	Lexer lexer(reader);
+	Logger logger;
 	Parser parser(lexer, logger);
 
 	SECTION("simple declare")
 	{
-		reader->setSourceString("Point point; Turtle zolw;");
+		reader.setSourceString("Point point; Turtle zolw;");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -1070,7 +1070,7 @@ TEST_CASE("declare class-type", "[parser]")
 
 	SECTION("declare class with one argument")
 	{
-		reader->setSourceString("Point point(20); Turtle zolw(-10);");
+		reader.setSourceString("Point point(20); Turtle zolw(-10);");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		REQUIRE(rootNode->getChildrenSize() == 2);
@@ -1128,7 +1128,7 @@ TEST_CASE("declare class-type", "[parser]")
 
 	SECTION("declare with multi args")
 	{
-		reader->setSourceString("Point point(20, 10, 0); Turtle zolw(-10, -20);");
+		reader.setSourceString("Point point(20, 10, 0); Turtle zolw(-10, -20);");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		REQUIRE(rootNode->getChildrenSize() == 2);
@@ -1226,14 +1226,14 @@ TEST_CASE("declare class-type", "[parser]")
 
 TEST_CASE("color var decl")
 {
-	SourceReader* reader = new SourceReader();
-	Lexer* lexer = new Lexer(reader);
-	Logger* logger = new Logger();
+	SourceReader reader;
+	Lexer lexer(reader);
+	Logger logger;
 	Parser parser(lexer, logger);
 
 	SECTION("simple declare")
 	{
-		reader->setSourceString("Color col1;");
+		reader.setSourceString("Color col1;");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -1249,7 +1249,7 @@ TEST_CASE("color var decl")
 
 	SECTION("declare with assign")
 	{
-		reader->setSourceString("Color col2 = \"#123456\";");
+		reader.setSourceString("Color col2 = \"#123456\";");
 
 		std::unique_ptr<Node> rootNode = parser.parse();
 		Node* firstNode = rootNode->getChild(0);
@@ -1272,14 +1272,14 @@ TEST_CASE("color var decl")
 
 TEST_CASE("Block of instructions", "[parser]")
 {
-	SourceReader* reader = new SourceReader();
-	Lexer* lexer = new Lexer(reader);
-	Logger* logger = new Logger();
+	SourceReader reader;
+	Lexer lexer(reader);
+	Logger logger;
 	Parser parser(lexer, logger);
 
 	SECTION("empty block")
 	{
-		reader->setSourceString(R"(if (true)
+		reader.setSourceString(R"(if (true)
 {
 
 }
@@ -1301,7 +1301,7 @@ TEST_CASE("Block of instructions", "[parser]")
 
 	SECTION("three instructions in block")
 	{
-		reader->setSourceString(R"(if (true)
+		reader.setSourceString(R"(if (true)
 {
 	callFunc();
 	repeat(20) {}
@@ -1350,12 +1350,12 @@ Color test4 = "#123456";
 test5 = "#654321";
 )";
 
-	SourceReader* reader = new SourceReader();
-	Lexer* lexer = new Lexer(reader);
-	Logger* logger = new Logger();
+	SourceReader reader;
+	Lexer lexer(reader);
+	Logger logger;
 	Parser parser(lexer, logger);
 
-	reader->setSourceString(code);
+	reader.setSourceString(code);
 
 	std::unique_ptr<Node> rootNode = parser.parse();
 	REQUIRE(rootNode->getChildrenSize() == 6);

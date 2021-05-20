@@ -6,24 +6,24 @@ const std::map<std::string, int> Lexer::lexerConfig =
 	{ "maxNumOfDigits", 9 }
 };
 
-Lexer::Lexer(SourceReader* reader) : source(reader), firstCharacter(-1)
+Lexer::Lexer(SourceReader& reader) : source(reader), firstCharacter(-1)
 {
 }
 
 Token Lexer::getNextToken()
 {
 	curToken.type = TokenType::INVALID;
-	firstCharacter = source->getCharacter();
+	firstCharacter = source.getCharacter();
 
 	while (std::isspace(firstCharacter) || isComment())
-		firstCharacter = source->getCharacter();
+		firstCharacter = source.getCharacter();
 
 
-	curToken.line = source->getLineNumber();
-	curToken.firstCharPos = source->getCharNumber();
-	curToken.tokenPos = source->getStreamPos();
+	curToken.line = source.getLineNumber();
+	curToken.firstCharPos = source.getCharNumber();
+	curToken.tokenPos = source.getStreamPos();
 
-	if (source->isEof())
+	if (source.isEof())
 	{
 		curToken.type = TokenType::EndOfFile;
 		return curToken;
@@ -66,13 +66,13 @@ const bool Lexer::tryToMakeDigit()
 
 	if (val == 0)
 	{
-		if ((source->getNextCharacter() - '0') == 0)
+		if ((source.getNextCharacter() - '0') == 0)
 		{
-			source->getCharacter();
+			source.getCharacter();
 			curToken.type = TokenType::BadDigitZeros;
 
-			while (std::isdigit(source->getNextCharacter()))
-				source->getCharacter();
+			while (std::isdigit(source.getNextCharacter()))
+				source.getCharacter();
 
 			return true;
 		}
@@ -82,9 +82,9 @@ const bool Lexer::tryToMakeDigit()
 		int counter = 1;
 		char digit;
 
-		while (std::isdigit(source->getNextCharacter()))
+		while (std::isdigit(source.getNextCharacter()))
 		{
-			digit = source->getCharacter();
+			digit = source.getCharacter();
 			counter++;
 			
 			if (counter > Lexer::lexerConfig.at("maxNumOfDigits"))
@@ -111,7 +111,7 @@ const bool Lexer::tryToMakeColor()
 		return false;
 
 
-	char nextChar = source->getNextCharacter();
+	char nextChar = source.getNextCharacter();
 	char curCharacter;
 	std::string string = "";
 
@@ -119,10 +119,10 @@ const bool Lexer::tryToMakeColor()
 	int expectedSize = 7;
 	bool badSyntax = false;
 	
-	while (std::isprint(nextChar) && nextChar != '"' && !source->isEof())
+	while (std::isprint(nextChar) && nextChar != '"' && !source.isEof())
 	{
 		counter++;
-		curCharacter = source->getCharacter();
+		curCharacter = source.getCharacter();
 
 		if (badSyntax || 
 			(counter != 1 && (curCharacter < '0' || curCharacter > 'F' || (curCharacter > '59' && curCharacter < '65'))) ||
@@ -135,7 +135,7 @@ const bool Lexer::tryToMakeColor()
 			string += curCharacter;
 		}
 
-		nextChar = source->getNextCharacter();
+		nextChar = source.getNextCharacter();
 	}
 
 	if (nextChar != '"')
@@ -144,7 +144,7 @@ const bool Lexer::tryToMakeColor()
 		return true;
 	}
 
-	source->getCharacter();
+	source.getCharacter();
 
 	if (counter != expectedSize)
 	{
@@ -181,12 +181,12 @@ const bool Lexer::tryToMakeIDorKeywordOrDatatypes()
 	
 	std::string name(1, firstCharacter);
 
-	char nextChar = source->getNextCharacter();
+	char nextChar = source.getNextCharacter();
 
 	while (std::isalnum(nextChar) || nextChar == '_')
 	{
-		name += source->getCharacter();
-		nextChar = source->getNextCharacter();
+		name += source.getCharacter();
+		nextChar = source.getNextCharacter();
 	}
 
 	std::map<std::string, TokenType>::const_iterator keywordIterator = KeywordToTokenType.find(name);
@@ -213,7 +213,7 @@ const bool Lexer::tryToMakeMathOperator()
 		return false;
 	}
 
-	if (firstCharacter == '/' && source->getNextCharacter() == '/')
+	if (firstCharacter == '/' && source.getNextCharacter() == '/')
 	{
 		return false;
 	}
@@ -229,25 +229,25 @@ const bool Lexer::tryToMakeConditionOperator()
 {
 	if (firstCharacter == '&')
 	{
-		if (source->getNextCharacter() != '&')
+		if (source.getNextCharacter() != '&')
 		{
 			curToken.type = TokenType::AndOperatorMissSecond;
 			return true;
 		}
 
-		source->getCharacter();
+		source.getCharacter();
 		curToken.type = TokenType::And;
 		return true;
 	}
 	else if (firstCharacter == '|')
 	{
-		if (source->getNextCharacter() != '|')
+		if (source.getNextCharacter() != '|')
 		{
 			curToken.type = TokenType::OrOperatorMissSecond;
 			return true;
 		}
 
-		source->getCharacter();
+		source.getCharacter();
 		curToken.type = TokenType::Or;
 		return true;
 	}
@@ -259,9 +259,9 @@ const bool Lexer::tryToMakeRelationOperator()
 {
 	if (firstCharacter == '<')
 	{
-		if (source->getNextCharacter() == '=')
+		if (source.getNextCharacter() == '=')
 		{
-			source->getCharacter();
+			source.getCharacter();
 			curToken.type = TokenType::LessOrEqual;
 			return true;
 		}
@@ -271,9 +271,9 @@ const bool Lexer::tryToMakeRelationOperator()
 	}
 	else if (firstCharacter == '>')
 	{
-		if (source->getNextCharacter() == '=')
+		if (source.getNextCharacter() == '=')
 		{
-			source->getCharacter();
+			source.getCharacter();
 			curToken.type = TokenType::GreaterOrEqual;
 			return true;
 		}
@@ -283,9 +283,9 @@ const bool Lexer::tryToMakeRelationOperator()
 	}
 	else if (firstCharacter == '=')
 	{
-		if (source->getNextCharacter() == '=')
+		if (source.getNextCharacter() == '=')
 		{
-			source->getCharacter();
+			source.getCharacter();
 			curToken.type = TokenType::Equal;
 			return true;
 		}
@@ -295,9 +295,9 @@ const bool Lexer::tryToMakeRelationOperator()
 	}
 	else if (firstCharacter == '!')
 	{
-		if (source->getNextCharacter() == '=')
+		if (source.getNextCharacter() == '=')
 		{
-			source->getCharacter();
+			source.getCharacter();
 			curToken.type = TokenType::NotEqual;
 			return true;
 		}
@@ -358,10 +358,10 @@ const bool Lexer::tryToMakeSymbols()
 
 const bool Lexer::isComment() const
 {
-	if (firstCharacter != '/' || source->getNextCharacter() != '/')
+	if (firstCharacter != '/' || source.getNextCharacter() != '/')
 		return false;
 
-	source->skipLine();
+	source.skipLine();
 	return true;
 }
 
