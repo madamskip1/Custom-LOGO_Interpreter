@@ -1,17 +1,27 @@
 #include "VarDeclare.h"
 
-VarDeclare::VarDeclare() : Node(NodeType::VarDeclare)
-{
-}
-
-const void VarDeclare::setType(const TokenType& type)
+VarDeclare::VarDeclare(TokenType type, std::string identifier) : Node(NodeType::VarDeclare)
 {
     this->type = type;
+    this->identifier = identifier;
+    classAssignment = nullptr;
+    assignment = nullptr;
 }
 
-const void VarDeclare::setIdentifier(std::string id)
+VarDeclare::VarDeclare(TokenType type, std::string identifier, std::unique_ptr<AssignmentStatement> assignStatement) : Node(NodeType::VarDeclare)
 {
-    identifier = id;
+    this->type = type;
+    this->identifier = identifier;
+    assignment = std::move(assignStatement);
+    classAssignment = nullptr;
+}
+
+VarDeclare::VarDeclare(TokenType type, std::string identifier, std::unique_ptr<ClassAssignment> classAssign) : Node(NodeType::VarDeclare)
+{
+    this->type = type;
+    this->identifier = identifier;
+    classAssignment = std::move(classAssign);
+    assignment = nullptr;
 }
 
 TokenType VarDeclare::getType() const
@@ -24,19 +34,9 @@ std::string VarDeclare::getIdentifier() const
     return identifier;
 }
 
-const void VarDeclare::setClassAssignment(std::unique_ptr<ClassAssignment> classAssign)
-{
-    classAssignment = std::move(classAssign);
-}
-
 ClassAssignment* VarDeclare::getClassAssignment() const
 {
     return classAssignment.get();
-}
-
-const void VarDeclare::setAssignment(std::unique_ptr<AssignmentStatement> assign)
-{
-    assignment = std::move(assign);
 }
 
 AssignmentStatement* VarDeclare::getAssignment() const

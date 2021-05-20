@@ -8,20 +8,17 @@ class RepeatTimeStatement :
     public Node
 {
 public:
-    RepeatTimeStatement();
-
-    const void setPeriod(std::unique_ptr<Expression> time);
-    const void setHowManyTime(std::unique_ptr<Expression> howMany);
+    RepeatTimeStatement() = delete;
+    RepeatTimeStatement(std::unique_ptr<Expression> period, std::unique_ptr<InstructionsBlock> block);
+    RepeatTimeStatement(std::unique_ptr<Expression> period, std::unique_ptr<Expression> howManyTime, std::unique_ptr<InstructionsBlock> block);
 
     Expression* getPeriod() const;
     Expression* getHowManyTime() const;
-
-    const void setInstructionsBlock(std::unique_ptr<InstructionsBlock> block);
     InstructionsBlock* getInstructuionsBlock() const;
 
 private:
-    std::unique_ptr<Expression> period = nullptr;
-    std::unique_ptr<Expression> howManyTime = nullptr;
+    std::unique_ptr<Expression> periodExpression = nullptr;
+    std::unique_ptr<Expression> howManyTimeExpression = nullptr;
     std::unique_ptr<InstructionsBlock> instructionsBlock = nullptr;
 };
 

@@ -9,6 +9,8 @@ public:
 	std::string getStringValue() const;
 	const bool isInvalidOrUnknown();
 
+	const bool isType(const TokenType& typeToCheck) const;
+
 
 	TokenType type = TokenType::UNKNOWN;
 	std::variant<int, std::string> value;

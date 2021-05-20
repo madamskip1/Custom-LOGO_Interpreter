@@ -8,16 +8,14 @@ class RepeatStatement :
     public Node
 {
 public:
-    RepeatStatement();
+    RepeatStatement() = delete;
+    RepeatStatement(std::unique_ptr<Expression> howManyTime, std::unique_ptr<InstructionsBlock> block);
 
-    const void setHowManyTime(std::unique_ptr<Expression> howMany);
     Expression* getHowManyTime() const;
-
-    const void setInstructionsBlock(std::unique_ptr<InstructionsBlock> block);
     InstructionsBlock* getInstructuionsBlock() const;
 
 private:
-    std::shared_ptr<Expression> howManyTime = nullptr;
+    std::shared_ptr<Expression> howManyTimeExpression = nullptr;
     std::unique_ptr<InstructionsBlock> instructionsBlock = nullptr;
 };
 

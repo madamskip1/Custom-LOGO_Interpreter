@@ -9,18 +9,15 @@ class VarDeclare :
     public Node
 {
 public:
-    VarDeclare();
-
-    const void setType(const TokenType& type);
-    const void setIdentifier(std::string id);
+    VarDeclare() = delete;
+    VarDeclare(TokenType type, std::string identifier);
+    VarDeclare(TokenType type, std::string identifier, std::unique_ptr<AssignmentStatement> assignStatement);
+    VarDeclare(TokenType type, std::string identifier, std::unique_ptr<ClassAssignment> classAssign);
 
     TokenType getType() const;
     std::string getIdentifier() const;
 
-    const void setClassAssignment(std::unique_ptr<ClassAssignment> classAssign);
     ClassAssignment* getClassAssignment() const;
-
-    const void setAssignment(std::unique_ptr<AssignmentStatement> assign);
     AssignmentStatement* getAssignment() const;
 
 private:

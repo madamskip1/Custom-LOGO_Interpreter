@@ -7,10 +7,8 @@ class Parameter :
     public Node
 {
 public:
-    Parameter();
-
-    const void setName(const std::string paramName);
-    const void setType(const TokenType type);
+    Parameter() = delete;
+    Parameter(TokenType parameterType, std::string parameterName);
 
     std::string getName() const;
     TokenType getType() const;

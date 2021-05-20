@@ -83,43 +83,19 @@ std::unique_ptr<InstructionsBlock> Parser::parseInstructionsBlock()
 
     std::unique_ptr<InstructionsBlock> instructionsBlock = std::make_unique<InstructionsBlock>();
 
-    /*
-        pêtla jak w parseProgram
-        pojedyncze instrukcje
-    */
+    std::unique_ptr<Node> node;
 
-    while (!checkCurTokenType({ TokenType::CurlyBracketClose, TokenType::EndOfFile }))
+    Token token = getToken();
+    while ((node = parseInstruction()) != nullptr || (node = parseReturnStatement()) != nullptr)
     {
-        if (getToken().type == TokenType::Return)
+        if (node->getNodeType() == NodeType::DefFuncStatement)
         {
-            consumeToken();
-            std::unique_ptr<ReturnStatement> returnStatement = parseReturnStatement();
-
-            if (!returnStatement)
-                return nullptr;
-
-            instructionsBlock->addChild(std::move(returnStatement));
+            logger->addNewError(LogType::CantDefFuncInBlock, token);
+            return nullptr;
         }
-        else
-        {
-            Token token = getToken();
-            std::unique_ptr<Node> instruction;
-            instruction = parseInstruction();
 
-            if (!instruction)
-            {   
-                logger->addNewError(LogType::BadSyntax, token);
-                return nullptr;
-            }
-
-            if (instruction->getNodeType() == NodeType::DefFuncStatement)
-            {
-                logger->addNewError(LogType::CantDefFuncInBlock, token);
-                return nullptr; 
-            }
-
-            instructionsBlock->addChild(std::move(instruction));
-        }
+        instructionsBlock->addChild(std::move(node));
+        token = getToken();
     }
 
     if (!consumeTokenIfType_Otherwise_AddError(TokenType::CurlyBracketClose, LogType::MissingCurlyBracketClose))
@@ -161,17 +137,8 @@ std::unique_ptr<Node> Parser::parseIfStatement()
         if (!elseBlock)
             return nullptr;
     }
-    
-    /*
-        w konstruktorze
-    */
-    std::unique_ptr<IfStatement> ifStatement = std::make_unique<IfStatement>();
-    ifStatement->setCondition(std::move(condition));
-    ifStatement->setTrueBlockNode(std::move(trueBlock));
-    
-    if (elseBlock)
-        ifStatement->setElseBlockNode(std::move(elseBlock));
 
+    std::unique_ptr<IfStatement> ifStatement = std::make_unique<IfStatement>(std::move(condition), std::move(trueBlock), std::move(elseBlock));
     return ifStatement;
 }
 
@@ -194,9 +161,7 @@ std::unique_ptr<Node> Parser::parseRepeatStatement()
     if (!block)
         return nullptr;
 
-    std::unique_ptr<RepeatStatement> repeatStatement = std::make_unique<RepeatStatement>();
-    repeatStatement->setHowManyTime(std::move(howManyTime));
-    repeatStatement->setInstructionsBlock(std::move(block));
+    std::unique_ptr<RepeatStatement> repeatStatement = std::make_unique<RepeatStatement>(std::move(howManyTime), std::move(block));
     return repeatStatement;
 }
 
@@ -227,13 +192,17 @@ std::unique_ptr<Node> Parser::parseRepeatTimeStatement()
     if (!block)
         return nullptr;
 
-    std::unique_ptr<RepeatTimeStatement> repeatTimeStatement = std::make_unique<RepeatTimeStatement>();
-    repeatTimeStatement->setPeriod(std::move(period));
+    std::unique_ptr<RepeatTimeStatement> repeatTimeStatement;
+
     if (howManyTime)
     {
-        repeatTimeStatement->setHowManyTime(std::move(howManyTime));
+        repeatTimeStatement = std::make_unique<RepeatTimeStatement>(std::move(period), std::move(howManyTime), std::move(block));
     }
-    repeatTimeStatement->setInstructionsBlock(std::move(block));
+    else 
+    {
+        repeatTimeStatement = std::make_unique<RepeatTimeStatement>(std::move(period), std::move(block));
+    }
+
     return repeatTimeStatement;
 }
 
@@ -311,7 +280,6 @@ std::unique_ptr<Node> Parser::parseVarDeclareORDefFuncWithReturStatement()
         return decVarOrDefFunc;
 
     decVarOrDefFunc = parseVarDeclare(token.type);
-
     return decVarOrDefFunc;
 }
 
@@ -341,14 +309,20 @@ std::unique_ptr<VarDeclare> Parser::parseVarDeclare(const TokenType& type)
 
     consumeTokenIfType_Otherwise_AddLog(TokenType::Semicolon, LogType::MissingSemicolon);
 
-    std::unique_ptr<VarDeclare> varDeclare = std::make_unique<VarDeclare>();
-    varDeclare->setType(type);
-    varDeclare->setIdentifier(identifier);
+    std::unique_ptr<VarDeclare> varDeclare;
 
     if (classAssign)
-        varDeclare->setClassAssignment(std::move(classAssign));
+    {
+        varDeclare = std::make_unique<VarDeclare>(type, identifier, std::move(classAssign));
+    }
     else if (assign)
-        varDeclare->setAssignment(std::move(assign));
+    {
+        varDeclare = std::make_unique<VarDeclare>(type, identifier, std::move(assign));
+    }
+    else
+    {
+        varDeclare = std::make_unique<VarDeclare>(type, identifier);
+    }
 
     return varDeclare;
 }
@@ -405,9 +379,8 @@ std::unique_ptr<AssignmentStatement> Parser::parseAssignment(std::vector<std::st
     if (!assignable)
         return nullptr;
 
-    std::unique_ptr<AssignmentStatement> assign = std::make_unique<AssignmentStatement>();
-    assign->addIdentifiers(identifiers);
-    assign->setAssign(std::move(assignable));
+    std::unique_ptr<AssignmentStatement> assign = std::make_unique<AssignmentStatement>(identifiers, std::move(assignable));
+
     return assign;
 }
 
@@ -484,9 +457,7 @@ std::unique_ptr<Parameter> Parser::parseParameter()
     if (identifier == "" || !consumeTokenIfType_Otherwise_AddError(TokenType::Identifier, LogType::MissingIdentifier))
         return nullptr;
 
-    std::unique_ptr<Parameter> parameter = std::make_unique<Parameter>();
-    parameter->setName(identifier);
-    parameter->setType(paramType);
+    std::unique_ptr<Parameter> parameter = std::make_unique<Parameter>(paramType, identifier);
 
     return parameter;
 }
@@ -591,8 +562,7 @@ std::unique_ptr<Expression> Parser::parseFactorExpression()
             return callFunc;
         }
 
-        std::unique_ptr<Variable> var = std::make_unique<Variable>();
-        var->setIdentfiers(identifiers);
+        std::unique_ptr<Variable> var = std::make_unique<Variable>(identifiers);
         var->setNegativeOp(negativeOp);
 
         return var;
@@ -609,7 +579,7 @@ std::unique_ptr<Node> Parser::parseCondition()
         return nullptr;
 
     std::unique_ptr<Condition> condition = std::make_unique<Condition>();
-    condition->setCondition(std::move(andCondition));
+    condition->setLeftCondition(std::move(andCondition));
 
     while (consumeTokenIfType(TokenType::Or))
     {
@@ -630,7 +600,7 @@ std::unique_ptr<Node> Parser::parseAndCondition()
         return nullptr;
 
     std::unique_ptr<Condition> andCondition = std::make_unique<Condition>();
-    andCondition->setCondition(std::move(relationCondition));
+    andCondition->setLeftCondition(std::move(relationCondition));
     
     while (consumeTokenIfType(TokenType::And))
     {
@@ -653,7 +623,7 @@ std::unique_ptr<Node> Parser::parseRelationCondition()
         std::unique_ptr<Boolean> booleanWord = std::make_unique<Boolean>(boolean);
         std::unique_ptr<Condition> conditionBoolean = std::make_unique<Condition>();
 
-        conditionBoolean->setCondition(std::move(booleanWord));
+        conditionBoolean->setLeftCondition(std::move(booleanWord));
         conditionBoolean->setNotOperator(notOperator);
 
         return conditionBoolean;
@@ -695,20 +665,22 @@ std::unique_ptr<Node> Parser::parseRelationCondition()
         relationCondition->setRightCondition(std::move(secondExpression));
     }
 
-    relationCondition->setCondition(std::move(expression));
+    relationCondition->setLeftCondition(std::move(expression));
 
     return relationCondition;
 }
 
 std::unique_ptr<ReturnStatement> Parser::parseReturnStatement()
 {
+    if (!consumeTokenIfType(TokenType::Return))
+        return nullptr;
+
     std::unique_ptr<Assignable> assignable = parseAssignable();
 
     if (!assignable)
         return nullptr;
 
-    std::unique_ptr<ReturnStatement> returnStatement = std::make_unique<ReturnStatement>();
-    returnStatement->setReturn(std::move(assignable));
+    std::unique_ptr<ReturnStatement> returnStatement = std::make_unique<ReturnStatement>(std::move(assignable));
 
     consumeTokenIfType_Otherwise_AddLog(TokenType::Semicolon, LogType::MissingSemicolon);
 
@@ -809,7 +781,7 @@ const bool Parser::consumeTokenIfType_Otherwise_AddError(const TokenType& tokenT
 
 const bool Parser::checkCurTokenType(const TokenType& type)
 {
-    return (getToken().type == type);
+    return getToken().isType(type);
 }
 
 const bool Parser::checkCurTokenType(const std::vector<TokenType>& types)

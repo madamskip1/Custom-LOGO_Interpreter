@@ -1,30 +1,28 @@
 #include "RepeatTimeStatement.h"
 
-RepeatTimeStatement::RepeatTimeStatement() : Node(NodeType::RepeatTimeStatement) {};
-
-const void RepeatTimeStatement::setPeriod(std::unique_ptr<Expression> time)
+RepeatTimeStatement::RepeatTimeStatement(std::unique_ptr<Expression> period, std::unique_ptr<InstructionsBlock> block) : Node(NodeType::RepeatTimeStatement)
 {
-	period = std::move(time);
+	periodExpression = std::move(period);
+	instructionsBlock = std::move(block);
+	howManyTimeExpression = nullptr;
 }
 
-const void RepeatTimeStatement::setHowManyTime(std::unique_ptr<Expression> howMany)
+RepeatTimeStatement::RepeatTimeStatement(std::unique_ptr<Expression> period, std::unique_ptr<Expression> howManyTime, std::unique_ptr<InstructionsBlock> block) : Node(NodeType::RepeatTimeStatement)
 {
-	howManyTime = std::move(howMany);
+	periodExpression = std::move(period);
+	howManyTimeExpression = std::move(howManyTime);
+	instructionsBlock = std::move(block);
 }
+
 
 Expression* RepeatTimeStatement::getPeriod() const
 {
-	return period.get();
+	return periodExpression.get();
 }
 
 Expression* RepeatTimeStatement::getHowManyTime() const
 {
-	return howManyTime.get();
-}
-
-const void RepeatTimeStatement::setInstructionsBlock(std::unique_ptr<InstructionsBlock> block)
-{
-	instructionsBlock = std::move(block);
+	return howManyTimeExpression.get();
 }
 
 InstructionsBlock* RepeatTimeStatement::getInstructuionsBlock() const

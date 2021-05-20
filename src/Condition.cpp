@@ -89,7 +89,7 @@ bool Condition::evaluate()
 	return returnBoolean;
 }
 
-const void Condition::setCondition(std::unique_ptr<Node> condition)
+const void Condition::setLeftCondition(std::unique_ptr<Node> condition)
 {
 	leftCondition = std::move(condition);
 }

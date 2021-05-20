@@ -1,20 +1,11 @@
 #include "IfStatement.h"
 
-IfStatement::IfStatement() : Node(NodeType::IfStatement) {};
-
-const void IfStatement::setTrueBlockNode(std::unique_ptr<InstructionsBlock> block)
+IfStatement::IfStatement(std::unique_ptr<Node> condition, std::unique_ptr<InstructionsBlock> trueBlock, std::unique_ptr<InstructionsBlock> elseBlock) : Node(NodeType::IfStatement)
 {
-	trueBlockNode = std::move(block);
-}
-
-const void IfStatement::setElseBlockNode(std::unique_ptr<InstructionsBlock> block)
-{
-	elseBlockNode = std::move(block);
-}
-
-const void IfStatement::setCondition(std::unique_ptr<Node> cond)
-{
-	condition = std::move(cond);
+	conditionNode = std::move(condition);
+	trueBlockNode = std::move(trueBlock);
+	if (elseBlock)
+		elseBlockNode = std::move(elseBlock);
 }
 
 const bool IfStatement::hasElseBlock() const
@@ -34,5 +25,5 @@ InstructionsBlock* IfStatement::getElseBlockNode() const
 
 Node* IfStatement::getCondition() const
 {
-	return condition.get();
+	return conditionNode.get();
 }

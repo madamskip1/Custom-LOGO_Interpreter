@@ -7,8 +7,8 @@ class ReturnStatement
 {
 public:
 	ReturnStatement();
+	ReturnStatement(std::unique_ptr<Assignable> returnAssignable);
 
-	const void setReturn(std::unique_ptr<Assignable> returnAssign);
 	Assignable* getReturn() const;
 
 private:

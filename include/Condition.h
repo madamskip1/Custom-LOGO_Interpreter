@@ -11,7 +11,7 @@ public:
 
     virtual bool evaluate();
    
-    const void setCondition(std::unique_ptr<Node> condition);
+    const void setLeftCondition(std::unique_ptr<Node> condition);
     const void setRightCondition(std::unique_ptr<Node> condition);
     const void setNotOperator(const bool& notOp);
     const void setRelationOperator(const TokenType& relOp);

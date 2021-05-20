@@ -8,13 +8,11 @@ class AssignmentStatement :
     public Node
 {
 public:
-    AssignmentStatement();
+    AssignmentStatement() = delete;
+    AssignmentStatement(std::vector<std::string> ids, std::unique_ptr<Assignable> assignable);
 
-    const void addIdentifier(std::string id);
-    const void addIdentifiers(const std::vector<std::string>& ids);
     std::string getIdentifier(int index = 0) const;
 
-    const void setAssign(std::unique_ptr<Assignable> assign);
     Assignable* getAssign() const;
 
 private:

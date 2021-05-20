@@ -1,18 +1,9 @@
 #include "Variable.h"
 
-Variable::Variable()
+Variable::Variable(std::vector<std::string> variableIdentifiers)
 {
     nodeType = NodeType::Variable;
-}
-
-const void Variable::addIdentifier(std::string identifier)
-{
-    identifiers.push_back(identifier);
-}
-
-const void Variable::setIdentfiers(std::vector<std::string> identfiers)
-{
-    this->identifiers = identfiers;
+    identifiers = variableIdentifiers;
 }
 
 std::string Variable::getIdentifier(const int& index) const

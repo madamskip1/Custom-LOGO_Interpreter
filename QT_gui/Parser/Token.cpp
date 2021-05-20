@@ -15,3 +15,8 @@ const bool Token::isInvalidOrUnknown()
     return (type == TokenType::INVALID || type == TokenType::UNKNOWN);
 }
 
+const bool Token::isType(const TokenType& typeToCheck) const
+{
+    return type == typeToCheck;
+}
+

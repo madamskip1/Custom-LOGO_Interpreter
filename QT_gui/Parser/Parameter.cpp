@@ -1,15 +1,9 @@
 #include "Parameter.h"
 
-Parameter::Parameter() : Node(NodeType::Parameter) {};
-
-const void Parameter::setName(const std::string paramName)
+Parameter::Parameter(TokenType parameterType, std::string parameterName) : Node(NodeType::Parameter)
 {
-    name = paramName;
-}
-
-const void Parameter::setType(const TokenType type)
-{
-    this->type = type;
+    type = parameterType;
+    name = parameterName;
 }
 
 std::string Parameter::getName() const

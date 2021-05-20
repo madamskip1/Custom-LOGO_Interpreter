@@ -2,11 +2,12 @@
 
 ReturnStatement::ReturnStatement() : Node(NodeType::ReturnStatement)
 {
+	returnAssignable = nullptr;
 }
 
-const void ReturnStatement::setReturn(std::unique_ptr<Assignable> returnAssign)
+ReturnStatement::ReturnStatement(std::unique_ptr<Assignable> returnAssignable) : Node(NodeType::ReturnStatement)
 {
-	returnAssignable = std::move(returnAssign);
+	this->returnAssignable = std::move(returnAssignable);
 }
 
 Assignable* ReturnStatement::getReturn() const
