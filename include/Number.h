@@ -2,16 +2,18 @@
 #include "Node.h"
 #include "Expression.h"
 
-class Number :
-    public Expression
+namespace AST
 {
-public:
-    Number(int value);
+	class Number :
+		public AST::Expression
+	{
+	public:
+		Number(int value);
 
-    int evaluate() const;
+		int evaluate() const;
 
-    const int getValue() const;
-private:
-    int value;
-};
-
+		const int getValue() const;
+	private:
+		int value;
+	};
+}

@@ -2,18 +2,20 @@
 #include "Node.h"
 #include "Expression.h"
 
-class ClassAssignment :
-    public Node
+namespace AST
 {
-public:
-    ClassAssignment();
+	class ClassAssignment :
+		public AST::Node
+	{
+	public:
+		ClassAssignment();
 
-    const void addExpression(std::unique_ptr<Expression> expression);
+		const void addExpression(std::unique_ptr<AST::Expression> expression);
 
-    std::size_t getExpressionsSize() const;
-    Expression* getExpression(int index = 0) const;
+		std::size_t getExpressionsSize() const;
+		AST::Expression* getExpression(int index = 0) const;
 
-private:
-    std::vector<std::unique_ptr<Expression>> expressions;
-};
-
+	private:
+		std::vector<std::unique_ptr<AST::Expression>> expressions;
+	};
+}

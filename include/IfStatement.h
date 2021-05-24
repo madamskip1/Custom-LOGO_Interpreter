@@ -4,20 +4,23 @@
 #include "InstructionsBlock.h"
 #include "Condition.h"
 
-class IfStatement :
-    public Node
+namespace AST
 {
-public:
-    IfStatement() = delete;
-    IfStatement(std::unique_ptr<Node> condition, std::unique_ptr <InstructionsBlock> trueBlock, std::unique_ptr <InstructionsBlock> elseBlock = nullptr);
+	class IfStatement :
+		public AST::Node
+	{
+	public:
+		IfStatement() = delete;
+		IfStatement(std::unique_ptr<AST::Node> condition, std::unique_ptr <AST::InstructionsBlock> trueBlock, std::unique_ptr <AST::InstructionsBlock> elseBlock = nullptr);
 
-    const bool hasElseBlock() const;
-    InstructionsBlock* getTrueBlockNode() const;
-    InstructionsBlock* getElseBlockNode() const;
-    Node* getCondition() const;
+		const bool hasElseBlock() const;
+		AST::InstructionsBlock* getTrueBlockNode() const;
+		AST::InstructionsBlock* getElseBlockNode() const;
+		AST::Node* getCondition() const;
 
-private:
-    std::unique_ptr<Node> conditionNode = nullptr;
-    std::unique_ptr<InstructionsBlock> trueBlockNode = nullptr;
-    std::unique_ptr<InstructionsBlock> elseBlockNode = nullptr;
-};
+	private:
+		std::unique_ptr<AST::Node> conditionNode = nullptr;
+		std::unique_ptr<AST::InstructionsBlock> trueBlockNode = nullptr;
+		std::unique_ptr<AST::InstructionsBlock> elseBlockNode = nullptr;
+	};
+}

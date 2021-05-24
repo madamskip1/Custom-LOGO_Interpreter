@@ -1,5 +1,5 @@
 #include "InstructionsBlock.h"
 
-InstructionsBlock::InstructionsBlock() : Node(NodeType::InstructionsBlock)
+AST::InstructionsBlock::InstructionsBlock() : AST::Node(AST::NodeType::InstructionsBlock)
 {
 }

@@ -4,18 +4,20 @@
 #include "InstructionsBlock.h"
 #include "Expression.h"
 
-class RepeatStatement :
-    public Node
+namespace AST
 {
-public:
-    RepeatStatement() = delete;
-    RepeatStatement(std::unique_ptr<Expression> howManyTime, std::unique_ptr<InstructionsBlock> block);
+	class RepeatStatement :
+		public AST::Node
+	{
+	public:
+		RepeatStatement() = delete;
+		RepeatStatement(std::unique_ptr<AST::Expression> howManyTime, std::unique_ptr<AST::InstructionsBlock> block);
 
-    Expression* getHowManyTime() const;
-    InstructionsBlock* getInstructuionsBlock() const;
+		AST::Expression* getHowManyTime() const;
+		AST::InstructionsBlock* getInstructuionsBlock() const;
 
-private:
-    std::shared_ptr<Expression> howManyTimeExpression = nullptr;
-    std::unique_ptr<InstructionsBlock> instructionsBlock = nullptr;
-};
-
+	private:
+		std::shared_ptr<AST::Expression> howManyTimeExpression = nullptr;
+		std::unique_ptr<AST::InstructionsBlock> instructionsBlock = nullptr;
+	};
+}

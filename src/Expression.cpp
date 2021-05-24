@@ -1,11 +1,11 @@
 #include "Expression.h"
 
-Expression::Expression() 
+AST::Expression::Expression()
 {
     nodeType = NodeType::Expression;
 }
 
-int Expression::evaluate() const
+int AST::Expression::evaluate() const
 {
     int val = childrenExpressions[0]->evaluate();
     int val2 = 0;
@@ -33,37 +33,37 @@ int Expression::evaluate() const
 }
 
 
-const void Expression::addChildExpression(std::unique_ptr<Expression> child)
+const void AST::Expression::addChildExpression(std::unique_ptr<AST::Expression> child)
 {
     childrenExpressions.push_back(std::move(child));
 }
 
-const void Expression::addOperator(const TokenType& op)
+const void AST::Expression::addOperator(const TokenType& op)
 {
     operators.push_back(op);
 }
 
-const void Expression::setNegativeOp(const bool& negative)
+const void AST::Expression::setNegativeOp(const bool& negative)
 {
     negativeOperator = negative;
 }
 
-const std::size_t Expression::getChildrenExpressionSize() const
+const std::size_t AST::Expression::getChildrenExpressionSize() const
 {
     return childrenExpressions.size();
 }
 
-Expression* Expression::getChildExpression(const int& index) const
+AST::Expression* AST::Expression::getChildExpression(const int& index) const
 {
     return childrenExpressions[index].get();
 }
 
-const bool Expression::getNegativeOperator() const
+const bool AST::Expression::getNegativeOperator() const
 {
     return negativeOperator;
 }
 
-const TokenType Expression::getOperator(const int& index) const
+const TokenType AST::Expression::getOperator(const int& index) const
 {
     return operators[index];
 }

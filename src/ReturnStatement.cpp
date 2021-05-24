@@ -1,16 +1,16 @@
 #include "ReturnStatement.h"
 
-ReturnStatement::ReturnStatement() : Node(NodeType::ReturnStatement)
+AST::ReturnStatement::ReturnStatement() : AST::Node(AST::NodeType::ReturnStatement)
 {
 	returnAssignable = nullptr;
 }
 
-ReturnStatement::ReturnStatement(std::unique_ptr<Assignable> returnAssignable) : Node(NodeType::ReturnStatement)
+AST::ReturnStatement::ReturnStatement(std::unique_ptr<AST::Assignable> returnAssignable) : AST::Node(AST::NodeType::ReturnStatement)
 {
 	this->returnAssignable = std::move(returnAssignable);
 }
 
-Assignable* ReturnStatement::getReturn() const
+AST::Assignable* AST::ReturnStatement::getReturn() const
 {
 	return returnAssignable.get();
 }

@@ -2,15 +2,17 @@
 #include "Condition.h"
 #include "Assignable.h"
 
-class Boolean :
-    public Assignable
+namespace AST
 {
-public:
-    Boolean(bool val);
+	class Boolean :
+		public AST::Assignable
+	{
+	public:
+		Boolean(bool val);
 
-    const bool getValue() const;
-    bool evaluate() const;
-private:
-    bool value;
-};
-
+		const bool getValue() const;
+		bool evaluate() const;
+	private:
+		bool value;
+	};
+}

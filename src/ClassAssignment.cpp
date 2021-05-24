@@ -1,18 +1,18 @@
 #include "ClassAssignment.h"
 
-ClassAssignment::ClassAssignment() : Node(NodeType::AssignClassStatement) {};
+AST::ClassAssignment::ClassAssignment() :AST::Node(AST::NodeType::AssignClassStatement) {};
 
-const void ClassAssignment::addExpression(std::unique_ptr<Expression> expression)
+const void AST::ClassAssignment::addExpression(std::unique_ptr<AST::Expression> expression)
 {
     expressions.push_back(std::move(expression));
 }
 
-std::size_t ClassAssignment::getExpressionsSize() const
+std::size_t AST::ClassAssignment::getExpressionsSize() const
 {
     return expressions.size();
 }
 
-Expression* ClassAssignment::getExpression(int index) const
+AST::Expression* AST::ClassAssignment::getExpression(int index) const
 {
     return expressions[index].get();
 }

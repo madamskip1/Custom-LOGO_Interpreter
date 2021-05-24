@@ -1,16 +1,16 @@
 #include "Boolean.h"
 
-Boolean::Boolean(bool val) : value(val)
+AST::Boolean::Boolean(bool val) : value(val)
 {
 	nodeType = NodeType::Boolean;
 }
 
-const bool Boolean::getValue() const
+const bool AST::Boolean::getValue() const
 {
 	return value;
 }
 
-bool Boolean::evaluate() const
+bool AST::Boolean::evaluate() const
 {
 	return value;
 }

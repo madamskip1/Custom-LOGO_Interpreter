@@ -2,16 +2,18 @@
 #include "Node.h"
 #include "Assignable.h"
 
-class ReturnStatement
-	: public Node
+namespace AST
 {
-public:
-	ReturnStatement();
-	ReturnStatement(std::unique_ptr<Assignable> returnAssignable);
+	class ReturnStatement
+		: public AST::Node
+	{
+	public:
+		ReturnStatement();
+		ReturnStatement(std::unique_ptr<AST::Assignable> returnAssignable);
 
-	Assignable* getReturn() const;
+		AST::Assignable* getReturn() const;
 
-private:
-	std::unique_ptr<Assignable> returnAssignable;
-};
-
+	private:
+		std::unique_ptr<AST::Assignable> returnAssignable;
+	};
+}

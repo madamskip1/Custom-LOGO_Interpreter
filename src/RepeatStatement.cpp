@@ -1,17 +1,17 @@
 #include "RepeatStatement.h"
 
-RepeatStatement::RepeatStatement(std::unique_ptr<Expression> howManyTime, std::unique_ptr<InstructionsBlock> block) : Node(NodeType::RepeatStatement) 
+AST::RepeatStatement::RepeatStatement(std::unique_ptr<AST::Expression> howManyTime, std::unique_ptr<AST::InstructionsBlock> block) : AST::Node(AST::NodeType::RepeatStatement)
 {
 	howManyTimeExpression = std::move(howManyTime);
 	instructionsBlock = std::move(block);
 }
 
-Expression* RepeatStatement::getHowManyTime() const
+AST::Expression* AST::RepeatStatement::getHowManyTime() const
 {
 	return howManyTimeExpression.get();
 }
 
-InstructionsBlock* RepeatStatement::getInstructuionsBlock() const
+AST::InstructionsBlock* AST::RepeatStatement::getInstructuionsBlock() const
 {
 	return instructionsBlock.get();
 }

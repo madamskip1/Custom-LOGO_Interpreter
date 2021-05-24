@@ -1,18 +1,18 @@
 #include "AssignmentStatement.h"
 
-AssignmentStatement::AssignmentStatement(std::vector<std::string> ids, std::unique_ptr<Assignable> assignable) : Node(NodeType::AssignmentStatement)
+AST::AssignmentStatement::AssignmentStatement(std::vector<std::string> ids, std::unique_ptr<AST::Assignable> assignable) : AST::Node(AST::NodeType::AssignmentStatement)
 {
     identifiers = ids;
     assign = std::move(assignable);
 }
 
-std::string AssignmentStatement::getIdentifier(int index) const
+std::string AST::AssignmentStatement::getIdentifier(int index) const
 {
     return identifiers[index];
 }
 
 
-Assignable* AssignmentStatement::getAssign() const
+AST::Assignable* AST::AssignmentStatement::getAssign() const
 {
     return assign.get();
 }

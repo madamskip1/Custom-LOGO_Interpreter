@@ -4,21 +4,23 @@
 #include "InstructionsBlock.h"
 #include "Expression.h"
 
-class RepeatTimeStatement :
-    public Node
+namespace AST
 {
-public:
-    RepeatTimeStatement() = delete;
-    RepeatTimeStatement(std::unique_ptr<Expression> period, std::unique_ptr<InstructionsBlock> block);
-    RepeatTimeStatement(std::unique_ptr<Expression> period, std::unique_ptr<Expression> howManyTime, std::unique_ptr<InstructionsBlock> block);
+	class RepeatTimeStatement :
+		public AST::Node
+	{
+	public:
+		RepeatTimeStatement() = delete;
+		RepeatTimeStatement(std::unique_ptr<AST::Expression> period, std::unique_ptr<AST::InstructionsBlock> block);
+		RepeatTimeStatement(std::unique_ptr<AST::Expression> period, std::unique_ptr<AST::Expression> howManyTime, std::unique_ptr<AST::InstructionsBlock> block);
 
-    Expression* getPeriod() const;
-    Expression* getHowManyTime() const;
-    InstructionsBlock* getInstructuionsBlock() const;
+		AST::Expression* getPeriod() const;
+		AST::Expression* getHowManyTime() const;
+		AST::InstructionsBlock* getInstructuionsBlock() const;
 
-private:
-    std::unique_ptr<Expression> periodExpression = nullptr;
-    std::unique_ptr<Expression> howManyTimeExpression = nullptr;
-    std::unique_ptr<InstructionsBlock> instructionsBlock = nullptr;
-};
-
+	private:
+		std::unique_ptr<AST::Expression> periodExpression = nullptr;
+		std::unique_ptr<AST::Expression> howManyTimeExpression = nullptr;
+		std::unique_ptr<AST::InstructionsBlock> instructionsBlock = nullptr;
+	};
+}

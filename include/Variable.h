@@ -3,17 +3,18 @@
 #include <vector>
 #include "Expression.h"
 
-
-class Variable :
-    public Expression
+namespace AST
 {
-public:
-    Variable() = delete;
-    Variable(std::vector<std::string> variableIdentifiers);
+    class Variable :
+        public AST::Expression
+    {
+    public:
+        Variable() = delete;
+        Variable(std::vector<std::string> variableIdentifiers);
 
-    std::string getIdentifier(const int& index = 0) const;
+        std::string getIdentifier(const int& index = 0) const;
 
-private:
-    std::vector<std::string> identifiers;
-};
-
+    private:
+        std::vector<std::string> identifiers;
+    };
+}

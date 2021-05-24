@@ -1,16 +1,16 @@
 #include "Color.h"
 
-Color::Color(std::string color) : colorHex(color)
+AST::Color::Color(std::string color) : colorHex(color)
 { 
 	nodeType = NodeType::Color;
 }
 
-const void Color::setColor(std::string color)
+const void AST::Color::setColor(std::string color)
 {
 	colorHex = color;
 }
 
-std::string Color::getColor() const
+std::string AST::Color::getColor() const
 {
 	return colorHex;
 }

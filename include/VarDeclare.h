@@ -5,25 +5,27 @@
 #include "ClassAssignment.h"
 #include "AssignmentStatement.h"
 
-class VarDeclare :
-    public Node
+namespace AST 
 {
-public:
-    VarDeclare() = delete;
-    VarDeclare(TokenType type, std::string identifier);
-    VarDeclare(TokenType type, std::string identifier, std::unique_ptr<AssignmentStatement> assignStatement);
-    VarDeclare(TokenType type, std::string identifier, std::unique_ptr<ClassAssignment> classAssign);
+	class VarDeclare :
+		public AST::Node
+	{
+	public:
+		VarDeclare() = delete;
+		VarDeclare(TokenType type, std::string identifier);
+		VarDeclare(TokenType type, std::string identifier, std::unique_ptr<AST::AssignmentStatement> assignStatement);
+		VarDeclare(TokenType type, std::string identifier, std::unique_ptr<AST::ClassAssignment> classAssign);
 
-    TokenType getType() const;
-    std::string getIdentifier() const;
+		TokenType getType() const;
+		std::string getIdentifier() const;
 
-    ClassAssignment* getClassAssignment() const;
-    AssignmentStatement* getAssignment() const;
+		AST::ClassAssignment* getClassAssignment() const;
+		AST::AssignmentStatement* getAssignment() const;
 
-private:
-    TokenType type = TokenType::UNKNOWN;
-    std::string identifier;
-    std::unique_ptr<ClassAssignment> classAssignment;
-    std::unique_ptr<AssignmentStatement> assignment;
-};
-
+	private:
+		TokenType type = TokenType::UNKNOWN;
+		std::string identifier;
+		std::unique_ptr<AST::ClassAssignment> classAssignment;
+		std::unique_ptr<AST::AssignmentStatement> assignment;
+	};
+}

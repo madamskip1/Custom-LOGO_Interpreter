@@ -1,25 +1,25 @@
 #include "Node.h"
 
-Node::Node() : nodeType(NodeType::NOTYPE) {};
+AST::Node::Node() : nodeType(AST::NodeType::NOTYPE) {};
 
-Node::Node(NodeType type) : nodeType(type) {};
+AST::Node::Node(AST::NodeType type) : nodeType(type) {};
 
-NodeType Node::getNodeType() const
+AST::NodeType AST::Node::getNodeType() const
 {
 	return nodeType;
 }
 
-const void Node::addChild(std::unique_ptr<Node> child)
+const void AST::Node::addChild(std::unique_ptr<AST::Node> child)
 {
 	children.push_back(std::move(child));
 }
 
-Node* Node::getChild(const int& index) const
+AST::Node* AST::Node::getChild(const int& index) const
 {
 	return children[index].get();
 }
 
-const std::size_t Node::getChildrenSize() const
+const std::size_t AST::Node::getChildrenSize() const
 {
 	return children.size();
 }

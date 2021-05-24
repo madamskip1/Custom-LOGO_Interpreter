@@ -3,28 +3,30 @@
 #include "Node.h"
 #include "TokenType.h"
 
-class Condition :
-    public Node
+namespace AST
 {
-public:
-    Condition();
+	class Condition :
+		public AST::Node
+	{
+	public:
+		Condition();
 
-    virtual bool evaluate();
-   
-    const void setLeftCondition(std::unique_ptr<Node> condition);
-    const void setRightCondition(std::unique_ptr<Node> condition);
-    const void setNotOperator(const bool& notOp);
-    const void setRelationOperator(const TokenType& relOp);
+		virtual bool evaluate();
+	   
+		const void setLeftCondition(std::unique_ptr<AST::Node> condition);
+		const void setRightCondition(std::unique_ptr<AST::Node> condition);
+		const void setNotOperator(const bool& notOp);
+		const void setRelationOperator(const TokenType& relOp);
 
-    Node* getLeftCondition() const;
-    Node* getRightCondition() const;
-    const bool getNotOperator() const;
-    const TokenType getRelationOperator() const;
+		Node* getLeftCondition() const;
+		Node* getRightCondition() const;
+		const bool getNotOperator() const;
+		const TokenType getRelationOperator() const;
 
-private:
-    std::unique_ptr<Node> leftCondition = nullptr;
-    std::unique_ptr<Node> rightCondition = nullptr;
-    TokenType relationOperator;
-    bool notOperator;
-};
-
+	private:
+		std::unique_ptr<AST::Node> leftCondition = nullptr;
+		std::unique_ptr<AST::Node> rightCondition = nullptr;
+		TokenType relationOperator;
+		bool notOperator;
+	};
+}

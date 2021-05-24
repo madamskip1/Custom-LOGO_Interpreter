@@ -1,54 +1,54 @@
 #include "DefFuncStatement.h"
 
-DefFuncStatement::DefFuncStatement() : Node(NodeType::DefFuncStatement) 
+AST::DefFuncStatement::DefFuncStatement() : Node(AST::NodeType::DefFuncStatement) 
 {
 }
 
-const void DefFuncStatement::setName(std::string name)
+const void AST::DefFuncStatement::setName(std::string name)
 {
 	this->name = name;
 }
 
-const void DefFuncStatement::setInstructionsBlock(std::unique_ptr<InstructionsBlock> block)
+const void AST::DefFuncStatement::setInstructionsBlock(std::unique_ptr<AST::InstructionsBlock> block)
 {
 	instructionsBlock = std::move(block);
 }
 
-const void DefFuncStatement::addParameter(std::unique_ptr<Parameter> parameter)
+const void AST::DefFuncStatement::addParameter(std::unique_ptr<AST::Parameter> parameter)
 {
 	parameters.push_back(std::move(parameter));
 }
 
-const void DefFuncStatement::setReturnType(const TokenType& retType)
+const void AST::DefFuncStatement::setReturnType(const TokenType& retType)
 {
 	returnType = retType;
 }
-std::string DefFuncStatement::getName() const
+std::string AST::DefFuncStatement::getName() const
 {
 	return name;
 }
 
-InstructionsBlock* DefFuncStatement::getInstructionsBlock() const
+AST::InstructionsBlock* AST::DefFuncStatement::getInstructionsBlock() const
 {
 	return instructionsBlock.get();
 }
 
-std::size_t DefFuncStatement::getParametersSize() const
+std::size_t AST::DefFuncStatement::getParametersSize() const
 {
 	return parameters.size();
 }
 
-Parameter* DefFuncStatement::getParameter(const int& index) const
+AST::Parameter* AST::DefFuncStatement::getParameter(const int& index) const
 {
 	return parameters[index].get();
 }
 
-const bool DefFuncStatement::hasReturnType() const
+const bool AST::DefFuncStatement::hasReturnType() const
 {
 	return (returnType != TokenType::UNKNOWN);
 }
 
-TokenType DefFuncStatement::getReturnType() const
+TokenType AST::DefFuncStatement::getReturnType() const
 {
 	return returnType;
 }

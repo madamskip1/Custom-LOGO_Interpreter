@@ -2,38 +2,38 @@
 #include "Expression.h"
 #include "Boolean.h"
 
-Condition::Condition() : Node(NodeType::Condition)
+AST::Condition::Condition() : AST::Node(AST::NodeType::Condition)
 {
 }
 
-bool Condition::evaluate()
+bool AST::Condition::evaluate()
 {
 	bool returnBoolean = false;
 
-	if (leftCondition->getNodeType() == NodeType::Condition || leftCondition->getNodeType() == NodeType::Boolean)
+	if (leftCondition->getNodeType() == NodeType::Condition || leftCondition->getNodeType() == AST::NodeType::Boolean)
 	{
-		if (leftCondition->getNodeType() == NodeType::Condition)
+		if (leftCondition->getNodeType() == AST::NodeType::Condition)
 		{
-			returnBoolean = (static_cast<Condition*>(leftCondition.get()))->evaluate();
+			returnBoolean = (static_cast<AST::Condition*>(leftCondition.get()))->evaluate();
 		}
 		else
 		{
-			returnBoolean = (static_cast<Boolean*>(leftCondition.get()))->evaluate();
+			returnBoolean = (static_cast<AST::Boolean*>(leftCondition.get()))->evaluate();
 		}
 
 
 		if (rightCondition)
 		{
-			if (rightCondition->getNodeType() == NodeType::Condition || rightCondition->getNodeType() == NodeType::Boolean)
+			if (rightCondition->getNodeType() == AST::NodeType::Condition || rightCondition->getNodeType() == AST::NodeType::Boolean)
 			{
 				bool rightBoolean;
-				if (rightCondition->getNodeType() == NodeType::Condition)
+				if (rightCondition->getNodeType() == AST::NodeType::Condition)
 				{
-					rightBoolean = (static_cast<Condition*>(rightCondition.get()))->evaluate();
+					rightBoolean = (static_cast<AST::Condition*>(rightCondition.get()))->evaluate();
 				}
 				else
 				{
-					rightBoolean = (static_cast<Boolean*>(rightCondition.get()))->evaluate();
+					rightBoolean = (static_cast<AST::Boolean*>(rightCondition.get()))->evaluate();
 				}
 
 				
@@ -52,13 +52,13 @@ bool Condition::evaluate()
 			}
 		}
 	}
-	else if (leftCondition->getNodeType() == NodeType::Expression)
+	else if (leftCondition->getNodeType() == AST::NodeType::Expression)
 	{
-		int leftValue = (static_cast<Expression*>(leftCondition.get()))->evaluate();
+		int leftValue = (static_cast<AST::Expression*>(leftCondition.get()))->evaluate();
 
-		if (rightCondition->getNodeType() == NodeType::Expression)
+		if (rightCondition->getNodeType() == AST::NodeType::Expression)
 		{
-			int rightValue = (static_cast<Expression*>(rightCondition.get()))->evaluate();
+			int rightValue = (static_cast<AST::Expression*>(rightCondition.get()))->evaluate();
 
 			if (relationOperator == TokenType::Equal)
 				returnBoolean = (leftValue == rightValue);
@@ -89,42 +89,42 @@ bool Condition::evaluate()
 	return returnBoolean;
 }
 
-const void Condition::setLeftCondition(std::unique_ptr<Node> condition)
+const void AST::Condition::setLeftCondition(std::unique_ptr<AST::Node> condition)
 {
 	leftCondition = std::move(condition);
 }
 
-const void Condition::setRightCondition(std::unique_ptr<Node> condition)
+const void AST::Condition::setRightCondition(std::unique_ptr<AST::Node> condition)
 {
 	rightCondition = std::move(condition);
 }
 
-const void Condition::setRelationOperator(const TokenType& relOp)
+const void AST::Condition::setRelationOperator(const TokenType& relOp)
 {
 	relationOperator = relOp;
 }
 
-const void Condition::setNotOperator(const bool& notOp)
+const void AST::Condition::setNotOperator(const bool& notOp)
 {
 	notOperator = notOp;
 }
 
-Node* Condition::getLeftCondition() const
+AST::Node* AST::Condition::getLeftCondition() const
 {
 	return leftCondition.get();
 }
 
-Node* Condition::getRightCondition() const
+AST::Node* AST::Condition::getRightCondition() const
 {
 	return rightCondition.get();
 }
 
-const bool Condition::getNotOperator() const
+const bool AST::Condition::getNotOperator() const
 {
 	return notOperator;
 }
 
-const TokenType Condition::getRelationOperator() const
+const TokenType AST::Condition::getRelationOperator() const
 {
 	return relationOperator;
 }

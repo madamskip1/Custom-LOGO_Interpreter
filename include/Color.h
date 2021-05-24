@@ -2,16 +2,18 @@
 #include <string>
 #include "Assignable.h"
 
-class Color :
-    public Assignable
+namespace AST
 {
-public:
-    Color(std::string color);
+	class Color :
+		public AST::Assignable
+	{
+	public:
+		Color(std::string color);
 
-    const void setColor(std::string color);
-    std::string getColor() const;
+		const void setColor(std::string color);
+		std::string getColor() const;
 
-private:
-    std::string colorHex;
-};
-
+	private:
+		std::string colorHex;
+	};
+}

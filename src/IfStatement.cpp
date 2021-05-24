@@ -1,6 +1,6 @@
 #include "IfStatement.h"
 
-IfStatement::IfStatement(std::unique_ptr<Node> condition, std::unique_ptr<InstructionsBlock> trueBlock, std::unique_ptr<InstructionsBlock> elseBlock) : Node(NodeType::IfStatement)
+AST::IfStatement::IfStatement(std::unique_ptr<AST::Node> condition, std::unique_ptr<AST::InstructionsBlock> trueBlock, std::unique_ptr<AST::InstructionsBlock> elseBlock) : AST::Node(AST::NodeType::IfStatement)
 {
 	conditionNode = std::move(condition);
 	trueBlockNode = std::move(trueBlock);
@@ -8,22 +8,22 @@ IfStatement::IfStatement(std::unique_ptr<Node> condition, std::unique_ptr<Instru
 		elseBlockNode = std::move(elseBlock);
 }
 
-const bool IfStatement::hasElseBlock() const
+const bool AST::IfStatement::hasElseBlock() const
 {
 	return elseBlockNode != nullptr;
 }
 
-InstructionsBlock* IfStatement::getTrueBlockNode() const
+AST::InstructionsBlock* AST::IfStatement::getTrueBlockNode() const
 {
 	return trueBlockNode.get();
 }
 
-InstructionsBlock* IfStatement::getElseBlockNode() const
+AST::InstructionsBlock* AST::IfStatement::getElseBlockNode() const
 {
 	return elseBlockNode.get();
 }
 
-Node* IfStatement::getCondition() const
+AST::Node* AST::IfStatement::getCondition() const
 {
 	return conditionNode.get();
 }

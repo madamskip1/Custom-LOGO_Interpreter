@@ -1,9 +1,13 @@
 #pragma once
 #include "Node.h"
 
-class Assignable :
-    public Node
+namespace AST 
 {
-public:
-};
+	class Assignable :
+		public Node
+	{
+	public:
+	};
+
+}
 

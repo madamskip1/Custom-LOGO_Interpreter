@@ -3,11 +3,13 @@
 #include <memory>
 #include "Node.h"
 
-class InstructionsBlock :
-    public Node
+namespace AST
 {
-public:
-    InstructionsBlock();
-private:
-};
-
+	class InstructionsBlock :
+		public AST::Node
+	{
+	public:
+		InstructionsBlock();
+	private:
+	};
+}

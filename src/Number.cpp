@@ -1,16 +1,16 @@
 #include "Number.h"
 
-Number::Number(int value) : value(value)
+AST::Number::Number(int value) : value(value)
 {
-    nodeType = NodeType::Number;
+    nodeType = AST::NodeType::Number;
 }
 
-int Number::evaluate() const
+int AST::Number::evaluate() const
 {
     return (negativeOperator ? (value * -1) : value);
 }
 
-const int Number::getValue() const
+const int AST::Number::getValue() const
 {
     return value;
 }

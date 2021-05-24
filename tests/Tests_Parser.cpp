@@ -30,28 +30,28 @@ TEST_CASE("IFStatement", "[parser]")
 	{
 		reader.setSourceString("if (!false) {}");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::IfStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::IfStatement);
 
-		IfStatement* ifStatement = static_cast<IfStatement*>(firstNode);
-		Condition* condition = static_cast<Condition*>(ifStatement->getCondition());
+		AST::IfStatement* ifStatement = static_cast<AST::IfStatement*>(firstNode);
+		AST::Condition* condition = static_cast<AST::Condition*>(ifStatement->getCondition());
 		REQUIRE(condition->getLeftCondition() != nullptr);
 		REQUIRE(condition->getRightCondition() == nullptr);
-		Condition* andCondition = static_cast<Condition*>(condition->getLeftCondition());
+		AST::Condition* andCondition = static_cast<AST::Condition*>(condition->getLeftCondition());
 		REQUIRE(andCondition->getLeftCondition() != nullptr);
 		REQUIRE(andCondition->getRightCondition() == nullptr);
 
-		Condition* booleanCondition = static_cast<Condition*>(andCondition->getLeftCondition());
+		AST::Condition* booleanCondition = static_cast<AST::Condition*>(andCondition->getLeftCondition());
 		REQUIRE(booleanCondition->getLeftCondition() != nullptr);
 		REQUIRE(booleanCondition->getRightCondition() == nullptr);
 		REQUIRE(booleanCondition->getNotOperator());
 
-		Boolean* boolean = static_cast<Boolean*>(booleanCondition->getLeftCondition());
+		AST::Boolean* boolean = static_cast<AST::Boolean*>(booleanCondition->getLeftCondition());
 		REQUIRE(!boolean->getValue());
 
-		InstructionsBlock* trueBlock = ifStatement->getTrueBlockNode();
-		REQUIRE(trueBlock->getNodeType() == NodeType::InstructionsBlock);
+		AST::InstructionsBlock* trueBlock = ifStatement->getTrueBlockNode();
+		REQUIRE(trueBlock->getNodeType() == AST::NodeType::InstructionsBlock);
 		REQUIRE(!ifStatement->hasElseBlock());
 
 		REQUIRE(condition->evaluate() == true);
@@ -61,31 +61,31 @@ TEST_CASE("IFStatement", "[parser]")
 	{
 		reader.setSourceString("if (true) {} else {}");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::IfStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::IfStatement);
 
-		IfStatement* ifStatement = static_cast<IfStatement*>(firstNode);
-		Condition* condition = static_cast<Condition*>(ifStatement->getCondition());
+		AST::IfStatement* ifStatement = static_cast<AST::IfStatement*>(firstNode);
+		AST::Condition* condition = static_cast<AST::Condition*>(ifStatement->getCondition());
 		REQUIRE(condition->getLeftCondition() != nullptr);
 		REQUIRE(condition->getRightCondition() == nullptr);
-		Condition* andCondition = static_cast<Condition*>(condition->getLeftCondition());
+		AST::Condition* andCondition = static_cast<AST::Condition*>(condition->getLeftCondition());
 		REQUIRE(andCondition->getLeftCondition() != nullptr);
 		REQUIRE(andCondition->getRightCondition() == nullptr);
 
-		Condition* booleanCondition = static_cast<Condition*>(andCondition->getLeftCondition());
+		AST::Condition* booleanCondition = static_cast<AST::Condition*>(andCondition->getLeftCondition());
 		REQUIRE(booleanCondition->getLeftCondition() != nullptr);
 		REQUIRE(booleanCondition->getRightCondition() == nullptr);
 		REQUIRE(!booleanCondition->getNotOperator());
 
-		Boolean* boolean = static_cast<Boolean*>(booleanCondition->getLeftCondition());
+		AST::Boolean* boolean = static_cast<AST::Boolean*>(booleanCondition->getLeftCondition());
 		REQUIRE(boolean->getValue());
 
-		InstructionsBlock* trueBlock = ifStatement->getTrueBlockNode();
-		REQUIRE(trueBlock->getNodeType() == NodeType::InstructionsBlock);
+		AST::InstructionsBlock* trueBlock = ifStatement->getTrueBlockNode();
+		REQUIRE(trueBlock->getNodeType() == AST::NodeType::InstructionsBlock);
 		REQUIRE(ifStatement->hasElseBlock());
-		InstructionsBlock* elseBlock = ifStatement->getElseBlockNode();
-		REQUIRE(trueBlock->getNodeType() == NodeType::InstructionsBlock);
+		AST::InstructionsBlock* elseBlock = ifStatement->getElseBlockNode();
+		REQUIRE(trueBlock->getNodeType() == AST::NodeType::InstructionsBlock);
 
 		REQUIRE(condition->evaluate() == true);
 	}
@@ -102,23 +102,23 @@ TEST_CASE("RepeatStatement", "[parser]")
 
 	reader.setSourceString("repeat(50) {}");
 
-	std::unique_ptr<Node> rootNode = parser.parse();
-	Node* firstNode = rootNode->getChild(0);
-	REQUIRE(firstNode->getNodeType() == NodeType::RepeatStatement);
+	std::unique_ptr<AST::Node> rootNode = parser.parse();
+	AST::Node* firstNode = rootNode->getChild(0);
+	REQUIRE(firstNode->getNodeType() == AST::NodeType::RepeatStatement);
 
-	RepeatStatement* repeatStatement = static_cast<RepeatStatement*>(firstNode);
+	AST::RepeatStatement* repeatStatement = static_cast<AST::RepeatStatement*>(firstNode);
 
-	Expression* expression = repeatStatement->getHowManyTime();
+	AST::Expression* expression = repeatStatement->getHowManyTime();
 	REQUIRE(expression->getChildrenExpressionSize() == 1);
-	Expression* termExpression = expression->getChildExpression(0);
+	AST::Expression* termExpression = expression->getChildExpression(0);
 	REQUIRE(termExpression->getChildrenExpressionSize() == 1);
-	REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::Number);
-	Number* number = static_cast<Number*>(termExpression->getChildExpression(0));
+	REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+	AST::Number* number = static_cast<AST::Number*>(termExpression->getChildExpression(0));
 	REQUIRE(number->getValue() == 50);
 	REQUIRE(!number->getNegativeOperator());
 	
-	InstructionsBlock* instructionsBlock = repeatStatement->getInstructuionsBlock();
-	REQUIRE(instructionsBlock->getNodeType() == NodeType::InstructionsBlock);
+	AST::InstructionsBlock* instructionsBlock = repeatStatement->getInstructuionsBlock();
+	REQUIRE(instructionsBlock->getNodeType() == AST::NodeType::InstructionsBlock);
 
 	REQUIRE(expression->evaluate() == 50);
 }
@@ -134,22 +134,22 @@ TEST_CASE("RepeatTimeStatement", "[parser]")
 	{
 		reader.setSourceString("repeatTime(22) {}");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::RepeatTimeStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::RepeatTimeStatement);
 
-		RepeatTimeStatement* repeatTimeStatement = static_cast<RepeatTimeStatement*>(firstNode);
+		AST::RepeatTimeStatement* repeatTimeStatement = static_cast<AST::RepeatTimeStatement*>(firstNode);
 
-		Expression* expression = repeatTimeStatement->getPeriod();
+		AST::Expression* expression = repeatTimeStatement->getPeriod();
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
-		Expression* termExpression = expression->getChildExpression(0);
+		AST::Expression* termExpression = expression->getChildExpression(0);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
-		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::Number);
-		Number* number = static_cast<Number*>(termExpression->getChildExpression(0));
+		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+		AST::Number* number = static_cast<AST::Number*>(termExpression->getChildExpression(0));
 		REQUIRE(number->getValue() == 22);
 		REQUIRE(!number->getNegativeOperator());
-		InstructionsBlock* instructionsBlock = repeatTimeStatement->getInstructuionsBlock();
-		REQUIRE(instructionsBlock->getNodeType() == NodeType::InstructionsBlock);
+		AST::InstructionsBlock* instructionsBlock = repeatTimeStatement->getInstructuionsBlock();
+		REQUIRE(instructionsBlock->getNodeType() == AST::NodeType::InstructionsBlock);
 
 		REQUIRE(expression->evaluate() == 22);
 	}
@@ -158,18 +158,18 @@ TEST_CASE("RepeatTimeStatement", "[parser]")
 	{
 		reader.setSourceString("repeatTime(22, 50) {}");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::RepeatTimeStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::RepeatTimeStatement);
 
-		RepeatTimeStatement* repeatTimeStatement = static_cast<RepeatTimeStatement*>(firstNode);
+		AST::RepeatTimeStatement* repeatTimeStatement = static_cast<AST::RepeatTimeStatement*>(firstNode);
 
-		Expression* expression = repeatTimeStatement->getPeriod();
+		AST::Expression* expression = repeatTimeStatement->getPeriod();
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
-		Expression* termExpression = expression->getChildExpression(0);
+		AST::Expression* termExpression = expression->getChildExpression(0);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
-		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::Number);
-		Number* number = static_cast<Number*>(termExpression->getChildExpression(0));
+		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+		AST::Number* number = static_cast<AST::Number*>(termExpression->getChildExpression(0));
 		REQUIRE(number->getValue() == 22);
 		REQUIRE(!number->getNegativeOperator());
 
@@ -179,13 +179,13 @@ TEST_CASE("RepeatTimeStatement", "[parser]")
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
 		termExpression = expression->getChildExpression(0);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
-		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::Number);
-		number = static_cast<Number*>(termExpression->getChildExpression(0));
+		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+		number = static_cast<AST::Number*>(termExpression->getChildExpression(0));
 		REQUIRE(number->getValue() == 50);
 		REQUIRE(!number->getNegativeOperator());
 
-		InstructionsBlock* instructionsBlock = repeatTimeStatement->getInstructuionsBlock();
-		REQUIRE(instructionsBlock->getNodeType() == NodeType::InstructionsBlock);
+		AST::InstructionsBlock* instructionsBlock = repeatTimeStatement->getInstructuionsBlock();
+		REQUIRE(instructionsBlock->getNodeType() == AST::NodeType::InstructionsBlock);
 
 		REQUIRE(expression->evaluate() == 50);
 	}
@@ -202,17 +202,17 @@ TEST_CASE("Expressions", "[parser]")
 	SECTION("Simple expression - just digit (zero)")
 	{
 		reader.setSourceString("repeat(0) {}");
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::RepeatStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::RepeatStatement);
 
-		RepeatStatement* repeatStatement = static_cast<RepeatStatement*>(firstNode);
-		Expression* expression = repeatStatement->getHowManyTime();
+		AST::RepeatStatement* repeatStatement = static_cast<AST::RepeatStatement*>(firstNode);
+		AST::Expression* expression = repeatStatement->getHowManyTime();
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
-		Expression* termExpression = expression->getChildExpression(0);
+		AST::Expression* termExpression = expression->getChildExpression(0);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
-		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::Number);
-		Number* number = static_cast<Number*>(termExpression->getChildExpression(0));
+		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+		AST::Number* number = static_cast<AST::Number*>(termExpression->getChildExpression(0));
 		REQUIRE(number->getValue() == 0);
 		REQUIRE(!number->getNegativeOperator());
 
@@ -223,17 +223,17 @@ TEST_CASE("Expressions", "[parser]")
 	SECTION("Simple expression - negative digit")
 	{
 		reader.setSourceString("repeat(-95) {}");
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::RepeatStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::RepeatStatement);
 
-		RepeatStatement* repeatStatement = static_cast<RepeatStatement*>(firstNode);
-		Expression* expression = repeatStatement->getHowManyTime();
+		AST::RepeatStatement* repeatStatement = static_cast<AST::RepeatStatement*>(firstNode);
+		AST::Expression* expression = repeatStatement->getHowManyTime();
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
-		Expression* termExpression = expression->getChildExpression(0);
+		AST::Expression* termExpression = expression->getChildExpression(0);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
-		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::Number);
-		Number* number = static_cast<Number*>(termExpression->getChildExpression(0));
+		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+		AST::Number* number = static_cast<AST::Number*>(termExpression->getChildExpression(0));
 		REQUIRE(number->getValue() == 95);
 		REQUIRE(number->getNegativeOperator());
 
@@ -244,12 +244,12 @@ TEST_CASE("Expressions", "[parser]")
 	{
 		reader.setSourceString("repeat(-95 + 20 * -20 / -30 - 20) {}");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::RepeatStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::RepeatStatement);
 
-		RepeatStatement* repeatStatement = static_cast<RepeatStatement*>(firstNode);
-		Expression* expression = repeatStatement->getHowManyTime();
+		AST::RepeatStatement* repeatStatement = static_cast<AST::RepeatStatement*>(firstNode);
+		AST::Expression* expression = repeatStatement->getHowManyTime();
 
 		//// A + B - C
 		REQUIRE(expression->getChildrenExpressionSize() == 3);
@@ -257,10 +257,10 @@ TEST_CASE("Expressions", "[parser]")
 		REQUIRE(expression->getOperator(1) == TokenType::Minus);
 
 		//// A Term   -95 
-		Expression* termExpression = expression->getChildExpression(0);
+		AST::Expression* termExpression = expression->getChildExpression(0);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
-		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::Number);
-		Number* number = static_cast<Number*>(termExpression->getChildExpression(0));
+		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+		AST::Number* number = static_cast<AST::Number*>(termExpression->getChildExpression(0));
 		REQUIRE(number->getValue() == 95);
 		REQUIRE(number->getNegativeOperator());
 
@@ -273,20 +273,20 @@ TEST_CASE("Expressions", "[parser]")
 		REQUIRE(termExpression->getOperator(1) == TokenType::Divide);
 		
 		// 20 * ...
-		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::Number);
-		number = static_cast<Number*>(termExpression->getChildExpression(0));
+		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+		number = static_cast<AST::Number*>(termExpression->getChildExpression(0));
 		REQUIRE(number->getValue() == 20);
 		REQUIRE(!number->getNegativeOperator());
 		
 		// ... * -20 / ...
-		REQUIRE(termExpression->getChildExpression(1)->getNodeType() == NodeType::Number);
-		number = static_cast<Number*>(termExpression->getChildExpression(1));
+		REQUIRE(termExpression->getChildExpression(1)->getNodeType() == AST::NodeType::Number);
+		number = static_cast<AST::Number*>(termExpression->getChildExpression(1));
 		REQUIRE(number->getValue() == 20);
 		REQUIRE(number->getNegativeOperator());
 
 		// ... / -30 
-		REQUIRE(termExpression->getChildExpression(2)->getNodeType() == NodeType::Number);
-		number = static_cast<Number*>(termExpression->getChildExpression(2));
+		REQUIRE(termExpression->getChildExpression(2)->getNodeType() == AST::NodeType::Number);
+		number = static_cast<AST::Number*>(termExpression->getChildExpression(2));
 		REQUIRE(number->getValue() == 30);
 		REQUIRE(number->getNegativeOperator());
 
@@ -295,8 +295,8 @@ TEST_CASE("Expressions", "[parser]")
 		// Even its  (- 20) its not negation, its substraction
 		termExpression = expression->getChildExpression(2);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
-		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::Number);
-		number = static_cast<Number*>(termExpression->getChildExpression(0));
+		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+		number = static_cast<AST::Number*>(termExpression->getChildExpression(0));
 		REQUIRE(number->getValue() == 20);
 		REQUIRE(!number->getNegativeOperator());
 
@@ -308,38 +308,38 @@ TEST_CASE("Expressions", "[parser]")
 	{
 		reader.setSourceString("repeat(-(1 + -2) * 3) {}");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::RepeatStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::RepeatStatement);
 
-		RepeatStatement* repeatStatement = static_cast<RepeatStatement*>(firstNode);
-		Expression* expression = repeatStatement->getHowManyTime();
+		AST::RepeatStatement* repeatStatement = static_cast<AST::RepeatStatement*>(firstNode);
+		AST::Expression* expression = repeatStatement->getHowManyTime();
 
 		// A
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
 		// A = B * C
-		Expression * termExpression = expression->getChildExpression(0);
+		AST::Expression* termExpression = expression->getChildExpression(0);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 2);
 		REQUIRE(termExpression->getOperator(0) == TokenType::Multiply);
 
 		// C = 3
-		Number* number = static_cast<Number*>(termExpression->getChildExpression(1));
+		AST::Number* number = static_cast<AST::Number*>(termExpression->getChildExpression(1));
 		REQUIRE(number->getValue() == 3);
 		REQUIRE(!number->getNegativeOperator());
 
 		// B = D -> bracket exprssion -(1 + -2)
-		Expression* factorExpression = termExpression->getChildExpression(0);
+		AST::Expression* factorExpression = termExpression->getChildExpression(0);
 		REQUIRE(factorExpression->getNegativeOperator());
 		REQUIRE(factorExpression->getChildrenExpressionSize() == 2);
 
 		termExpression = factorExpression->getChildExpression(0);
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
-		number = static_cast<Number*>(termExpression->getChildExpression(0));
+		number = static_cast<AST::Number*>(termExpression->getChildExpression(0));
 		REQUIRE(number->getValue() == 1);
 		REQUIRE(!number->getNegativeOperator());
 		termExpression = factorExpression->getChildExpression(1);
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
-		number = static_cast<Number*>(termExpression->getChildExpression(0));
+		number = static_cast<AST::Number*>(termExpression->getChildExpression(0));
 		REQUIRE(number->getValue() == 2);
 		REQUIRE(number->getNegativeOperator());
 
@@ -349,29 +349,29 @@ TEST_CASE("Expressions", "[parser]")
 	SECTION("expression fun call")
 	{
 		reader.setSourceString("repeat(callFunc(20)) {}");
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::RepeatStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::RepeatStatement);
 
-		RepeatStatement* repeatStatement = static_cast<RepeatStatement*>(firstNode);
-		Expression* expression = repeatStatement->getHowManyTime();
+		AST::RepeatStatement* repeatStatement = static_cast<AST::RepeatStatement*>(firstNode);
+		AST::Expression* expression = repeatStatement->getHowManyTime();
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
 
-		Expression* termExpression = expression->getChildExpression(0);
+		AST::Expression* termExpression = expression->getChildExpression(0);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
-		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::CallFuncStatement);
-		CallFuncStatement* callFunc = static_cast<CallFuncStatement*>(termExpression->getChildExpression(0));
+		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::CallFuncStatement);
+		AST::CallFuncStatement* callFunc = static_cast<AST::CallFuncStatement*>(termExpression->getChildExpression(0));
 		REQUIRE(callFunc->getIdentifiersSize() == 1);
 		REQUIRE(callFunc->getIdentifier(0) == "callFunc");
 		REQUIRE(callFunc->getArgumentsSize() == 1);
 
-		Expression* callFuncArg = callFunc->getArgument(0);
+		AST::Expression* callFuncArg = callFunc->getArgument(0);
 		REQUIRE(callFuncArg->getChildrenExpressionSize() == 1);
 
 		termExpression = callFuncArg->getChildExpression(0);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
 
-		Number* expressionFactor = static_cast<Number*>(termExpression->getChildExpression(0));
+		AST::Number* expressionFactor = static_cast<AST::Number*>(termExpression->getChildExpression(0));
 		REQUIRE(expressionFactor->getValue() == 20);
 		REQUIRE(!expressionFactor->getNegativeOperator());
 	}
@@ -380,18 +380,18 @@ TEST_CASE("Expressions", "[parser]")
 	{
 		reader.setSourceString("repeat(identifier) {}");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::RepeatStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::RepeatStatement);
 
-		RepeatStatement* repeatStatement = static_cast<RepeatStatement*>(firstNode);
-		Expression* expression = repeatStatement->getHowManyTime();
+		AST::RepeatStatement* repeatStatement = static_cast<AST::RepeatStatement*>(firstNode);
+		AST::Expression* expression = repeatStatement->getHowManyTime();
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
 
-		Expression* termExpression = expression->getChildExpression(0);
+		AST::Expression* termExpression = expression->getChildExpression(0);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
-		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::Variable);
-		Variable* variable = static_cast<Variable*>(termExpression->getChildExpression(0));
+		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Variable);
+		AST::Variable* variable = static_cast<AST::Variable*>(termExpression->getChildExpression(0));
 		REQUIRE(variable->getIdentifier(0) == "identifier");
 	}
 }
@@ -408,28 +408,28 @@ TEST_CASE("Conditions", "[parser]")
 	SECTION("simple condition - boolean word")
 	{
 		reader.setSourceString("if(true) {}");
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::IfStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::IfStatement);
 
-		IfStatement* ifStatement = static_cast<IfStatement*>(firstNode);
-		Condition* condition = static_cast<Condition*>(ifStatement->getCondition());
+		AST::IfStatement* ifStatement = static_cast<AST::IfStatement*>(firstNode);
+		AST::Condition* condition = static_cast<AST::Condition*>(ifStatement->getCondition());
 		REQUIRE(condition->getLeftCondition() != nullptr);
 		REQUIRE(condition->getRightCondition() == nullptr);
-		REQUIRE(condition->getLeftCondition()->getNodeType() == NodeType::Condition);
+		REQUIRE(condition->getLeftCondition()->getNodeType() == AST::NodeType::Condition);
 
-		Condition* andCondition = static_cast<Condition*>(condition->getLeftCondition());
+		AST::Condition* andCondition = static_cast<AST::Condition*>(condition->getLeftCondition());
 		REQUIRE(andCondition->getLeftCondition() != nullptr);
 		REQUIRE(andCondition->getRightCondition() == nullptr);
-		REQUIRE(andCondition->getLeftCondition()->getNodeType() == NodeType::Condition);
+		REQUIRE(andCondition->getLeftCondition()->getNodeType() == AST::NodeType::Condition);
 
-		Condition* booleanCondition = static_cast<Condition*>(andCondition->getLeftCondition());
+		AST::Condition* booleanCondition = static_cast<AST::Condition*>(andCondition->getLeftCondition());
 		REQUIRE(booleanCondition->getLeftCondition() != nullptr);
 		REQUIRE(booleanCondition->getRightCondition() == nullptr);
 		REQUIRE(!booleanCondition->getNotOperator());
-		REQUIRE(booleanCondition->getLeftCondition()->getNodeType() == NodeType::Boolean);
+		REQUIRE(booleanCondition->getLeftCondition()->getNodeType() == AST::NodeType::Boolean);
 
-		Boolean* boolean = static_cast<Boolean*>(booleanCondition->getLeftCondition());
+		AST::Boolean* boolean = static_cast<AST::Boolean*>(booleanCondition->getLeftCondition());
 		REQUIRE(boolean->getValue());
 
 
@@ -442,39 +442,39 @@ TEST_CASE("Conditions", "[parser]")
 	{
 		reader.setSourceString("if (2 < -3) {}");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::IfStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::IfStatement);
 
-		IfStatement* ifStatement = static_cast<IfStatement*>(firstNode);
-		Condition* condition = static_cast<Condition*>(ifStatement->getCondition());
+		AST::IfStatement* ifStatement = static_cast<AST::IfStatement*>(firstNode);
+		AST::Condition* condition = static_cast<AST::Condition*>(ifStatement->getCondition());
 		REQUIRE(condition->getLeftCondition() != nullptr);
-		Condition* andCondition = static_cast<Condition*>(condition->getLeftCondition());
+		AST::Condition* andCondition = static_cast<AST::Condition*>(condition->getLeftCondition());
 		REQUIRE(andCondition->getLeftCondition() != nullptr);
 		REQUIRE(andCondition->getRightCondition() == nullptr);
-		REQUIRE(andCondition->getLeftCondition()->getNodeType() == NodeType::Condition);
+		REQUIRE(andCondition->getLeftCondition()->getNodeType() == AST::NodeType::Condition);
 
-		Condition* relationCondition = static_cast<Condition*>(andCondition->getLeftCondition());
+		AST::Condition* relationCondition = static_cast<AST::Condition*>(andCondition->getLeftCondition());
 		REQUIRE(relationCondition->getLeftCondition() != nullptr);
 		REQUIRE(relationCondition->getRightCondition() != nullptr);
-		REQUIRE(relationCondition->getLeftCondition()->getNodeType() == NodeType::Expression);
-		REQUIRE(relationCondition->getRightCondition()->getNodeType() == NodeType::Expression);
+		REQUIRE(relationCondition->getLeftCondition()->getNodeType() == AST::NodeType::Expression);
+		REQUIRE(relationCondition->getRightCondition()->getNodeType() == AST::NodeType::Expression);
 		REQUIRE(relationCondition->getRelationOperator() == TokenType::Less);
 
-		Expression* expression = static_cast<Expression*>(relationCondition->getLeftCondition());
+		AST::Expression* expression = static_cast<AST::Expression*>(relationCondition->getLeftCondition());
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
-		Expression* termExpression = expression->getChildExpression(0);
+		AST::Expression* termExpression = expression->getChildExpression(0);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
-		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::Number);
-		Number* number = static_cast<Number*>(termExpression->getChildExpression(0));
+		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+		AST::Number* number = static_cast<AST::Number*>(termExpression->getChildExpression(0));
 		REQUIRE(number->getValue() == 2);
 		REQUIRE(!number->getNegativeOperator());
 
-		expression = static_cast<Expression*>(relationCondition->getRightCondition());
+		expression = static_cast<AST::Expression*>(relationCondition->getRightCondition());
 		termExpression = expression->getChildExpression(0);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
-		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::Number);
-		number = static_cast<Number*>(termExpression->getChildExpression(0));
+		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+		number = static_cast<AST::Number*>(termExpression->getChildExpression(0));
 		REQUIRE(number->getValue() == 3);
 		REQUIRE(number->getNegativeOperator());
 
@@ -485,50 +485,50 @@ TEST_CASE("Conditions", "[parser]")
 	{
 		reader.setSourceString("if (!true && false || true) {}");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::IfStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::IfStatement);
 
-		IfStatement* ifStatement = static_cast<IfStatement*>(firstNode);
-		Condition* condition = static_cast<Condition*>(ifStatement->getCondition());
+		AST::IfStatement* ifStatement = static_cast<AST::IfStatement*>(firstNode);
+		AST::Condition* condition = static_cast<AST::Condition*>(ifStatement->getCondition());
 		REQUIRE(condition->getLeftCondition() != nullptr);
 		REQUIRE(condition->getRightCondition() != nullptr);
-		REQUIRE(condition->getLeftCondition()->getNodeType() == NodeType::Condition);
-		REQUIRE(condition->getRightCondition()->getNodeType() == NodeType::Condition);
+		REQUIRE(condition->getLeftCondition()->getNodeType() == AST::NodeType::Condition);
+		REQUIRE(condition->getRightCondition()->getNodeType() == AST::NodeType::Condition);
 
-		Condition* andCondition = static_cast<Condition*>(condition->getLeftCondition());
+		AST::Condition* andCondition = static_cast<AST::Condition*>(condition->getLeftCondition());
 		REQUIRE(andCondition->getLeftCondition() != nullptr);
 		REQUIRE(andCondition->getRightCondition() != nullptr);
-		REQUIRE(andCondition->getLeftCondition()->getNodeType() == NodeType::Condition);
-		REQUIRE(andCondition->getRightCondition()->getNodeType() == NodeType::Condition);
+		REQUIRE(andCondition->getLeftCondition()->getNodeType() == AST::NodeType::Condition);
+		REQUIRE(andCondition->getRightCondition()->getNodeType() == AST::NodeType::Condition);
 
-		Condition* booleanCondition = static_cast<Condition*>(andCondition->getLeftCondition());
+		AST::Condition* booleanCondition = static_cast<AST::Condition*>(andCondition->getLeftCondition());
 		REQUIRE(booleanCondition->getLeftCondition() != nullptr);
 		REQUIRE(booleanCondition->getRightCondition() == nullptr);
 		REQUIRE(booleanCondition->getNotOperator());
-		REQUIRE(booleanCondition->getLeftCondition()->getNodeType() == NodeType::Boolean);
-		Boolean* boolean = static_cast<Boolean*>(booleanCondition->getLeftCondition());
+		REQUIRE(booleanCondition->getLeftCondition()->getNodeType() == AST::NodeType::Boolean);
+		AST::Boolean* boolean = static_cast<AST::Boolean*>(booleanCondition->getLeftCondition());
 	//	REQUIRE(boolean->getValue());
 		
-		booleanCondition = static_cast<Condition*>(andCondition->getRightCondition());
+		booleanCondition = static_cast<AST::Condition*>(andCondition->getRightCondition());
 		REQUIRE(booleanCondition->getLeftCondition() != nullptr);
 		REQUIRE(booleanCondition->getRightCondition() == nullptr);
 		REQUIRE(!booleanCondition->getNotOperator());
-		REQUIRE(booleanCondition->getLeftCondition()->getNodeType() == NodeType::Boolean);
-		boolean = static_cast<Boolean*>(booleanCondition->getLeftCondition());
+		REQUIRE(booleanCondition->getLeftCondition()->getNodeType() == AST::NodeType::Boolean);
+		boolean = static_cast<AST::Boolean*>(booleanCondition->getLeftCondition());
 	//	REQUIRE(!boolean->getValue());
 		
-		andCondition = static_cast<Condition*>(condition->getRightCondition());
+		andCondition = static_cast<AST::Condition*>(condition->getRightCondition());
 		REQUIRE(andCondition->getLeftCondition() != nullptr);
 		REQUIRE(andCondition->getRightCondition() == nullptr);
-		REQUIRE(andCondition->getLeftCondition()->getNodeType() == NodeType::Condition);
+		REQUIRE(andCondition->getLeftCondition()->getNodeType() == AST::NodeType::Condition);
 
-		booleanCondition = static_cast<Condition*>(andCondition->getLeftCondition());
+		booleanCondition = static_cast<AST::Condition*>(andCondition->getLeftCondition());
 		REQUIRE(booleanCondition->getLeftCondition() != nullptr);
 		REQUIRE(booleanCondition->getRightCondition() == nullptr);
 		REQUIRE(!booleanCondition->getNotOperator());
-		REQUIRE(booleanCondition->getLeftCondition()->getNodeType() == NodeType::Boolean);
-		boolean = static_cast<Boolean*>(andCondition->getLeftCondition());
+		REQUIRE(booleanCondition->getLeftCondition()->getNodeType() == AST::NodeType::Boolean);
+		boolean = static_cast<AST::Boolean*>(andCondition->getLeftCondition());
 	//	REQUIRE(boolean->getValue());
 
 		REQUIRE(condition->evaluate() == true);
@@ -538,89 +538,89 @@ TEST_CASE("Conditions", "[parser]")
 	{
 		reader.setSourceString("if (!(callFunc() || 2 == -2) && true) {}");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::IfStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::IfStatement);
 
-		IfStatement* ifStatement = static_cast<IfStatement*>(firstNode);
+		AST::IfStatement* ifStatement = static_cast<AST::IfStatement*>(firstNode);
 		REQUIRE(ifStatement->getCondition() != nullptr);
-		Condition* mainCondition = static_cast<Condition*>(ifStatement->getCondition());
+		AST::Condition* mainCondition = static_cast<AST::Condition*>(ifStatement->getCondition());
 
 		REQUIRE(mainCondition->getLeftCondition() != nullptr);
 		REQUIRE(mainCondition->getRightCondition() == nullptr);
-		REQUIRE(mainCondition->getLeftCondition()->getNodeType() == NodeType::Condition);
+		REQUIRE(mainCondition->getLeftCondition()->getNodeType() == AST::NodeType::Condition);
 		REQUIRE(!mainCondition->getNotOperator());
-		mainCondition = static_cast<Condition*>(mainCondition->getLeftCondition());
+		mainCondition = static_cast<AST::Condition*>(mainCondition->getLeftCondition());
 		
 		REQUIRE(mainCondition->getLeftCondition() != nullptr);
 		REQUIRE(mainCondition->getRightCondition() != nullptr);
-		REQUIRE(mainCondition->getLeftCondition()->getNodeType() == NodeType::Condition);
-		REQUIRE(mainCondition->getRightCondition()->getNodeType() == NodeType::Condition);
+		REQUIRE(mainCondition->getLeftCondition()->getNodeType() == AST::NodeType::Condition);
+		REQUIRE(mainCondition->getRightCondition()->getNodeType() == AST::NodeType::Condition);
 		REQUIRE(!mainCondition->getNotOperator());
 
-		Condition* booleanCondition = static_cast<Condition*>(mainCondition->getRightCondition());
+		AST::Condition* booleanCondition = static_cast<AST::Condition*>(mainCondition->getRightCondition());
 		REQUIRE(booleanCondition->getLeftCondition() != nullptr);
 		REQUIRE(booleanCondition->getRightCondition() == nullptr);
 		REQUIRE(!booleanCondition->getNotOperator());
-		REQUIRE(booleanCondition->getLeftCondition()->getNodeType() == NodeType::Boolean);
-		Boolean* boolean = static_cast<Boolean*>(booleanCondition->getLeftCondition());
+		REQUIRE(booleanCondition->getLeftCondition()->getNodeType() == AST::NodeType::Boolean);
+		AST::Boolean* boolean = static_cast<AST::Boolean*>(booleanCondition->getLeftCondition());
 		REQUIRE(boolean->getValue());
 
-		Condition* bracketCondition = static_cast<Condition*>(mainCondition->getLeftCondition());
+		AST::Condition* bracketCondition = static_cast<AST::Condition*>(mainCondition->getLeftCondition());
 		REQUIRE(bracketCondition->getLeftCondition() != nullptr);
 		REQUIRE(bracketCondition->getRightCondition() != nullptr);
-		REQUIRE(bracketCondition->getLeftCondition()->getNodeType() == NodeType::Condition);
-		REQUIRE(bracketCondition->getRightCondition()->getNodeType() == NodeType::Condition);
+		REQUIRE(bracketCondition->getLeftCondition()->getNodeType() == AST::NodeType::Condition);
+		REQUIRE(bracketCondition->getRightCondition()->getNodeType() == AST::NodeType::Condition);
 		REQUIRE(bracketCondition->getNotOperator());
 
-		Condition* callFuncCon = static_cast<Condition*>(bracketCondition->getLeftCondition());
+		AST::Condition* callFuncCon = static_cast<AST::Condition*>(bracketCondition->getLeftCondition());
 		REQUIRE(callFuncCon->getLeftCondition() != nullptr);
 		REQUIRE(callFuncCon->getRightCondition() == nullptr);
-		REQUIRE(callFuncCon->getLeftCondition()->getNodeType() == NodeType::Condition);
+		REQUIRE(callFuncCon->getLeftCondition()->getNodeType() == AST::NodeType::Condition);
 
-		callFuncCon = static_cast<Condition*>(callFuncCon->getLeftCondition());
+		callFuncCon = static_cast<AST::Condition*>(callFuncCon->getLeftCondition());
 		REQUIRE(callFuncCon->getLeftCondition() != nullptr);
 		REQUIRE(callFuncCon->getRightCondition() == nullptr);
-		REQUIRE(callFuncCon->getLeftCondition()->getNodeType() == NodeType::Expression);
+		REQUIRE(callFuncCon->getLeftCondition()->getNodeType() == AST::NodeType::Expression);
 		
-		Expression* expression = static_cast<Expression*>(callFuncCon->getLeftCondition());
+		AST::Expression* expression = static_cast<AST::Expression*>(callFuncCon->getLeftCondition());
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
 
-		Expression* termExpression = expression->getChildExpression(0);
+		AST::Expression* termExpression = expression->getChildExpression(0);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
-		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::CallFuncStatement);
-		CallFuncStatement* callFunc = static_cast<CallFuncStatement*>(termExpression->getChildExpression(0));
+		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::CallFuncStatement);
+		AST::CallFuncStatement* callFunc = static_cast<AST::CallFuncStatement*>(termExpression->getChildExpression(0));
 		REQUIRE(callFunc->getIdentifiersSize() == 1);
 		REQUIRE(callFunc->getIdentifier(0) == "callFunc");
 		REQUIRE(callFunc->getArgumentsSize() == 0);
 
-		Condition* equalityCond = static_cast<Condition*>(bracketCondition->getRightCondition());
+		AST::Condition* equalityCond = static_cast<AST::Condition*>(bracketCondition->getRightCondition());
 		REQUIRE(equalityCond->getLeftCondition() != nullptr);
 		REQUIRE(equalityCond->getRightCondition() == nullptr);
-		REQUIRE(equalityCond->getLeftCondition()->getNodeType() == NodeType::Condition);
+		REQUIRE(equalityCond->getLeftCondition()->getNodeType() == AST::NodeType::Condition);
 
-		equalityCond = static_cast<Condition*>(equalityCond->getLeftCondition());
+		equalityCond = static_cast<AST::Condition*>(equalityCond->getLeftCondition());
 		REQUIRE(equalityCond->getLeftCondition() != nullptr);
 		REQUIRE(equalityCond->getRightCondition() != nullptr);
-		REQUIRE(equalityCond->getLeftCondition()->getNodeType() == NodeType::Expression);
-		REQUIRE(equalityCond->getRightCondition()->getNodeType() == NodeType::Expression);
+		REQUIRE(equalityCond->getLeftCondition()->getNodeType() == AST::NodeType::Expression);
+		REQUIRE(equalityCond->getRightCondition()->getNodeType() == AST::NodeType::Expression);
 		REQUIRE(equalityCond->getRelationOperator() == TokenType::Equal);
 
-		expression = static_cast<Expression*>(equalityCond->getLeftCondition());
+		expression = static_cast<AST::Expression*>(equalityCond->getLeftCondition());
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
 		termExpression = expression->getChildExpression(0);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
-		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::Number);
-		Number* number = static_cast<Number*>(termExpression->getChildExpression(0));
+		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+		AST::Number* number = static_cast<AST::Number*>(termExpression->getChildExpression(0));
 		REQUIRE(number->getValue() == 2);
 		REQUIRE(!number->getNegativeOperator());
 
-		expression = static_cast<Expression*>(equalityCond->getRightCondition());
+		expression = static_cast<AST::Expression*>(equalityCond->getRightCondition());
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
 		termExpression = expression->getChildExpression(0);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
-		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::Number);
-		number = static_cast<Number*>(termExpression->getChildExpression(0));
+		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+		number = static_cast<AST::Number*>(termExpression->getChildExpression(0));
 		REQUIRE(number->getValue() == 2);
 		REQUIRE(number->getNegativeOperator());
  	}
@@ -639,11 +639,11 @@ TEST_CASE("def function", "[parser]")
 	{
 		reader.setSourceString("function test() {}");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::DefFuncStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::DefFuncStatement);
 
-		DefFuncStatement* defFunction = static_cast<DefFuncStatement*>(firstNode);
+		AST::DefFuncStatement* defFunction = static_cast<AST::DefFuncStatement*>(firstNode);
 		REQUIRE(defFunction->getName() == "test");
 		REQUIRE(defFunction->getParametersSize() == 0);
 		REQUIRE(!defFunction->hasReturnType());
@@ -653,16 +653,16 @@ TEST_CASE("def function", "[parser]")
 	{
 		reader.setSourceString("function test2(Turtle zolw) {}");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::DefFuncStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::DefFuncStatement);
 
-		DefFuncStatement* defFunction = static_cast<DefFuncStatement*>(firstNode);
+		AST::DefFuncStatement* defFunction = static_cast<AST::DefFuncStatement*>(firstNode);
 		REQUIRE(defFunction->getName() == "test2");
 		REQUIRE(defFunction->getParametersSize() == 1);
 		REQUIRE(!defFunction->hasReturnType());
 
-		Parameter* parameter = defFunction->getParameter(0);
+		AST::Parameter* parameter = defFunction->getParameter(0);
 		REQUIRE(parameter->getType() == TokenType::Turtle);
 		REQUIRE(parameter->getName() == "zolw");
 	}
@@ -671,16 +671,16 @@ TEST_CASE("def function", "[parser]")
 	{
 		reader.setSourceString("function test3(Turtle zolw, Color color, Integer int) {}");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::DefFuncStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::DefFuncStatement);
 
-		DefFuncStatement* defFunction = static_cast<DefFuncStatement*>(firstNode);
+		AST::DefFuncStatement* defFunction = static_cast<AST::DefFuncStatement*>(firstNode);
 		REQUIRE(defFunction->getName() == "test3");
 		REQUIRE(defFunction->getParametersSize() == 3);
 		REQUIRE(!defFunction->hasReturnType());
 
-		Parameter* parameter = defFunction->getParameter(0);
+		AST::Parameter* parameter = defFunction->getParameter(0);
 		REQUIRE(parameter->getType() == TokenType::Turtle);
 		REQUIRE(parameter->getName() == "zolw");
 		
@@ -697,29 +697,29 @@ TEST_CASE("def function", "[parser]")
 	{
 		reader.setSourceString("Turtle function test4() { Turtle test; return test;}");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::DefFuncStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::DefFuncStatement);
 
-		DefFuncStatement* defFunction = static_cast<DefFuncStatement*>(firstNode);
+		AST::DefFuncStatement* defFunction = static_cast<AST::DefFuncStatement*>(firstNode);
 		REQUIRE(defFunction->getName() == "test4");
 		REQUIRE(defFunction->getParametersSize() == 0);
 		REQUIRE(defFunction->hasReturnType());
 		REQUIRE(defFunction->getReturnType() == TokenType::Turtle);
 		REQUIRE(defFunction->getInstructionsBlock() != nullptr);
 
-		InstructionsBlock* instructionsBlock = defFunction->getInstructionsBlock();
+		AST::InstructionsBlock* instructionsBlock = defFunction->getInstructionsBlock();
 		REQUIRE(instructionsBlock->getChildrenSize() == 2);
-		REQUIRE(instructionsBlock->getChild(1)->getNodeType() == NodeType::ReturnStatement);
+		REQUIRE(instructionsBlock->getChild(1)->getNodeType() == AST::NodeType::ReturnStatement);
 
-		ReturnStatement* returnStatement = static_cast<ReturnStatement*>(instructionsBlock->getChild(1));
-		Expression* expression = static_cast<Expression*>(returnStatement->getReturn());
+		AST::ReturnStatement* returnStatement = static_cast<AST::ReturnStatement*>(instructionsBlock->getChild(1));
+		AST::Expression* expression = static_cast<AST::Expression*>(returnStatement->getReturn());
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
 
-		Expression* termExpression = expression->getChildExpression(0);
+		AST::Expression* termExpression = expression->getChildExpression(0);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
-		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::Variable);
-		Variable* variable = static_cast<Variable*>(termExpression->getChildExpression(0));
+		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Variable);
+		AST::Variable* variable = static_cast<AST::Variable*>(termExpression->getChildExpression(0));
 		REQUIRE(variable->getIdentifier(0) == "test");
 	}
 
@@ -727,17 +727,17 @@ TEST_CASE("def function", "[parser]")
 	{
 		reader.setSourceString("Integer function test5(Point point, Integer int) {}");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::DefFuncStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::DefFuncStatement);
 
-		DefFuncStatement* defFunction = static_cast<DefFuncStatement*>(firstNode);
+		AST::DefFuncStatement* defFunction = static_cast<AST::DefFuncStatement*>(firstNode);
 		REQUIRE(defFunction->getName() == "test5");
 		REQUIRE(defFunction->getParametersSize() == 2);
 		REQUIRE(defFunction->hasReturnType());
 		REQUIRE(defFunction->getReturnType() == TokenType::Integer);
 
-		Parameter* parameter = defFunction->getParameter(0);
+		AST::Parameter* parameter = defFunction->getParameter(0);
 		REQUIRE(parameter->getType() == TokenType::Point);
 		REQUIRE(parameter->getName() == "point");
 
@@ -758,11 +758,11 @@ TEST_CASE("call function", "[parser]")
 	{
 		reader.setSourceString("test();");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::CallFuncStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::CallFuncStatement);
 
-		CallFuncStatement* callFunc = static_cast<CallFuncStatement*>(firstNode);
+		AST::CallFuncStatement* callFunc = static_cast<AST::CallFuncStatement*>(firstNode);
 		REQUIRE(callFunc->getArgumentsSize() == 0);
 		REQUIRE(callFunc->getIdentifiersSize() == 1);
 		REQUIRE(callFunc->getIdentifier(0) == "test");
@@ -772,23 +772,23 @@ TEST_CASE("call function", "[parser]")
 	{
 		reader.setSourceString("test2(153);");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::CallFuncStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::CallFuncStatement);
 
-		CallFuncStatement* callFunc = static_cast<CallFuncStatement*>(firstNode);
+		AST::CallFuncStatement* callFunc = static_cast<AST::CallFuncStatement*>(firstNode);
 		REQUIRE(callFunc->getArgumentsSize() == 1);
 		REQUIRE(callFunc->getIdentifiersSize() == 1);
 		REQUIRE(callFunc->getIdentifier(0) == "test2");
 
 
-		Expression* expression = callFunc->getArgument(0);
+		AST::Expression* expression = callFunc->getArgument(0);
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
 
-		Expression* expressionTerm = expression->getChildExpression(0);
+		AST::Expression* expressionTerm = expression->getChildExpression(0);
 		REQUIRE(expressionTerm->getChildrenExpressionSize() == 1);
 
-		Number* expressionFactor = static_cast<Number*>(expressionTerm->getChildExpression(0));
+		AST::Number* expressionFactor = static_cast<AST::Number*>(expressionTerm->getChildExpression(0));
 		REQUIRE(expressionFactor->getValue() == 153);
 		REQUIRE(!expressionFactor->getNegativeOperator());
 
@@ -799,24 +799,24 @@ TEST_CASE("call function", "[parser]")
 	{
 		reader.setSourceString("test3(160, -20, 10);");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::CallFuncStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::CallFuncStatement);
 
-		CallFuncStatement* callFunc = static_cast<CallFuncStatement*>(firstNode);
+		AST::CallFuncStatement* callFunc = static_cast<AST::CallFuncStatement*>(firstNode);
 		REQUIRE(callFunc->getArgumentsSize() == 3);
 		REQUIRE(callFunc->getIdentifiersSize() == 1);
 		REQUIRE(callFunc->getIdentifier(0) == "test3");
 
-		Expression* arg;
-		Expression* expressionTerm;
-		Number* argNumber;
+		AST::Expression* arg;
+		AST::Expression* expressionTerm;
+		AST::Number* argNumber;
 
 		arg = callFunc->getArgument(0);
 		REQUIRE(arg->getChildrenExpressionSize() == 1);
 		expressionTerm = arg->getChildExpression(0);
 		REQUIRE(expressionTerm->getChildrenExpressionSize() == 1);
-		argNumber = static_cast<Number*>(expressionTerm->getChildExpression(0));
+		argNumber = static_cast<AST::Number*>(expressionTerm->getChildExpression(0));
 		REQUIRE(argNumber->getValue() == 160);
 		REQUIRE(!argNumber->getNegativeOperator());
 
@@ -826,7 +826,7 @@ TEST_CASE("call function", "[parser]")
 		REQUIRE(arg->getChildrenExpressionSize() == 1);
 		expressionTerm = arg->getChildExpression(0);
 		REQUIRE(expressionTerm->getChildrenExpressionSize() == 1);
-		argNumber = static_cast<Number*>(expressionTerm->getChildExpression(0));
+		argNumber = static_cast<AST::Number*>(expressionTerm->getChildExpression(0));
 		REQUIRE(argNumber->getValue() == 20);
 		REQUIRE(argNumber->getNegativeOperator());
 
@@ -836,7 +836,7 @@ TEST_CASE("call function", "[parser]")
 		REQUIRE(arg->getChildrenExpressionSize() == 1);
 		expressionTerm = arg->getChildExpression(0);
 		REQUIRE(expressionTerm->getChildrenExpressionSize() == 1);
-		argNumber = static_cast<Number*>(expressionTerm->getChildExpression(0));
+		argNumber = static_cast<AST::Number*>(expressionTerm->getChildExpression(0));
 		REQUIRE(argNumber->getValue() == 10);
 		REQUIRE(!argNumber->getNegativeOperator());
 
@@ -847,11 +847,11 @@ TEST_CASE("call function", "[parser]")
 	{
 		reader.setSourceString("test4.test44.test444();");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::CallFuncStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::CallFuncStatement);
 
-		CallFuncStatement* callFunc = static_cast<CallFuncStatement*>(firstNode);
+		AST::CallFuncStatement* callFunc = static_cast<AST::CallFuncStatement*>(firstNode);
 		REQUIRE(callFunc->getArgumentsSize() == 0);
 		REQUIRE(callFunc->getIdentifiersSize() == 3);
 		REQUIRE(callFunc->getIdentifier(0) == "test4");
@@ -863,26 +863,26 @@ TEST_CASE("call function", "[parser]")
 	{
 		reader.setSourceString("test5.test55.test555(1, -2, 3);");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::CallFuncStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::CallFuncStatement);
 
-		CallFuncStatement* callFunc = static_cast<CallFuncStatement*>(firstNode);
+		AST::CallFuncStatement* callFunc = static_cast<AST::CallFuncStatement*>(firstNode);
 		REQUIRE(callFunc->getArgumentsSize() == 3);
 		REQUIRE(callFunc->getIdentifiersSize() == 3);
 		REQUIRE(callFunc->getIdentifier(0) == "test5");
 		REQUIRE(callFunc->getIdentifier(1) == "test55");
 		REQUIRE(callFunc->getIdentifier(2) == "test555");
 
-		Expression* arg;
-		Expression* expressionTerm;
-		Number* argNumber;
+		AST::Expression* arg;
+		AST::Expression* expressionTerm;
+		AST::Number* argNumber;
 
 		arg = callFunc->getArgument(0);
 		REQUIRE(arg->getChildrenExpressionSize() == 1);
 		expressionTerm = arg->getChildExpression(0);
 		REQUIRE(expressionTerm->getChildrenExpressionSize() == 1);
-		argNumber = static_cast<Number*>(expressionTerm->getChildExpression(0));
+		argNumber = static_cast<AST::Number*>(expressionTerm->getChildExpression(0));
 		REQUIRE(argNumber->getValue() == 1);
 		REQUIRE(!argNumber->getNegativeOperator());
 
@@ -892,7 +892,7 @@ TEST_CASE("call function", "[parser]")
 		REQUIRE(arg->getChildrenExpressionSize() == 1);
 		expressionTerm = arg->getChildExpression(0);
 		REQUIRE(expressionTerm->getChildrenExpressionSize() == 1);
-		argNumber = static_cast<Number*>(expressionTerm->getChildExpression(0));
+		argNumber = static_cast<AST::Number*>(expressionTerm->getChildExpression(0));
 		REQUIRE(argNumber->getValue() == 2);
 		REQUIRE(argNumber->getNegativeOperator());
 
@@ -902,7 +902,7 @@ TEST_CASE("call function", "[parser]")
 		REQUIRE(arg->getChildrenExpressionSize() == 1);
 		expressionTerm = arg->getChildExpression(0);
 		REQUIRE(expressionTerm->getChildrenExpressionSize() == 1);
-		argNumber = static_cast<Number*>(expressionTerm->getChildExpression(0));
+		argNumber = static_cast<AST::Number*>(expressionTerm->getChildExpression(0));
 		REQUIRE(argNumber->getValue() == 3);
 		REQUIRE(!argNumber->getNegativeOperator());
 
@@ -922,11 +922,11 @@ TEST_CASE("Var declartion", "[parser]")
 	{
 		reader.setSourceString("Integer test;");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::VarDeclare);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::VarDeclare);
 
-		VarDeclare* varDeclare = static_cast<VarDeclare*>(firstNode);
+		AST::VarDeclare* varDeclare = static_cast<AST::VarDeclare*>(firstNode);
 		REQUIRE(varDeclare->getIdentifier() == "test");
 		REQUIRE(varDeclare->getAssignment() == nullptr);
 		REQUIRE(varDeclare->getClassAssignment() == nullptr);
@@ -938,19 +938,19 @@ TEST_CASE("Var declartion", "[parser]")
 	{
 		reader.setSourceString("Integer test2 =  2 + 2;");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::VarDeclare);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::VarDeclare);
 
-		VarDeclare* varDeclare = static_cast<VarDeclare*>(firstNode);
+		AST::VarDeclare* varDeclare = static_cast<AST::VarDeclare*>(firstNode);
 		REQUIRE(varDeclare->getIdentifier() == "test2");
 		REQUIRE(varDeclare->getAssignment() != nullptr);
 		REQUIRE(varDeclare->getClassAssignment() == nullptr);
 		REQUIRE(varDeclare->getType() == TokenType::Integer);
 
-		AssignmentStatement* assignmentStatement = static_cast<AssignmentStatement*>(varDeclare->getAssignment());
+		AST::AssignmentStatement* assignmentStatement = static_cast<AST::AssignmentStatement*>(varDeclare->getAssignment());
 
-		Expression* expression = static_cast<Expression*>(assignmentStatement->getAssign());
+		AST::Expression* expression = static_cast<AST::Expression*>(assignmentStatement->getAssign());
 
 		REQUIRE(expression->evaluate() == 4);
 	}
@@ -967,15 +967,15 @@ TEST_CASE("assign", "[parser]")
 	{
 		reader.setSourceString("test = -20;");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::AssignmentStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::AssignmentStatement);
 
-		AssignmentStatement* assignmentStatement = static_cast<AssignmentStatement*>(firstNode);
+		AST::AssignmentStatement* assignmentStatement = static_cast<AST::AssignmentStatement*>(firstNode);
 		REQUIRE(assignmentStatement->getIdentifier(0) == "test");
-		REQUIRE(assignmentStatement->getAssign()->getNodeType() == NodeType::Expression);
+		REQUIRE(assignmentStatement->getAssign()->getNodeType() == AST::NodeType::Expression);
 
-		Expression* expression = static_cast<Expression*>(assignmentStatement->getAssign());
+		AST::Expression* expression = static_cast<AST::Expression*>(assignmentStatement->getAssign());
 		REQUIRE(expression->evaluate() == -20);
 	}
 
@@ -983,23 +983,23 @@ TEST_CASE("assign", "[parser]")
 	{
 		reader.setSourceString("test2.test22.test222 = callFunc();");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::AssignmentStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::AssignmentStatement);
 
-		AssignmentStatement* assignmentStatement = static_cast<AssignmentStatement*>(firstNode);
+		AST::AssignmentStatement* assignmentStatement = static_cast<AST::AssignmentStatement*>(firstNode);
 		REQUIRE(assignmentStatement->getIdentifier(0) == "test2");
 		REQUIRE(assignmentStatement->getIdentifier(1) == "test22");
 		REQUIRE(assignmentStatement->getIdentifier(2) == "test222");
-		REQUIRE(assignmentStatement->getAssign()->getNodeType() == NodeType::Expression);
+		REQUIRE(assignmentStatement->getAssign()->getNodeType() == AST::NodeType::Expression);
 
-		Expression* expression = static_cast<Expression*>(assignmentStatement->getAssign());
+		AST::Expression* expression = static_cast<AST::Expression*>(assignmentStatement->getAssign());
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
 
-		Expression* termExpression = expression->getChildExpression(0);
+		AST::Expression* termExpression = expression->getChildExpression(0);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
-		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::CallFuncStatement);
-		CallFuncStatement* callFunc = static_cast<CallFuncStatement*>(termExpression->getChildExpression(0));
+		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::CallFuncStatement);
+		AST::CallFuncStatement* callFunc = static_cast<AST::CallFuncStatement*>(termExpression->getChildExpression(0));
 		REQUIRE(callFunc->getIdentifiersSize() == 1);
 		REQUIRE(callFunc->getIdentifier(0) == "callFunc");
 		REQUIRE(callFunc->getArgumentsSize() == 0);
@@ -1009,15 +1009,15 @@ TEST_CASE("assign", "[parser]")
 	{
 		reader.setSourceString("testBoolean = true;");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::AssignmentStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::AssignmentStatement);
 		
-		AssignmentStatement* assignment = static_cast<AssignmentStatement*>(firstNode);
+		AST::AssignmentStatement* assignment = static_cast<AST::AssignmentStatement*>(firstNode);
 		REQUIRE(assignment->getIdentifier(0) == "testBoolean");
-		REQUIRE(assignment->getAssign()->getNodeType() == NodeType::Boolean);
+		REQUIRE(assignment->getAssign()->getNodeType() == AST::NodeType::Boolean);
 
-		Boolean* boolean = static_cast<Boolean*>(assignment->getAssign());
+		AST::Boolean* boolean = static_cast<AST::Boolean*>(assignment->getAssign());
 		REQUIRE(boolean->getValue());
 	}
 
@@ -1025,14 +1025,14 @@ TEST_CASE("assign", "[parser]")
 	{
 		reader.setSourceString("testColor = \"#654321\";");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::AssignmentStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::AssignmentStatement);
 
-		AssignmentStatement* assign = static_cast<AssignmentStatement*>(firstNode);
-		REQUIRE(assign->getAssign()->getNodeType() == NodeType::Color);
+		AST::AssignmentStatement* assign = static_cast<AST::AssignmentStatement*>(firstNode);
+		REQUIRE(assign->getAssign()->getNodeType() == AST::NodeType::Color);
 
-		Color* color = static_cast<Color*>(assign->getAssign());
+		AST::Color* color = static_cast<AST::Color*>(assign->getAssign());
 		REQUIRE(color->getColor() == "#654321");
 	}
 }
@@ -1048,20 +1048,20 @@ TEST_CASE("declare class-type", "[parser]")
 	{
 		reader.setSourceString("Point point; Turtle zolw;");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::VarDeclare);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::VarDeclare);
 
-		VarDeclare* varDeclare = static_cast<VarDeclare*>(firstNode);
+		AST::VarDeclare* varDeclare = static_cast<AST::VarDeclare*>(firstNode);
 
 		REQUIRE(varDeclare->getType() == TokenType::Point);
 		REQUIRE(varDeclare->getAssignment() == nullptr);
 		REQUIRE(varDeclare->getClassAssignment() == nullptr);
 		REQUIRE(varDeclare->getIdentifier() == "point");
 
-		Node* secondNode = rootNode->getChild(1);
-		REQUIRE(secondNode->getNodeType() == NodeType::VarDeclare);
-		varDeclare = static_cast<VarDeclare*>(secondNode);
+		AST::Node* secondNode = rootNode->getChild(1);
+		REQUIRE(secondNode->getNodeType() == AST::NodeType::VarDeclare);
+		varDeclare = static_cast<AST::VarDeclare*>(secondNode);
 		REQUIRE(varDeclare->getType() == TokenType::Turtle);
 		REQUIRE(varDeclare->getAssignment() == nullptr);
 		REQUIRE(varDeclare->getClassAssignment() == nullptr);
@@ -1072,54 +1072,54 @@ TEST_CASE("declare class-type", "[parser]")
 	{
 		reader.setSourceString("Point point(20); Turtle zolw(-10);");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
 		REQUIRE(rootNode->getChildrenSize() == 2);
-		Node* node = rootNode->getChild(0);
-		REQUIRE(node->getNodeType() == NodeType::VarDeclare);
+		AST::Node* node = rootNode->getChild(0);
+		REQUIRE(node->getNodeType() == AST::NodeType::VarDeclare);
 
-		VarDeclare* varDeclare = static_cast<VarDeclare*>(node);
+		AST::VarDeclare* varDeclare = static_cast<AST::VarDeclare*>(node);
 		REQUIRE(varDeclare->getType() == TokenType::Point);
 		REQUIRE(varDeclare->getAssignment() == nullptr);
 		REQUIRE(varDeclare->getClassAssignment() != nullptr);
 		REQUIRE(varDeclare->getIdentifier() == "point");
 
-		ClassAssignment* classAssign = static_cast<ClassAssignment*>(varDeclare->getClassAssignment());
+		AST::ClassAssignment* classAssign = static_cast<AST::ClassAssignment*>(varDeclare->getClassAssignment());
 		REQUIRE(classAssign->getExpressionsSize() == 1);
-		REQUIRE(classAssign->getExpression(0)->getNodeType() == NodeType::Expression);
+		REQUIRE(classAssign->getExpression(0)->getNodeType() == AST::NodeType::Expression);
 			
-		Expression* expression = classAssign->getExpression(0);
-		Expression * expressionTerm;
-		Number* expressionFactor;
+		AST::Expression* expression = classAssign->getExpression(0);
+		AST::Expression* expressionTerm;
+		AST::Number* expressionFactor;
 
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
 		expressionTerm = expression->getChildExpression(0);
 		REQUIRE(expressionTerm->getChildrenExpressionSize() == 1);
-		REQUIRE(expressionTerm->getChildExpression(0)->getNodeType() == NodeType::Number);
-		expressionFactor = static_cast<Number*>(expressionTerm->getChildExpression(0));
+		REQUIRE(expressionTerm->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+		expressionFactor = static_cast<AST::Number*>(expressionTerm->getChildExpression(0));
 		REQUIRE(expressionFactor->getValue() == 20);
 		REQUIRE(!expressionFactor->getNegativeOperator());
 
 		REQUIRE(expression->evaluate() == 20);
 
 		node = rootNode->getChild(1);
-		REQUIRE(node->getNodeType() == NodeType::VarDeclare);
+		REQUIRE(node->getNodeType() == AST::NodeType::VarDeclare);
 
-		varDeclare = static_cast<VarDeclare*>(node);
+		varDeclare = static_cast<AST::VarDeclare*>(node);
 		REQUIRE(varDeclare->getType() == TokenType::Turtle);
 		REQUIRE(varDeclare->getAssignment() == nullptr);
 		REQUIRE(varDeclare->getClassAssignment() != nullptr);
 		REQUIRE(varDeclare->getIdentifier() == "zolw");
 
-		classAssign = static_cast<ClassAssignment*>(varDeclare->getClassAssignment());
+		classAssign = static_cast<AST::ClassAssignment*>(varDeclare->getClassAssignment());
 		REQUIRE(classAssign->getExpressionsSize() == 1);
-		REQUIRE(classAssign->getExpression(0)->getNodeType() == NodeType::Expression);
+		REQUIRE(classAssign->getExpression(0)->getNodeType() == AST::NodeType::Expression);
 
 		expression = classAssign->getExpression(0);
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
 		expressionTerm = expression->getChildExpression(0);
 		REQUIRE(expressionTerm->getChildrenExpressionSize() == 1);
-		REQUIRE(expressionTerm->getChildExpression(0)->getNodeType() == NodeType::Number);
-		expressionFactor = static_cast<Number*>(expressionTerm->getChildExpression(0));
+		REQUIRE(expressionTerm->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+		expressionFactor = static_cast<AST::Number*>(expressionTerm->getChildExpression(0));
 		REQUIRE(expressionFactor->getValue() == 10);
 		REQUIRE(expressionFactor->getNegativeOperator());
 
@@ -1130,55 +1130,55 @@ TEST_CASE("declare class-type", "[parser]")
 	{
 		reader.setSourceString("Point point(20, 10, 0); Turtle zolw(-10, -20);");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
 		REQUIRE(rootNode->getChildrenSize() == 2);
-		Node* node = rootNode->getChild(0);
-		REQUIRE(node->getNodeType() == NodeType::VarDeclare);
+		AST::Node* node = rootNode->getChild(0);
+		REQUIRE(node->getNodeType() == AST::NodeType::VarDeclare);
 
-		VarDeclare* varDeclare = static_cast<VarDeclare*>(node);
+		AST::VarDeclare* varDeclare = static_cast<AST::VarDeclare*>(node);
 		REQUIRE(varDeclare->getType() == TokenType::Point);
 		REQUIRE(varDeclare->getAssignment() == nullptr);
 		REQUIRE(varDeclare->getClassAssignment() != nullptr);
 		REQUIRE(varDeclare->getIdentifier() == "point");
 
-		ClassAssignment* classAssign = static_cast<ClassAssignment*>(varDeclare->getClassAssignment());
+		AST::ClassAssignment* classAssign = static_cast<AST::ClassAssignment*>(varDeclare->getClassAssignment());
 		REQUIRE(classAssign->getExpressionsSize() == 3);
-		REQUIRE(classAssign->getExpression(0)->getNodeType() == NodeType::Expression);
+		REQUIRE(classAssign->getExpression(0)->getNodeType() == AST::NodeType::Expression);
 
-		Expression* expression = classAssign->getExpression(0);
-		Expression* expressionTerm;
-		Number* expressionFactor;
+		AST::Expression* expression = classAssign->getExpression(0);
+		AST::Expression* expressionTerm;
+		AST::Number* expressionFactor;
 
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
 		expressionTerm = expression->getChildExpression(0);
 		REQUIRE(expressionTerm->getChildrenExpressionSize() == 1);
-		REQUIRE(expressionTerm->getChildExpression(0)->getNodeType() == NodeType::Number);
-		expressionFactor = static_cast<Number*>(expressionTerm->getChildExpression(0));
+		REQUIRE(expressionTerm->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+		expressionFactor = static_cast<AST::Number*>(expressionTerm->getChildExpression(0));
 		REQUIRE(expressionFactor->getValue() == 20);
 		REQUIRE(!expressionFactor->getNegativeOperator());
 
 		REQUIRE(expression->evaluate() == 20);
 
-		REQUIRE(classAssign->getExpression(1)->getNodeType() == NodeType::Expression);
+		REQUIRE(classAssign->getExpression(1)->getNodeType() == AST::NodeType::Expression);
 		expression = classAssign->getExpression(1);
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
 		expressionTerm = expression->getChildExpression(0);
 		REQUIRE(expressionTerm->getChildrenExpressionSize() == 1);
-		REQUIRE(expressionTerm->getChildExpression(0)->getNodeType() == NodeType::Number);
-		expressionFactor = static_cast<Number*>(expressionTerm->getChildExpression(0));
+		REQUIRE(expressionTerm->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+		expressionFactor = static_cast<AST::Number*>(expressionTerm->getChildExpression(0));
 		REQUIRE(expressionFactor->getValue() == 10);
 		REQUIRE(!expressionFactor->getNegativeOperator());
 
 		REQUIRE(expression->evaluate() == 10);
 
-		REQUIRE(classAssign->getExpression(2)->getNodeType() == NodeType::Expression);
+		REQUIRE(classAssign->getExpression(2)->getNodeType() == AST::NodeType::Expression);
 
 		expression = classAssign->getExpression(2);
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
 		expressionTerm = expression->getChildExpression(0);
 		REQUIRE(expressionTerm->getChildrenExpressionSize() == 1);
-		REQUIRE(expressionTerm->getChildExpression(0)->getNodeType() == NodeType::Number);
-		expressionFactor = static_cast<Number*>(expressionTerm->getChildExpression(0));
+		REQUIRE(expressionTerm->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+		expressionFactor = static_cast<AST::Number*>(expressionTerm->getChildExpression(0));
 		REQUIRE(expressionFactor->getValue() == 0);
 		REQUIRE(!expressionFactor->getNegativeOperator());
 
@@ -1186,37 +1186,37 @@ TEST_CASE("declare class-type", "[parser]")
 
 
 		node = rootNode->getChild(1);
-		REQUIRE(node->getNodeType() == NodeType::VarDeclare);
+		REQUIRE(node->getNodeType() == AST::NodeType::VarDeclare);
 
-		varDeclare = static_cast<VarDeclare*>(node);
+		varDeclare = static_cast<AST::VarDeclare*>(node);
 		REQUIRE(varDeclare->getType() == TokenType::Turtle);
 		REQUIRE(varDeclare->getAssignment() == nullptr);
 		REQUIRE(varDeclare->getClassAssignment() != nullptr);
 		REQUIRE(varDeclare->getIdentifier() == "zolw");
 
-		classAssign = static_cast<ClassAssignment*>(varDeclare->getClassAssignment());
+		classAssign = static_cast<AST::ClassAssignment*>(varDeclare->getClassAssignment());
 		REQUIRE(classAssign->getExpressionsSize() == 2);
-		REQUIRE(classAssign->getExpression(0)->getNodeType() == NodeType::Expression);
+		REQUIRE(classAssign->getExpression(0)->getNodeType() == AST::NodeType::Expression);
 
 		expression = classAssign->getExpression(0);
 
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
 		expressionTerm = expression->getChildExpression(0);
 		REQUIRE(expressionTerm->getChildrenExpressionSize() == 1);
-		REQUIRE(expressionTerm->getChildExpression(0)->getNodeType() == NodeType::Number);
-		expressionFactor = static_cast<Number*>(expressionTerm->getChildExpression(0));
+		REQUIRE(expressionTerm->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+		expressionFactor = static_cast<AST::Number*>(expressionTerm->getChildExpression(0));
 		REQUIRE(expressionFactor->getValue() == 10);
 		REQUIRE(expressionFactor->getNegativeOperator());
 		
 		REQUIRE(expression->evaluate() == -10);
 		
-		REQUIRE(classAssign->getExpression(1)->getNodeType() == NodeType::Expression);
+		REQUIRE(classAssign->getExpression(1)->getNodeType() == AST::NodeType::Expression);
 		expression = classAssign->getExpression(1);
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
 		expressionTerm = expression->getChildExpression(0);
 		REQUIRE(expressionTerm->getChildrenExpressionSize() == 1);
-		REQUIRE(expressionTerm->getChildExpression(0)->getNodeType() == NodeType::Number);
-		expressionFactor = static_cast<Number*>(expressionTerm->getChildExpression(0));
+		REQUIRE(expressionTerm->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+		expressionFactor = static_cast<AST::Number*>(expressionTerm->getChildExpression(0));
 		REQUIRE(expressionFactor->getValue() == 20);
 		REQUIRE(expressionFactor->getNegativeOperator());
 
@@ -1235,11 +1235,11 @@ TEST_CASE("color var decl")
 	{
 		reader.setSourceString("Color col1;");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::VarDeclare);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::VarDeclare);
 
-		VarDeclare* varDeclare = static_cast<VarDeclare*>(firstNode);
+		AST::VarDeclare* varDeclare = static_cast<AST::VarDeclare*>(firstNode);
 
 		REQUIRE(varDeclare->getType() == TokenType::ColorVar);
 		REQUIRE(varDeclare->getAssignment() == nullptr);
@@ -1251,21 +1251,21 @@ TEST_CASE("color var decl")
 	{
 		reader.setSourceString("Color col2 = \"#123456\";");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::VarDeclare);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::VarDeclare);
 
-		VarDeclare* varDeclare = static_cast<VarDeclare*>(firstNode);
+		AST::VarDeclare* varDeclare = static_cast<AST::VarDeclare*>(firstNode);
 
 		REQUIRE(varDeclare->getType() == TokenType::ColorVar);
 		REQUIRE(varDeclare->getAssignment() != nullptr);
 		REQUIRE(varDeclare->getClassAssignment() == nullptr);
 		REQUIRE(varDeclare->getIdentifier() == "col2");
 
-		AssignmentStatement* assign = varDeclare->getAssignment();
-		REQUIRE(assign->getAssign()->getNodeType() == NodeType::Color);
+		AST::AssignmentStatement* assign = varDeclare->getAssignment();
+		REQUIRE(assign->getAssign()->getNodeType() == AST::NodeType::Color);
 
-		Color* color = static_cast<Color*>(assign->getAssign());
+		AST::Color* color = static_cast<AST::Color*>(assign->getAssign());
 		REQUIRE(color->getColor() == "#123456");
 	}
 }
@@ -1285,17 +1285,17 @@ TEST_CASE("Block of instructions", "[parser]")
 }
 )");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::IfStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::IfStatement);
 
 
-		IfStatement* ifStatement = static_cast<IfStatement*>(firstNode);
+		AST::IfStatement* ifStatement = static_cast<AST::IfStatement*>(firstNode);
 		REQUIRE(ifStatement->getTrueBlockNode() != nullptr);
 		REQUIRE(ifStatement->getElseBlockNode() == nullptr);
-		REQUIRE(ifStatement->getCondition()->getNodeType() == NodeType::Condition);
+		REQUIRE(ifStatement->getCondition()->getNodeType() == AST::NodeType::Condition);
 		
-		Node* trueBlock = ifStatement->getTrueBlockNode();
+		AST::Node* trueBlock = ifStatement->getTrueBlockNode();
 		REQUIRE(trueBlock->getChildrenSize() == 0);
 	}
 
@@ -1309,21 +1309,21 @@ TEST_CASE("Block of instructions", "[parser]")
 }
 )");
 
-		std::unique_ptr<Node> rootNode = parser.parse();
-		Node* firstNode = rootNode->getChild(0);
-		REQUIRE(firstNode->getNodeType() == NodeType::IfStatement);
+		std::unique_ptr<AST::Node> rootNode = parser.parse();
+		AST::Node* firstNode = rootNode->getChild(0);
+		REQUIRE(firstNode->getNodeType() == AST::NodeType::IfStatement);
 
 
-		IfStatement* ifStatement = static_cast<IfStatement*>(firstNode);
+		AST::IfStatement* ifStatement = static_cast<AST::IfStatement*>(firstNode);
 		REQUIRE(ifStatement->getTrueBlockNode() != nullptr);
 		REQUIRE(ifStatement->getElseBlockNode() == nullptr);
-		REQUIRE(ifStatement->getCondition()->getNodeType() == NodeType::Condition);
+		REQUIRE(ifStatement->getCondition()->getNodeType() == AST::NodeType::Condition);
 
-		Node* trueBlock = ifStatement->getTrueBlockNode();
+		AST::Node* trueBlock = ifStatement->getTrueBlockNode();
 		REQUIRE(trueBlock->getChildrenSize() == 3);
-		REQUIRE(trueBlock->getChild(0)->getNodeType() == NodeType::CallFuncStatement);
-		REQUIRE(trueBlock->getChild(1)->getNodeType() == NodeType::RepeatStatement);
-		REQUIRE(trueBlock->getChild(2)->getNodeType() == NodeType::VarDeclare);
+		REQUIRE(trueBlock->getChild(0)->getNodeType() == AST::NodeType::CallFuncStatement);
+		REQUIRE(trueBlock->getChild(1)->getNodeType() == AST::NodeType::RepeatStatement);
+		REQUIRE(trueBlock->getChild(2)->getNodeType() == AST::NodeType::VarDeclare);
 	}
 }
 
@@ -1357,22 +1357,22 @@ test5 = "#654321";
 
 	reader.setSourceString(code);
 
-	std::unique_ptr<Node> rootNode = parser.parse();
+	std::unique_ptr<AST::Node> rootNode = parser.parse();
 	REQUIRE(rootNode->getChildrenSize() == 6);
 
 
 
 
-	REQUIRE(rootNode->getChild(0)->getNodeType() == NodeType::RepeatStatement);
+	REQUIRE(rootNode->getChild(0)->getNodeType() == AST::NodeType::RepeatStatement);
 
-	RepeatStatement* repeat = static_cast<RepeatStatement*>(rootNode->getChild(0));
-	Expression* period = static_cast<Expression*>(repeat->getHowManyTime());
+	AST::RepeatStatement* repeat = static_cast<AST::RepeatStatement*>(rootNode->getChild(0));
+	AST::Expression* period = static_cast<AST::Expression*>(repeat->getHowManyTime());
 	REQUIRE(period->evaluate() == 10);
 
-	Node* block = repeat->getInstructuionsBlock();
+	AST::Node* block = repeat->getInstructuionsBlock();
 	REQUIRE(block->getChildrenSize() == 1);
-	REQUIRE(block->getChild(0)->getNodeType() == NodeType::CallFuncStatement);
-	CallFuncStatement* callFunc = static_cast<CallFuncStatement*>(block->getChild(0));
+	REQUIRE(block->getChild(0)->getNodeType() == AST::NodeType::CallFuncStatement);
+	AST::CallFuncStatement* callFunc = static_cast<AST::CallFuncStatement*>(block->getChild(0));
 	REQUIRE(callFunc->getIdentifiersSize() == 2);
 	REQUIRE(callFunc->getIdentifier(0) == "zolw1");
 	REQUIRE(callFunc->getIdentifier(1) == "go");
@@ -1382,71 +1382,71 @@ test5 = "#654321";
 
 
 	
-	REQUIRE(rootNode->getChild(1)->getNodeType() == NodeType::IfStatement);
+	REQUIRE(rootNode->getChild(1)->getNodeType() == AST::NodeType::IfStatement);
 
-	IfStatement* ifStatement = static_cast<IfStatement*>(rootNode->getChild(1));
+	AST::IfStatement* ifStatement = static_cast<AST::IfStatement*>(rootNode->getChild(1));
 
-	Condition* condition = static_cast<Condition*>(ifStatement->getCondition());
+	AST::Condition* condition = static_cast<AST::Condition*>(ifStatement->getCondition());
 	REQUIRE(condition->getLeftCondition() != nullptr);
-	Condition* andCondition = static_cast<Condition*>(condition->getLeftCondition());
+	AST::Condition* andCondition = static_cast<AST::Condition*>(condition->getLeftCondition());
 	REQUIRE(andCondition->getLeftCondition() != nullptr);
 	REQUIRE(andCondition->getRightCondition() == nullptr);
-	REQUIRE(andCondition->getLeftCondition()->getNodeType() == NodeType::Condition);
+	REQUIRE(andCondition->getLeftCondition()->getNodeType() == AST::NodeType::Condition);
 
-	Condition* relationCondition = static_cast<Condition*>(andCondition->getLeftCondition());
+	AST::Condition* relationCondition = static_cast<AST::Condition*>(andCondition->getLeftCondition());
 	REQUIRE(relationCondition->getLeftCondition() != nullptr);
 	REQUIRE(relationCondition->getRightCondition() != nullptr);
-	REQUIRE(relationCondition->getLeftCondition()->getNodeType() == NodeType::Expression);
-	REQUIRE(relationCondition->getRightCondition()->getNodeType() == NodeType::Expression);
+	REQUIRE(relationCondition->getLeftCondition()->getNodeType() == AST::NodeType::Expression);
+	REQUIRE(relationCondition->getRightCondition()->getNodeType() == AST::NodeType::Expression);
 	REQUIRE(relationCondition->getRelationOperator() == TokenType::Less);
 
-	Expression* expression = static_cast<Expression*>(relationCondition->getLeftCondition());
+	AST::Expression* expression = static_cast<AST::Expression*>(relationCondition->getLeftCondition());
 	REQUIRE(expression->getChildrenExpressionSize() == 1);
-	Expression* termExpression = expression->getChildExpression(0);
+	AST::Expression* termExpression = expression->getChildExpression(0);
 	REQUIRE(termExpression->getChildrenExpressionSize() == 1);
-	REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::Variable);
-	Variable* variable = static_cast<Variable*>(termExpression->getChildExpression(0));
+	REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Variable);
+	AST::Variable* variable = static_cast<AST::Variable*>(termExpression->getChildExpression(0));
 	REQUIRE(variable->getIdentifier(0) == "x");
 	REQUIRE(variable->getNegativeOperator());
 
-	expression = static_cast<Expression*>(relationCondition->getRightCondition());
+	expression = static_cast<AST::Expression*>(relationCondition->getRightCondition());
 	termExpression = expression->getChildExpression(0);
 	REQUIRE(termExpression->getChildrenExpressionSize() == 1);
-	REQUIRE(termExpression->getChildExpression(0)->getNodeType() == NodeType::Number);
-	Number* number = static_cast<Number*>(termExpression->getChildExpression(0));
+	REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Number);
+	AST::Number* number = static_cast<AST::Number*>(termExpression->getChildExpression(0));
 	REQUIRE(number->getValue() == 20);
 	REQUIRE(number->getNegativeOperator());
 
-	Node* trueBlock = ifStatement->getTrueBlockNode();
+	AST::Node* trueBlock = ifStatement->getTrueBlockNode();
 	REQUIRE(trueBlock->getChildrenSize() == 1);
-	REQUIRE(trueBlock->getChild(0)->getNodeType() == NodeType::CallFuncStatement);
-	callFunc = static_cast<CallFuncStatement*>(trueBlock->getChild(0));
+	REQUIRE(trueBlock->getChild(0)->getNodeType() == AST::NodeType::CallFuncStatement);
+	callFunc = static_cast<AST::CallFuncStatement*>(trueBlock->getChild(0));
 	REQUIRE(callFunc->getIdentifiersSize() == 2);
 	REQUIRE(callFunc->getIdentifier(0) == "zolw");
 	REQUIRE(callFunc->getIdentifier(1) == "go");
 	REQUIRE(callFunc->getArgumentsSize() == 1);
 	REQUIRE(callFunc->getArgument(0)->evaluate() == 0);
 
-	Node* elseBlock = ifStatement->getElseBlockNode();
+	AST::Node* elseBlock = ifStatement->getElseBlockNode();
 	REQUIRE(elseBlock->getChildrenSize() == 1);
-	REQUIRE(elseBlock->getChild(0)->getNodeType() == NodeType::VarDeclare);
+	REQUIRE(elseBlock->getChild(0)->getNodeType() == AST::NodeType::VarDeclare);
 
-	VarDeclare* varDeclare = static_cast<VarDeclare*>(elseBlock->getChild(0));
+	AST::VarDeclare* varDeclare = static_cast<AST::VarDeclare*>(elseBlock->getChild(0));
 	REQUIRE(varDeclare->getIdentifier() == "test");
 	REQUIRE(varDeclare->getAssignment() != nullptr);
 	REQUIRE(varDeclare->getClassAssignment() == nullptr);
 	REQUIRE(varDeclare->getType() == TokenType::Integer);
 
-	AssignmentStatement* assignmentStatement = static_cast<AssignmentStatement*>(varDeclare->getAssignment());
-	expression = static_cast<Expression*>(assignmentStatement->getAssign());
+	AST::AssignmentStatement* assignmentStatement = static_cast<AST::AssignmentStatement*>(varDeclare->getAssignment());
+	expression = static_cast<AST::Expression*>(assignmentStatement->getAssign());
 	REQUIRE(expression->evaluate() == 20);
 
 
 
 
-	REQUIRE(rootNode->getChild(2)->getNodeType() == NodeType::VarDeclare);
+	REQUIRE(rootNode->getChild(2)->getNodeType() == AST::NodeType::VarDeclare);
 
-	varDeclare = static_cast<VarDeclare*>(rootNode->getChild(2));
+	varDeclare = static_cast<AST::VarDeclare*>(rootNode->getChild(2));
 
 	REQUIRE(varDeclare->getType() == TokenType::Turtle);
 	REQUIRE(varDeclare->getAssignment() == nullptr);
@@ -1456,19 +1456,19 @@ test5 = "#654321";
 
 
 
-	REQUIRE(rootNode->getChild(3)->getNodeType() == NodeType::VarDeclare);
+	REQUIRE(rootNode->getChild(3)->getNodeType() == AST::NodeType::VarDeclare);
 
-	varDeclare = static_cast<VarDeclare*>(rootNode->getChild(3));
+	varDeclare = static_cast<AST::VarDeclare*>(rootNode->getChild(3));
 
 	REQUIRE(varDeclare->getType() == TokenType::Point);
 	REQUIRE(varDeclare->getAssignment() == nullptr);
 	REQUIRE(varDeclare->getClassAssignment() != nullptr);
 	REQUIRE(varDeclare->getIdentifier() == "test3");
 
-	ClassAssignment* classAssign = static_cast<ClassAssignment*>(varDeclare->getClassAssignment());
+	AST::ClassAssignment* classAssign = static_cast<AST::ClassAssignment*>(varDeclare->getClassAssignment());
 	REQUIRE(classAssign->getExpressionsSize() == 2);
-	REQUIRE(classAssign->getExpression(0)->getNodeType() == NodeType::Expression);
-	REQUIRE(classAssign->getExpression(1)->getNodeType() == NodeType::Expression);
+	REQUIRE(classAssign->getExpression(0)->getNodeType() == AST::NodeType::Expression);
+	REQUIRE(classAssign->getExpression(1)->getNodeType() == AST::NodeType::Expression);
 	expression = classAssign->getExpression(0);
 	REQUIRE(expression->evaluate() == 20);
 	expression = classAssign->getExpression(1);
@@ -1477,29 +1477,29 @@ test5 = "#654321";
 
 
 
-	REQUIRE(rootNode->getChild(4)->getNodeType() == NodeType::VarDeclare);
-	varDeclare = static_cast<VarDeclare*>(rootNode->getChild(4));
+	REQUIRE(rootNode->getChild(4)->getNodeType() == AST::NodeType::VarDeclare);
+	varDeclare = static_cast<AST::VarDeclare*>(rootNode->getChild(4));
 
 	REQUIRE(varDeclare->getType() == TokenType::ColorVar);
 	REQUIRE(varDeclare->getAssignment() != nullptr);
 	REQUIRE(varDeclare->getClassAssignment() == nullptr);
 	REQUIRE(varDeclare->getIdentifier() == "test4");
 
-	AssignmentStatement* assign = varDeclare->getAssignment();
-	REQUIRE(assign->getAssign()->getNodeType() == NodeType::Color);
+	AST::AssignmentStatement* assign = varDeclare->getAssignment();
+	REQUIRE(assign->getAssign()->getNodeType() == AST::NodeType::Color);
 
-	Color* color = static_cast<Color*>(assign->getAssign());
+	AST::Color* color = static_cast<AST::Color*>(assign->getAssign());
 	REQUIRE(color->getColor() == "#123456");
 
 
 
 
-	REQUIRE(rootNode->getChild(5)->getNodeType() == NodeType::AssignmentStatement);
+	REQUIRE(rootNode->getChild(5)->getNodeType() == AST::NodeType::AssignmentStatement);
 
-	assign = static_cast<AssignmentStatement*>(rootNode->getChild(5));
-	REQUIRE(assign->getAssign()->getNodeType() == NodeType::Color);
+	assign = static_cast<AST::AssignmentStatement*>(rootNode->getChild(5));
+	REQUIRE(assign->getAssign()->getNodeType() == AST::NodeType::Color);
 
-	color = static_cast<Color*>(assign->getAssign());
+	color = static_cast<AST::Color*>(assign->getAssign());
 	REQUIRE(color->getColor() == "#654321");
 
 }
