@@ -1,6 +1,11 @@
 #pragma once
 #include <vector>
+#include <string>
+#include "Node.h"
 #include "DefFuncStatement.h"
+
+
+
 
 class Context
 {

@@ -24,7 +24,7 @@ TEST_CASE("simple interpreter", "[interpreter]")
 
 	SECTION("YYY")
 	{
-		reader.setSourceString("if(true) {} else {}");
+		reader.setSourceString("if(false) {} else {}");
 
 		Interpreter interpreter(parser.parse());
 		interpreter.run();

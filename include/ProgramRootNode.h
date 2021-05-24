@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 #include "Node.h"
+#include "Context.h"
 
 namespace AST
 {
@@ -10,5 +11,6 @@ namespace AST
 	{
 	public:
 		ProgramRootNode();
+		virtual void execute(Context* context);
 	};
 }

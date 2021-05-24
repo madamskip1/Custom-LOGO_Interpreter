@@ -4,7 +4,7 @@
 namespace AST 
 {
 	class Assignable :
-		public Node
+		public AST::Node
 	{
 	public:
 	};

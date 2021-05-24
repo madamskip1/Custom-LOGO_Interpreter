@@ -1,5 +1,6 @@
 #include "Interpreter.h"
 #include "Node.h"
+#include "DefFuncStatement.h"
 
 Interpreter::Interpreter(std::unique_ptr<AST::ProgramRootNode> rootNode)
 {
@@ -11,20 +12,24 @@ void Interpreter::run()
 {
 	lookForDefFunctions();
 
-	int rootNodeChildrenSize = programNode->getChildrenSize();
+	std::size_t rootNodeChildrenSize = programNode->getChildrenSize();
 	for (int i = 0; i < rootNodeChildrenSize; i++)
 	{
-
+		AST::Node* curNode = programNode->getChild(i);
+		if (curNode->getNodeType() != AST::NodeType::DefFuncStatement)
+		{
+			curNode->execute(context.get());
+		}
 	}
 }
 
 void Interpreter::lookForDefFunctions()
 {
-	int rootNodeChildrenSize = programNode->getChildrenSize();
+	std::size_t rootNodeChildrenSize = programNode->getChildrenSize();
 	
 	for (int i = 0; i < rootNodeChildrenSize; i++)
 	{
-		AST::Node* curNode = programNode->getChild(0);
+		AST::Node* curNode = programNode->getChild(i);
 		if (curNode->getNodeType() == AST::NodeType::DefFuncStatement)
 		{
 			AST::DefFuncStatement* defFuncNode = static_cast<AST::DefFuncStatement*>(curNode);

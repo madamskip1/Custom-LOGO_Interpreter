@@ -1,6 +1,9 @@
 #pragma once
 #include <vector>
 #include <memory>
+//#include "Context.h"
+
+class Context;
 
 namespace AST
 {
@@ -32,12 +35,14 @@ namespace AST
 	};
 
 	class Node
-	{	
+	{
 	public:
 		Node();
 		Node(AST::NodeType type);
 		virtual ~Node() {};
 
+		virtual void execute() {};
+		virtual void execute(Context* context) {};
 
 		NodeType getNodeType() const;
 		

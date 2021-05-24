@@ -1,4 +1,5 @@
 #include "Node.h"
+#include "Context.h"
 
 AST::Node::Node() : nodeType(AST::NodeType::NOTYPE) {};
 

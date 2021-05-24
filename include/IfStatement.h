@@ -3,6 +3,7 @@
 #include "Node.h"
 #include "InstructionsBlock.h"
 #include "Condition.h"
+#include "Context.h"
 
 namespace AST
 {
@@ -12,6 +13,8 @@ namespace AST
 	public:
 		IfStatement() = delete;
 		IfStatement(std::unique_ptr<AST::Node> condition, std::unique_ptr <AST::InstructionsBlock> trueBlock, std::unique_ptr <AST::InstructionsBlock> elseBlock = nullptr);
+
+		virtual void execute(Context* context);
 
 		const bool hasElseBlock() const;
 		AST::InstructionsBlock* getTrueBlockNode() const;
