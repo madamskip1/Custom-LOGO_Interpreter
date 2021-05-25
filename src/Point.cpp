@@ -1,6 +1,7 @@
 #include "Point.h"
 #include <vector>
 #include <string>
+#include "Context.h"
 
 Point::Point()
 {

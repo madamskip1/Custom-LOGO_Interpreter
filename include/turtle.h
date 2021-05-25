@@ -6,9 +6,11 @@
 #include "drawingboard.h"
 #include "turtleboard.h"
 #include "Variable.h"
+#include "Point.h"
 
 class TurtleBoard;
 class Context;
+
 
 class Turtle
         : public QObject, public Variable
@@ -35,6 +37,7 @@ public:
     int direction;
 
     void callFunction(std::vector<std::string> identifiers, Context* context);
+    void getSomeVal(std::vector<std::string> identifiers, Context* context);
 
 signals:
     void turtleMoved();
@@ -42,9 +45,9 @@ signals:
 private:
     DrawingBoard* board;
     TurtleBoard* turtleBoard;
-    QPoint position;
+    Point position;
 
-    QPoint movePoint(QPoint pos, int direct, int distance);
+    Point movePoint(Point pos, int direct, int distance);
     float getRealDirection();
     float getRealDirection(int direct);
 };

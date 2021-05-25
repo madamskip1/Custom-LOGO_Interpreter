@@ -4,6 +4,7 @@
 #include "turtle.h"
 #include "drawingboard.h"
 #include "Context.h"
+#include "Point.h"
 
 Turtle::Turtle(DrawingBoard* drawingBoardPtr)
 {
@@ -23,8 +24,8 @@ void Turtle::setTurtleBoard(TurtleBoard *turtleBoardPtr)
 
 void Turtle::go(const int &distance)
 {
-    QPoint end = movePoint(position, direction, distance);
-    board->drawLine(position, end, Qt::blue, 2);
+    Point end = movePoint(position, direction, distance);
+    board->drawLine(QPoint(position.x, position.y), QPoint(end.x, end.y), Qt::blue, 2);
     position = end;
 
     emit turtleMoved();
@@ -45,16 +46,16 @@ void Turtle::right(const int &angle)
 
 void Turtle::toStart()
 {
-    position.setX(DrawingBoard::BOARD_WIDTH / 2);
-    position.setY(DrawingBoard::BOARD_HEIGHT / 2);
+    position.x = (DrawingBoard::BOARD_WIDTH / 2);
+    position.y = (DrawingBoard::BOARD_HEIGHT / 2);
     direction = 0;
     emit turtleMoved();
 }
 
 void Turtle::move(int x, int y)
 {
-    position.setX(x);
-    position.setY(y);
+    position.x = x;
+    position.y = y;
     emit turtleMoved();
 }
 
@@ -81,11 +82,11 @@ void Turtle::draw()
     if (hidden)
         return;
 
-    QPoint top = movePoint(position, direction, 30);
-    QPoint bottomLeft = movePoint(position, direction + 135, 15);
-    QPoint bottomRight = movePoint(position, direction - 135, 15);
+    Point top = movePoint(position, direction, 30);
+    Point bottomLeft = movePoint(position, direction + 135, 15);
+    Point bottomRight = movePoint(position, direction - 135, 15);
 
-    turtleBoard->drawTurtle(top, bottomLeft, bottomRight, Qt::blue);
+    turtleBoard->drawTurtle(QPoint(top.x, top.y), QPoint(bottomLeft.x, bottomLeft.y), QPoint(bottomRight.x, bottomRight.y), Qt::blue);
 }
 
 void Turtle::callFunction(std::vector<std::string> identifiers, Context *context)
@@ -110,28 +111,37 @@ void Turtle::callFunction(std::vector<std::string> identifiers, Context *context
     }
 }
 
+void Turtle::getSomeVal(std::vector<std::string> identifiers, Context *context)
+{
+    if (identifiers[0] == "pos")
+    {
+        position.getSomeVal(std::vector<std::string>(identifiers.begin() + 1, identifiers.end()), context);
+        return;
+    }
+}
 
 
-QPoint Turtle::movePoint(QPoint pos, int direct, int distance)
+
+Point Turtle::movePoint(Point pos, int direct, int distance)
 {
     if (distance == 0)
         return pos;
 
     if (direct == 0)
     {
-        return QPoint(pos.x(), pos.y() - distance);
+        return Point(position.x, position.y - distance);
     }
     else if (direct == 90)
     {
-        return QPoint(pos.x() + distance, pos.y());
+        return Point(position.x + distance, position.y);
     }
     else if (direct == 180)
     {
-        return QPoint(pos.x(), pos.y() + distance);
+        return Point(position.x, position.y + distance);
     }
     else if (direct == 270)
     {
-        return QPoint(pos.x() - distance, pos.y());
+        return Point(position.x - distance, position.y);
     }
 
     float realDirection = getRealDirection(direct);
@@ -140,7 +150,7 @@ QPoint Turtle::movePoint(QPoint pos, int direct, int distance)
     float cos = qCos(radians);
     float sin = qSin(radians);
 
-    return QPoint(pos.x() + distance * sin, pos.y() + distance * cos);
+    return Point(position.x + distance * sin, position.y + distance * cos);
 }
 
 float Turtle::getRealDirection()
