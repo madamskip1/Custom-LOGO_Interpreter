@@ -6,9 +6,9 @@
 #include "drawingboard.h"
 #include "turtleboard.h"
 #include "Variable.h"
-#include "Context.h"
 
 class TurtleBoard;
+class Context;
 
 class Turtle
         : public QObject, public Variable
@@ -34,7 +34,7 @@ public:
     bool hidden = false;
     int direction;
 
-    //void callFunction(std::vector<std::string> identifiers, Context* context);
+    void callFunction(std::vector<std::string> identifiers, Context* context);
 
 signals:
     void turtleMoved();

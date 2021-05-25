@@ -14,6 +14,9 @@ namespace AST
 		Expression();
         virtual int evaluate(Context* context) const;
 
+        virtual bool isOnlyId(Context* context) const;
+        virtual std::vector<std::string> getIdentifiers(Context* context) const;
+
 		const void addChildExpression(std::unique_ptr<AST::Expression> child);
 		const void addOperator(const TokenType& op);
 		const void setNegativeOp(const bool& negative);

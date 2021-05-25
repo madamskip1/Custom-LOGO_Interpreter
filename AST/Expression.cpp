@@ -33,6 +33,22 @@ int AST::Expression::evaluate(Context* context) const
     return val;
 }
 
+bool AST::Expression::isOnlyId(Context *context) const
+{
+    if (childrenExpressions.size() != 1)
+        return false;
+
+    return childrenExpressions[0]->isOnlyId((context));
+}
+
+std::vector<std::string> AST::Expression::getIdentifiers(Context *context) const
+{
+    if (childrenExpressions.size() != 1)
+        throw "expression isn't just identifiers";
+
+    return childrenExpressions[0]->getIdentifiers(context);
+}
+
 
 const void AST::Expression::addChildExpression(std::unique_ptr<AST::Expression> child)
 {

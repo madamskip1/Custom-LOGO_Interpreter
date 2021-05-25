@@ -27,6 +27,19 @@ int AST::VariableExpression::evaluate(Context *context) const
     }
 }
 
+bool AST::VariableExpression::isOnlyId(Context *context) const
+{
+    if (identifiers.size() > 0)
+        return true;
+
+    return false;
+}
+
+std::vector<std::string> AST::VariableExpression::getIdentifiers(Context *context) const
+{
+    return identifiers;
+}
+
 std::string AST::VariableExpression::getIdentifier(const int& index) const
 {
     return identifiers[index];

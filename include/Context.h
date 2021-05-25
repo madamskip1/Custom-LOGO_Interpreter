@@ -4,8 +4,8 @@
 #include <variant>
 #include "../AST/Node.h"
 #include "../AST/DefFuncStatement.h"
-#include "Variable.h"
 #include "BlockScope.h"
+#include "Variable.h"
 #include "turtleboard.h"
 #include "drawingboard.h"
 
@@ -14,6 +14,8 @@ class Context
 public:
 	std::variant<std::monostate, int, std::string, /*Turtle, Color*/ bool> returnVariant;
 	TokenType returnType = TokenType::UNKNOWN;
+
+    std::vector<AST::Node*> args;
 
 	Context();
     ~Context();

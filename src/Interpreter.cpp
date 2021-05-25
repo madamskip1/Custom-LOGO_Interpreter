@@ -40,3 +40,9 @@ void Interpreter::lookForDefFunctions()
 		}
 	}
 }
+
+/*
+
+  Point point(20, 30);
+  Turtle zolw(point);
+ * */

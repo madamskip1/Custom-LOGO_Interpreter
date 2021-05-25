@@ -24,18 +24,21 @@ void AST::CallFuncStatement::execute(Context* context)
 
             defFunc->executeFunction(newContext);
         }
-        // sprawdziæ czy ma funkcjê standardow¹
     }
     else if (identifiers.size() > 1)
-    {/*
+    {
         Variable* firstIdVar = context->getVariable(identifiers[0]);
         if (firstIdVar->type == TokenType::Turtle)
         {
             Turtle* turtle = static_cast<Turtle*>(firstIdVar);
-            turtle->callFunction(std::vector<std::string>(identifiers.begin() +1, identifiers.end()), context);
-        }*/
+            Context* newContext = new Context();
+            for (auto& arg : arguments)
+            {
+                newContext->args.push_back(arg.get());
+            }
+            turtle->callFunction(std::vector<std::string>(identifiers.begin() +1, identifiers.end()), newContext);
+        }
     }
-    
 }
 
 const void AST::CallFuncStatement::addArgument(std::unique_ptr<AST::Expression> arg)

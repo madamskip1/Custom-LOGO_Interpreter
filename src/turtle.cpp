@@ -1,7 +1,9 @@
 #include <QtMath>
 #include <QDebug>
+#include "../AST/Expression.h"
 #include "turtle.h"
 #include "drawingboard.h"
+#include "Context.h"
 
 Turtle::Turtle(DrawingBoard* drawingBoardPtr)
 {
@@ -85,14 +87,30 @@ void Turtle::draw()
 
     turtleBoard->drawTurtle(top, bottomLeft, bottomRight, Qt::blue);
 }
-/*
+
 void Turtle::callFunction(std::vector<std::string> identifiers, Context *context)
 {
     if (identifiers[0] == "go")
     {
-        go(200);
+        AST::Expression* distanceToGo = static_cast<AST::Expression*>(context->args[0]);
+        go(distanceToGo->evaluate(context));
     }
-}*/
+    if (identifiers[0] == "left" || identifiers[0] == "right")
+    {
+        AST::Expression* rotate = static_cast<AST::Expression*>(context->args[0]);
+        int angle = rotate->evaluate(context);
+        if (identifiers[0] == "right")
+        {
+            right(angle);
+        }
+        else
+        {
+            left(angle);
+        }
+    }
+}
+
+
 
 QPoint Turtle::movePoint(QPoint pos, int direct, int distance)
 {
