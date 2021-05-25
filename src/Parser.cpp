@@ -1,19 +1,19 @@
 #include "Parser.h"
 #include "TokenType.h"
 
-#include "InstructionsBlock.h"
-#include "IfStatement.h"
-#include "RepeatStatement.h"
-#include "RepeatTimeStatement.h"
-#include "Expression.h"
-#include "Number.h"
-#include "Condition.h"
-#include "Boolean.h"
-#include "DefFuncStatement.h"
-#include "CallFuncStatement.h"
-#include "VarDeclare.h"
-#include "Variable.h"
-#include "Color.h"
+#include "../AST/InstructionsBlock.h"
+#include "../AST/IfStatement.h"
+#include "../AST/RepeatStatement.h"
+#include "../AST/RepeatTimeStatement.h"
+#include "../AST/Expression.h"
+#include "../AST/Number.h"
+#include "../AST/Condition.h"
+#include "../AST/Boolean.h"
+#include "../AST/DefFuncStatement.h"
+#include "../AST/CallFuncStatement.h"
+#include "../AST/VarDeclare.h"
+#include "../AST/VariableExpression.h"
+#include "../AST/Color.h"
 
 
 Parser::Parser(Lexer& lex, Logger& logger) : lexer(lex), logger(logger)
@@ -296,7 +296,7 @@ std::unique_ptr<AST::VarDeclare> Parser::parseVarDeclare(const TokenType& type)
     if (checkCurTokenType(TokenType::AssignOperator))
     {
         consumeToken();
-        assign = parseAssignment(std::vector<std::string>());
+        assign = parseAssignment(std::vector<std::string>({ identifier }));
         if (!assign)
             return nullptr;
     }
@@ -562,7 +562,7 @@ std::unique_ptr<AST::Expression> Parser::parseFactorExpression()
             return callFunc;
         }
 
-        std::unique_ptr<AST::Variable> var = std::make_unique<AST::Variable>(identifiers);
+        std::unique_ptr<AST::VariableExpression> var = std::make_unique<AST::VariableExpression>(identifiers);
         var->setNegativeOp(negativeOp);
 
         return var;

@@ -7,17 +7,17 @@
 #include "Logger.h"
 #include "Token.h"
 
-#include "ProgramRootNode.h"
-#include "Node.h"
-#include "InstructionsBlock.h"
-#include "Expression.h"
-#include "Condition.h"
-#include "Parameter.h"
-#include "VarDeclare.h"
-#include "CallFuncStatement.h"
-#include "AssignmentStatement.h"
-#include "ClassAssignment.h"
-#include "ReturnStatement.h"
+#include "../AST/ProgramRootNode.h"
+#include "../AST/Node.h"
+#include "../AST/InstructionsBlock.h"
+#include "../AST/Expression.h"
+#include "../AST/Condition.h"
+#include "../AST/Parameter.h"
+#include "../AST/VarDeclare.h"
+#include "../AST/CallFuncStatement.h"
+#include "../AST/AssignmentStatement.h"
+#include "../AST/ClassAssignment.h"
+#include "../AST/ReturnStatement.h"
 
 
 class Parser

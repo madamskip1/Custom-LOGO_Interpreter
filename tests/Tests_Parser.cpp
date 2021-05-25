@@ -11,7 +11,7 @@
 #include "DefFuncStatement.h"
 #include "CallFuncStatement.h"
 #include "AssignmentStatement.h"
-#include "Variable.h"
+#include "VariableAST.h"
 #include "Color.h"
 
 #pragma warning(push, 0)        
@@ -391,7 +391,7 @@ TEST_CASE("Expressions", "[parser]")
 		AST::Expression* termExpression = expression->getChildExpression(0);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
 		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Variable);
-		AST::Variable* variable = dynamic_cast<AST::Variable*>(termExpression->getChildExpression(0));
+		AST::VariableExpression* variable = dynamic_cast<AST::VariableExpression*>(termExpression->getChildExpression(0));
 		REQUIRE(variable->getIdentifier(0) == "identifier");
 	}
 }
@@ -719,7 +719,7 @@ TEST_CASE("def function", "[parser]")
 		AST::Expression* termExpression = expression->getChildExpression(0);
 		REQUIRE(termExpression->getChildrenExpressionSize() == 1);
 		REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Variable);
-		AST::Variable* variable = dynamic_cast<AST::Variable*>(termExpression->getChildExpression(0));
+		AST::VariableExpression* variable = dynamic_cast<AST::VariableExpression*>(termExpression->getChildExpression(0));
 		REQUIRE(variable->getIdentifier(0) == "test");
 	}
 
@@ -1405,7 +1405,7 @@ test5 = "#654321";
 	AST::Expression* termExpression = expression->getChildExpression(0);
 	REQUIRE(termExpression->getChildrenExpressionSize() == 1);
 	REQUIRE(termExpression->getChildExpression(0)->getNodeType() == AST::NodeType::Variable);
-	AST::Variable* variable = dynamic_cast<AST::Variable*>(termExpression->getChildExpression(0));
+	AST::VariableExpression* variable = dynamic_cast<AST::VariableExpression*>(termExpression->getChildExpression(0));
 	REQUIRE(variable->getIdentifier(0) == "x");
 	REQUIRE(variable->getNegativeOperator());
 

@@ -1,20 +1,13 @@
 #pragma once
+#include <variant>
 #include <string>
-#include <vector>
-#include "Expression.h"
+#include "TokenType.h"
 
-namespace AST
+class Variable
 {
-    class Variable :
-        public AST::Expression
-    {
-    public:
-        Variable() = delete;
-        Variable(std::vector<std::string> variableIdentifiers);
+public:
+	std::variant<std::monostate, int, bool, std::string> value;
+	std::string name;
+	TokenType type;
+};
 
-        std::string getIdentifier(const int& index = 0) const;
-
-    private:
-        std::vector<std::string> identifiers;
-    };
-}

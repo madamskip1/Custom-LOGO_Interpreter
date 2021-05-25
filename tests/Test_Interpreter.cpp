@@ -14,17 +14,57 @@ TEST_CASE("simple interpreter", "[interpreter]")
 	Logger logger;
 	Parser parser(lexer, logger);
 
-	SECTION("XXX")
+	//SECTION("XXX")
+	//{
+	//	reader.setSourceString("function test() {}");
+
+	//	Interpreter interpreter(parser.parse());
+	//	interpreter.run();
+	//}
+
+	//SECTION("YYY")
+	//{
+	//	reader.setSourceString("if(false) {} else {}");
+
+	//	Interpreter interpreter(parser.parse());
+	//	interpreter.run();
+	//}
+
+	//SECTION("repeat")
+	//{
+	//	reader.setSourceString("repeat(5) {}");
+
+	//	Interpreter interpreter(parser.parse());
+	//	interpreter.run();
+	//}
+
+	SECTION("int declare assign")
 	{
-		reader.setSourceString("function test() {}");
+		reader.setSourceString("Integer test = 4; test = 5;");
 
 		Interpreter interpreter(parser.parse());
 		interpreter.run();
 	}
 
-	SECTION("YYY")
+	SECTION("Boolean declare assign")
 	{
-		reader.setSourceString("if(false) {} else {}");
+		reader.setSourceString("Boolean test1 = true; test1 = false;");
+
+		Interpreter interpreter(parser.parse());
+		interpreter.run();
+	}
+
+	SECTION("Var declare in scope")
+	{
+		reader.setSourceString("if (true) { Integer test; }");
+
+		Interpreter interpreter(parser.parse());
+		interpreter.run();
+	}
+
+	SECTION("execute function")
+	{
+		reader.setSourceString("function test() {} test();");
 
 		Interpreter interpreter(parser.parse());
 		interpreter.run();

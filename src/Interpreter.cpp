@@ -1,12 +1,15 @@
 #include "Interpreter.h"
-#include "Node.h"
-#include "DefFuncStatement.h"
+#include "../AST/Node.h"
+#include "../AST/DefFuncStatement.h"
 
-Interpreter::Interpreter(std::unique_ptr<AST::ProgramRootNode> rootNode)
+Interpreter::Interpreter(std::unique_ptr<AST::ProgramRootNode> rootNode, DrawingBoard* drawingBoard, TurtleBoard* turtleBoard)
 {
 	programNode = std::move(rootNode);
-	context = std::make_unique<Context>();
+    context = std::make_unique<Context>();
+    context->setDrawingBoard(drawingBoard);
+    context->setTurtleBoard(turtleBoard);
 }
+
 
 void Interpreter::run()
 {
