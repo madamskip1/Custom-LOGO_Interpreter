@@ -4,8 +4,8 @@
 #include <variant>
 #include "../AST/Node.h"
 #include "../AST/DefFuncStatement.h"
-#include "BlockScope.h"
 #include "Variable.h"
+#include "BlockScope.h"
 #include "turtleboard.h"
 #include "drawingboard.h"
 

@@ -85,6 +85,14 @@ void Turtle::draw()
 
     turtleBoard->drawTurtle(top, bottomLeft, bottomRight, Qt::blue);
 }
+/*
+void Turtle::callFunction(std::vector<std::string> identifiers, Context *context)
+{
+    if (identifiers[0] == "go")
+    {
+        go(200);
+    }
+}*/
 
 QPoint Turtle::movePoint(QPoint pos, int direct, int distance)
 {

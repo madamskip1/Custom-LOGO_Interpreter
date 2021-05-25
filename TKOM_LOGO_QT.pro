@@ -41,6 +41,7 @@ SOURCES += \
     src/Logger.cpp \
     src/Node.cpp \
     src/Parser.cpp \
+    src/Point.cpp \
     src/SourceReader.cpp \
     src/Token.cpp \
     src/Variable.cpp \
@@ -85,6 +86,7 @@ HEADERS += \
     include/Logger.h \
     include/Node.h \
     include/Parser.h \
+    include/Point.h \
     include/SourceReader.h \
     include/Token.h \
     include/TokenType.h \

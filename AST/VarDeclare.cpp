@@ -98,6 +98,24 @@ void AST::VarDeclare::execute(Context* context)
     {
         assignment->execute(context);
     }
+
+
+    //if (type == TokenType::Integer)
+    //{
+    //    Expression* expression = dynamic_cast<Expression*>(assignment->getAssign());
+    //    var->value = expression->evaluate();
+    //    return;
+    //}
+    //else if (type == TokenType::Boolean)
+    //{
+    //    Boolean* boolean = static_cast<Boolean*>(assignment->getAssign());
+    //    var->value = boolean->evaluate();
+    //}
+    //else if (type == TokenType::ColorVar)
+    //{
+    //    Color* color = static_cast<Color*>(assignment->getAssign());
+    //    var->value = color->getColor();
+    //}
 }
 
 TokenType AST::VarDeclare::getType() const

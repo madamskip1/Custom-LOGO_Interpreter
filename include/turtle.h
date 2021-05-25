@@ -6,6 +6,7 @@
 #include "drawingboard.h"
 #include "turtleboard.h"
 #include "Variable.h"
+#include "Context.h"
 
 class TurtleBoard;
 
@@ -32,6 +33,8 @@ public:
 
     bool hidden = false;
     int direction;
+
+    //void callFunction(std::vector<std::string> identifiers, Context* context);
 
 signals:
     void turtleMoved();
