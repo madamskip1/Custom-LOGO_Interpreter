@@ -45,6 +45,7 @@ SOURCES += \
     src/Point.cpp \
     src/SourceReader.cpp \
     src/Token.cpp \
+    src/TurtleStdFunc.cpp \
     src/Variable.cpp \
     src/drawingboard.cpp \
     src/turtle.cpp \
@@ -92,6 +93,7 @@ HEADERS += \
     include/SourceReader.h \
     include/Token.h \
     include/TokenType.h \
+    include/TurtleStdFunc.h \
     include/Variable.h \
     include/drawingboard.h \
     include/turtle.h \

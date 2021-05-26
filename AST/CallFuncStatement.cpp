@@ -24,6 +24,11 @@ void AST::CallFuncStatement::execute(Context* context)
 
             defFunc->executeFunction(newContext);
         }
+        else if (context->hasStdLibFunction(identifiers[0]))
+        {
+            std::function<void(Context*)> func = context->getStdLibFunction(identifiers[0]);
+            func(context);
+        }
     }
     else if (identifiers.size() > 1)
     {

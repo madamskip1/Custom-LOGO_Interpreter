@@ -1,8 +1,10 @@
 #include "../include/Context.h"
+#include "TurtleStdFunc.h"
 
 Context::Context()
 {
-	rootScope = curScope = new BlockScope(nullptr);
+    rootScope = curScope = new BlockScope(nullptr);
+    prepareStdLibFunctions();
 }
 
 Context::~Context()
@@ -67,12 +69,23 @@ Variable* Context::getVariable(std::string name)
 
 AST::DefFuncStatement* Context::getDefFunction(std::string name) const
 {
-	return defFunctions.at(name);
+    return defFunctions.at(name);
+}
+
+std::function<void (Context *)> Context::getStdLibFunction(std::string name) const
+{
+    return stdLibFunctions.at(name);
 }
 
 const bool Context::hasReturn() const
 {
-	return (returnType != TokenType::UNKNOWN && returnVariant.index() == 0);
+    return (returnType != TokenType::UNKNOWN && returnVariant.index() == 0);
+}
+
+void Context::prepareStdLibFunctions()
+{
+    stdLibFunctions.emplace("clean", clean);
+    stdLibFunctions.emplace("allToStart", allToStart);
 }
 
 const bool Context::hasFunction(std::string name) const
@@ -80,5 +93,13 @@ const bool Context::hasFunction(std::string name) const
 	if (defFunctions.find(name) != defFunctions.cend())
 		return true;
 
-	return false;
+    return false;
+}
+
+const bool Context::hasStdLibFunction(std::string name) const
+{
+    if (stdLibFunctions.find(name) != stdLibFunctions.cend())
+        return true;
+
+    return false;
 }
