@@ -59,9 +59,15 @@ void MainWindow::on_pushButton_clicked()
 
     if (!logger.hasAnyError())
     {
-        Interpreter interpreter(std::move(program), this->ui->drawingBoard, this->ui->turtleBoard);
         try
         {
+            if (!mainContext)
+            {
+                mainContext = std::make_unique<Context>();
+                mainContext->setDrawingBoard(this->ui->drawingBoard);
+                mainContext->setTurtleBoard(this->ui->turtleBoard);
+            }
+            Interpreter interpreter(std::move(program), mainContext.get());
             interpreter.run();
         }
         catch(std::exception e)

@@ -2,13 +2,8 @@
 #include "../AST/Node.h"
 #include "../AST/DefFuncStatement.h"
 
-Interpreter::Interpreter(std::unique_ptr<AST::ProgramRootNode> rootNode, DrawingBoard* drawingBoard, TurtleBoard* turtleBoard)
-{
-	programNode = std::move(rootNode);
-    context = std::make_unique<Context>();
-    context->setDrawingBoard(drawingBoard);
-    context->setTurtleBoard(turtleBoard);
-}
+Interpreter::Interpreter(std::unique_ptr<AST::ProgramRootNode> rootNode, Context* context) : programNode(std::move(rootNode)), context(context)
+{}
 
 
 void Interpreter::run()
@@ -21,7 +16,7 @@ void Interpreter::run()
 		AST::Node* curNode = programNode->getChild(i);
 		if (curNode->getNodeType() != AST::NodeType::DefFuncStatement)
 		{
-			curNode->execute(context.get());
+            curNode->execute(context);
 		}
 	}
 }

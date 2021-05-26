@@ -2,7 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "include/turtle.h"
+#include <memory>
+#include "Context.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -22,6 +23,6 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    Turtle * turtle;
+    std::unique_ptr<Context> mainContext = nullptr;
 };
 #endif // MAINWINDOW_H

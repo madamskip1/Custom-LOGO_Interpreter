@@ -8,13 +8,13 @@
 class Interpreter
 {
 public:
-    Interpreter(std::unique_ptr<AST::ProgramRootNode> rootNode, DrawingBoard* drawingBoard = nullptr, TurtleBoard* turtleBoard = nullptr);
+    Interpreter(std::unique_ptr<AST::ProgramRootNode> rootNode, Context* context);
 
 	void run();
 
 private:
 	std::unique_ptr<AST::ProgramRootNode> programNode;
-	std::unique_ptr<Context> context;
+    Context* context;
 
 	void lookForDefFunctions();
 };
