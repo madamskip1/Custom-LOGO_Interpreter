@@ -25,7 +25,7 @@ void Turtle::setTurtleBoard(TurtleBoard *turtleBoardPtr)
 void Turtle::go(const int &distance)
 {
     Point end = movePoint(position, direction, distance);
-    board->drawLine(QPoint(position.x, position.y), QPoint(end.x, end.y), Qt::blue, 2);
+    board->drawLine(QPoint(position.x, position.y), QPoint(end.x, end.y), QColor(QString::fromStdString(brush.getColor())), brush.getSize());
     position = end;
 
     emit turtleMoved();
@@ -86,7 +86,7 @@ void Turtle::draw()
     Point bottomLeft = movePoint(position, direction + 135, 15);
     Point bottomRight = movePoint(position, direction - 135, 15);
 
-    turtleBoard->drawTurtle(QPoint(top.x, top.y), QPoint(bottomLeft.x, bottomLeft.y), QPoint(bottomRight.x, bottomRight.y), Qt::blue);
+    turtleBoard->drawTurtle(QPoint(top.x, top.y), QPoint(bottomLeft.x, bottomLeft.y), QPoint(bottomRight.x, bottomRight.y),  QColor(QString::fromStdString(brush.getColor())));
 }
 
 void Turtle::callFunction(std::vector<std::string> identifiers, Context *context)

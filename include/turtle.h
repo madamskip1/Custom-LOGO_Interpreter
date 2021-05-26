@@ -7,6 +7,7 @@
 #include "turtleboard.h"
 #include "Variable.h"
 #include "Point.h"
+#include "Brush.h"
 
 class TurtleBoard;
 class Context;
@@ -46,6 +47,7 @@ private:
     DrawingBoard* board;
     TurtleBoard* turtleBoard;
     Point position;
+    Brush brush;
 
     Point movePoint(Point pos, int direct, int distance);
     float getRealDirection();

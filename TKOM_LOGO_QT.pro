@@ -34,6 +34,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     src/BlockScope.cpp \
+    src/Brush.cpp \
     src/Context.cpp \
     src/Interpreter.cpp \
     src/Lexer.cpp \
@@ -79,6 +80,7 @@ HEADERS += \
     AST/VarDeclare.h \
     AST/VariableExpression.h \
     include/BlockScope.h \
+    include/Brush.h \
     include/Context.h \
     include/Interpreter.h \
     include/Lexer.h \
