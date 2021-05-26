@@ -39,6 +39,43 @@ void AST::AssignmentStatement::execute(Context* context)
             var->value = color->getColor();
         }
     }
+    else if (identifiers.size() > 1)
+    {
+        Variable* var = context->getVariable(identifiers[0]);
+        if (var->type == TokenType::Point)
+        {
+            Expression* expression = dynamic_cast<Expression*>(assign.get());
+            int value = expression->evaluate(context);
+            context->setVariant = value;
+            Point* point = static_cast<Point*>(var);
+            point->setSomeVal(std::vector<std::string>(identifiers.begin() + 1, identifiers.end()), context);
+            return;
+        }
+        else if (var->type == TokenType::Turtle)
+        {
+            Turtle* turtle = static_cast<Turtle*>(var);
+
+            AST::Assignable* assignable = assign.get();
+            if (assignable->getNodeType() == AST::NodeType::Expression)
+            {
+                Expression* expression = dynamic_cast<Expression*>(assignable);
+                int value = expression->evaluate(context);
+                context->setVariant = value;
+            }
+            else if (assignable->getNodeType() == AST::NodeType::Boolean)
+            {
+                Boolean* boolean = static_cast<Boolean*>(assignable);
+                context->setVariant = boolean->evaluate();
+            }
+            else if (assignable->getNodeType() == AST::NodeType::Color)
+            {
+                Color* color = static_cast<Color*>(assignable);
+                context->setVariant = color->getColor();
+            }
+
+            turtle->setSomeVal(std::vector<std::string>(identifiers.begin() + 1, identifiers.end()), context);
+        }
+    }
 }
 
 std::string AST::AssignmentStatement::getIdentifier(int index) const

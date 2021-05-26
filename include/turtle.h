@@ -39,6 +39,7 @@ public:
 
     void callFunction(std::vector<std::string> identifiers, Context* context);
     void getSomeVal(std::vector<std::string> identifiers, Context* context);
+    void setSomeVal(std::vector<std::string> identifiers, Context *context);
 
 signals:
     void turtleMoved();

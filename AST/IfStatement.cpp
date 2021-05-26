@@ -1,5 +1,6 @@
 #include "IfStatement.h"
 #include <iostream>
+#include <QDebug>
 
 AST::IfStatement::IfStatement(std::unique_ptr<AST::Node> condition, std::unique_ptr<AST::InstructionsBlock> trueBlock, std::unique_ptr<AST::InstructionsBlock> elseBlock) : AST::Node(AST::NodeType::IfStatement)
 {
@@ -15,12 +16,10 @@ void AST::IfStatement::execute(Context* context)
 
 	if (ifCondition)
 	{
-		std::cout << "TRUE BLOCK" << std::endl;
 		trueBlockNode->execute(context);
 	}
 	else if (elseBlockNode)
 	{
-		std::cout << "ELSE BLOCK" << std::endl;
 		elseBlockNode->execute(context);
 	}
 }

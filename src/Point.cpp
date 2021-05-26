@@ -44,3 +44,25 @@ void Point::getSomeVal(std::vector<std::string> identifiers, Context *context)
 
     throw "identifier not recognized";
 }
+
+void Point::setSomeVal(std::vector<std::string> identifiers, Context *context)
+{
+    if (identifiers.size() != 1)
+        throw "wrong level of identifier";
+
+    if (identifiers[0] == "x")
+    {
+        x = std::get<int>(context->setVariant);
+        context->setVariant = std::monostate{};
+        return;
+    }
+
+    if (identifiers[0] == "y")
+    {
+        y = std::get<int>(context->setVariant);
+        context->setVariant = std::monostate{};
+        return;
+    }
+
+    throw "identifier not recognized";
+}

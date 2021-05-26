@@ -1,10 +1,11 @@
 #include "Brush.h"
+#include "Context.h"
 
 const int Brush::DEFAULT_SIZE = 2;
 const std::string Brush::DEFAULT_COLOR = "#3498DB";
 
 
-Brush::Brush() : size(DEFAULT_SIZE), color(DEFAULT_COLOR)
+Brush::Brush() : size(DEFAULT_SIZE), color(DEFAULT_COLOR), enabled(true)
 {
 }
 
@@ -16,6 +17,69 @@ int Brush::getSize() const
 std::string Brush::getColor() const
 {
     return color;
+}
+
+bool Brush::getEnabled() const
+{
+    return enabled;
+}
+
+void Brush::getSomeVal(std::vector<std::string> identifiers, Context *context)
+{
+    if (identifiers[0] == "size")
+    {
+        context->returnVariant = size;
+        return;
+    }
+    else if(identifiers[0] == "enabled")
+    {
+        context->returnVariant = enabled;
+    }
+    else if (identifiers[0] == "color")
+    {
+        if (identifiers[1] == "hex")
+        {
+            context->returnVariant = color;
+            return;
+        }
+        if (identifiers[1] == "R")
+        {
+            context->returnVariant = getColorR();
+            return;
+        }
+        else if (identifiers[1] == "G")
+        {
+            context->returnVariant = getColorG();
+            return;
+        }
+        if (identifiers[1] == "R")
+        {
+            context->returnVariant = getColorB();
+            return;
+        }
+    }
+}
+
+void Brush::setSomeVal(std::vector<std::string> identifiers, Context *context)
+{
+    if (identifiers[0] == "color")
+    {
+        color = std::get<std::string>(context->setVariant);
+        context->setVariant = std::monostate{};
+        return;
+    }
+    else if (identifiers[0] == "size")
+    {
+        size = std::get<int>(context->setVariant);
+        context->setVariant = std::monostate{};
+        return;
+    }
+    else if (identifiers[0] == "enabled")
+    {
+        enabled = std::get<bool>(context->setVariant);
+        context->setVariant = std::monostate{};
+        return;
+    }
 }
 
 std::string Brush::getColorR() const

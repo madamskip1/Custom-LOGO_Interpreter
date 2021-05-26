@@ -12,7 +12,8 @@
 class Context
 {
 public:
-	std::variant<std::monostate, int, std::string, /*Turtle, Color*/ bool> returnVariant;
+    std::variant<std::monostate, int, std::string, bool> returnVariant;
+    std::variant<std::monostate, int, std::string, /*Turtle, Color*/ bool> setVariant;
 	TokenType returnType = TokenType::UNKNOWN;
 
     std::vector<AST::Node*> args;

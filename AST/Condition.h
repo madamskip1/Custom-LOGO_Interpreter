@@ -27,6 +27,6 @@ namespace AST
 		std::unique_ptr<AST::Node> leftCondition = nullptr;
 		std::unique_ptr<AST::Node> rightCondition = nullptr;
 		TokenType relationOperator;
-		bool notOperator;
+        bool notOperator = false;
 	};
 }
