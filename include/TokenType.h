@@ -84,7 +84,7 @@ enum class TokenType : unsigned int
 
 const std::array<char, 4> mathOperators = { '+', '-', '/', '*' };
 
-const std::map<char, TokenType> MathOperatorsToTokenType =
+static const std::map<char, TokenType> MathOperatorsToTokenType =
 {
 	{ '+', TokenType::Plus },
 	{ '-', TokenType::Minus },
@@ -92,7 +92,7 @@ const std::map<char, TokenType> MathOperatorsToTokenType =
 	{ '*', TokenType::Multiply }
 };
 
-const std::map<std::string, TokenType> KeywordToTokenType =
+static const std::map<std::string, TokenType> KeywordToTokenType =
 {
 	{ "repeat", TokenType::Repeat },
 	{ "repeatTime", TokenType::RepeatTime },

@@ -20,7 +20,6 @@ public:
 
 
 	Context();
-    ~Context();
 
 	void addNewScope();
 	void removeScope();
@@ -37,12 +36,12 @@ public:
 	AST::DefFuncStatement* getDefFunction(std::string name) const;
     std::function<void(Context*)> getStdLibFunction(std::string name) const;
 
-	const bool hasFunction(std::string name) const;
-    const bool hasStdLibFunction(std::string name) const;
-	const bool hasReturn() const;
+    bool hasFunction(std::string name) const;
+    bool hasStdLibFunction(std::string name) const;
+    bool hasReturn() const;
 
 private:
-	std::map<std::string, AST::DefFuncStatement*> defFunctions;
+    std::map<std::string, AST::DefFuncStatement*> defFunctions;
     std::map<std::string, std::function<void(Context*)>> stdLibFunctions;
 	BlockScope* rootScope; // Global
 	BlockScope* curScope;

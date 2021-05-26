@@ -41,8 +41,8 @@ void TurtleBoard::addTurtle(Turtle *turtle)
 
 void TurtleBoard::removeTurtle(Turtle *turtle)
 {
-    auto iterator = std::find(turtles.begin(), turtles.end(), turtle);
-    if (iterator != turtles.end())
+    auto iterator = std::find(turtles.cbegin(), turtles.cend(), turtle);
+    if (iterator != turtles.cend())
     {
         turtles.erase(iterator);
     }

@@ -19,8 +19,8 @@ int AST::Expression::evaluate(Context* context) const
         return 0;
     }
 
-    int val = childrenExpressions[0]->evaluate(context);
-    val = std::get<int>(context->evaluateValues[0]);
+    childrenExpressions[0]->evaluate(context);
+    int val = std::get<int>(context->evaluateValues[0]);
     context->evaluateValues.clear();
 
     int val2 = 0;
@@ -28,7 +28,7 @@ int AST::Expression::evaluate(Context* context) const
 
     for (std::size_t i = 1; i < childrenExpressions.size(); i++)
     {
-        val2 = childrenExpressions[i]->evaluate(context);
+        childrenExpressions[i]->evaluate(context);
         val2 = std::get<int>(context->evaluateValues[0]);
         context->evaluateValues.clear();
 

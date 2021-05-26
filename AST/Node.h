@@ -42,13 +42,14 @@ namespace AST
 		virtual ~Node() {};
 
 		virtual void execute() {};
-		virtual void execute(Context* context) {};
+        virtual void execute(Context*) {};
 
 		NodeType getNodeType() const;
 		
-		const void addChild(std::unique_ptr<AST::Node> child);
+        void addChild(std::unique_ptr<AST::Node> child);
 		AST::Node* getChild(const int& index) const;
-		const std::size_t getChildrenSize() const;
+        std::size_t getChildrenSize() const;
+        void releaseChild(const int& index);
 
 	protected:
 		AST::NodeType nodeType;

@@ -15,7 +15,7 @@ namespace AST
 	{
 	public:
 		DefFuncStatement();
-		
+        ~DefFuncStatement();
 		void executeFunction(Context* context);
 
 		const void setName(const std::string name);

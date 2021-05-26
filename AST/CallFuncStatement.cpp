@@ -8,7 +8,7 @@ AST::CallFuncStatement::CallFuncStatement()
 
 void AST::CallFuncStatement::execute(Context* context)
 {
-    std::size_t argumentsSize = arguments.size();
+    //std::size_t argumentsSize = arguments.size();
 
     if (identifiers.size() == 1) 
     {

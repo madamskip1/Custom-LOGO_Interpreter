@@ -22,5 +22,10 @@ AST::Node* AST::Node::getChild(const int& index) const
 
 const std::size_t AST::Node::getChildrenSize() const
 {
-	return children.size();
+    return children.size();
+}
+
+void AST::Node::releaseChild(const int &index)
+{
+    children[index].release();
 }

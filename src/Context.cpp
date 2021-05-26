@@ -7,10 +7,6 @@ Context::Context()
     prepareStdLibFunctions();
 }
 
-Context::~Context()
-{
-    defFunctions.clear();
-}
 
 void Context::addNewScope()
 {
@@ -21,7 +17,10 @@ void Context::addNewScope()
 
 void Context::removeScope()
 {
-	BlockScope* temp = curScope;
+    if (curScope == rootScope)
+        return;
+
+    BlockScope* temp = curScope;
 	curScope = curScope->getUpperScope();
     delete temp;
 }
@@ -77,7 +76,7 @@ std::function<void (Context *)> Context::getStdLibFunction(std::string name) con
     return stdLibFunctions.at(name);
 }
 
-const bool Context::hasReturn() const
+bool Context::hasReturn() const
 {
     return (returnType != TokenType::UNKNOWN && returnVariant.index() == 0);
 }
@@ -88,7 +87,7 @@ void Context::prepareStdLibFunctions()
     stdLibFunctions.emplace("allToStart", allToStart);
 }
 
-const bool Context::hasFunction(std::string name) const
+bool Context::hasFunction(std::string name) const
 {
 	if (defFunctions.find(name) != defFunctions.cend())
 		return true;
@@ -96,7 +95,7 @@ const bool Context::hasFunction(std::string name) const
     return false;
 }
 
-const bool Context::hasStdLibFunction(std::string name) const
+bool Context::hasStdLibFunction(std::string name) const
 {
     if (stdLibFunctions.find(name) != stdLibFunctions.cend())
         return true;

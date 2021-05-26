@@ -2,6 +2,7 @@
 #include <string>
 #include "Node.h"
 #include "../include/TokenType.h"
+#include <QDebug>
 
 namespace AST
 {
@@ -9,8 +10,9 @@ namespace AST
 		public AST::Node
 	{
 	public:
-		Parameter() = delete;
-		Parameter(TokenType parameterType, std::string parameterName);
+        Parameter() = delete;
+        ~Parameter();
+        Parameter(TokenType parameterType, std::string parameterName);
 
 		std::string getName() const;
 		TokenType getType() const;

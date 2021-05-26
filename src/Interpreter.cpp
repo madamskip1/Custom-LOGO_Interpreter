@@ -11,10 +11,10 @@ void Interpreter::run()
 	lookForDefFunctions();
 
 	std::size_t rootNodeChildrenSize = programNode->getChildrenSize();
-	for (int i = 0; i < rootNodeChildrenSize; i++)
+    for (std::size_t i = 0; i < rootNodeChildrenSize; i++)
 	{
 		AST::Node* curNode = programNode->getChild(i);
-		if (curNode->getNodeType() != AST::NodeType::DefFuncStatement)
+        if (curNode)
 		{
             curNode->execute(context);
 		}
@@ -24,20 +24,17 @@ void Interpreter::run()
 void Interpreter::lookForDefFunctions()
 {
 	std::size_t rootNodeChildrenSize = programNode->getChildrenSize();
-	
-	for (int i = 0; i < rootNodeChildrenSize; i++)
+
+    for (std::size_t i = 0; i < rootNodeChildrenSize; i++)
 	{
 		AST::Node* curNode = programNode->getChild(i);
 		if (curNode->getNodeType() == AST::NodeType::DefFuncStatement)
 		{
 			AST::DefFuncStatement* defFuncNode = static_cast<AST::DefFuncStatement*>(curNode);
 			context->addDefFunction(defFuncNode);
+            programNode->releaseChild(i);
 		}
 	}
+
 }
 
-/*
-
-  Point point(20, 30);
-  Turtle zolw(point);
- * */

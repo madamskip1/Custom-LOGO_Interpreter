@@ -4,6 +4,16 @@ BlockScope::BlockScope(BlockScope* upper) : upperScope(upper)
 {
 }
 
+BlockScope::~BlockScope()
+{
+    for (auto& var : variables)
+    {
+        var.second.reset();
+    }
+
+    variables.clear();
+}
+
 
 BlockScope* BlockScope::getUpperScope() const
 {

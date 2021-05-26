@@ -9,6 +9,8 @@ class Context;
 class Variable
 {
 public:
+    virtual ~Variable() {};
+
     std::variant<std::monostate, int, std::string, bool, Variable*> value;
 	std::string name;
 	TokenType type;

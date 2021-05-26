@@ -105,7 +105,7 @@ const void SourceReader::skipLine()
     {
         if (nextChar == '\r')
         {
-            character = getSingleCharFromSource();
+            getSingleCharFromSource();
             nextChar = getNextCharacter();
         }
 

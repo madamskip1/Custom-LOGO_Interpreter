@@ -6,6 +6,11 @@ AST::Parameter::Parameter(TokenType parameterType, std::string parameterName) : 
     name = parameterName;
 }
 
+AST::Parameter::~Parameter()
+{
+    qDebug() << "DUPA";
+}
+
 std::string AST::Parameter::getName() const
 {
     return name;

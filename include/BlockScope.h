@@ -6,20 +6,20 @@
 
 class BlockScope
 {
-public:
-	std::map<std::string, std::unique_ptr<Variable>> variables;
-	
+public:	
 	BlockScope(BlockScope* upper);
-
-	BlockScope* getUpperScope() const;
+    ~BlockScope();
 
 	void addVariable(std::unique_ptr<Variable> var);
-	bool hasVariableInThisScope(std::string name);
-	bool hasVariableInAnyScope(std::string name);
 
 	Variable* getVariable(std::string name);
+    BlockScope* getUpperScope() const;
+
+    bool hasVariableInThisScope(std::string name);
+    bool hasVariableInAnyScope(std::string name);
 
 private:
+    std::map<std::string, std::unique_ptr<Variable>> variables;
 	BlockScope* upperScope = nullptr;
 };
 
