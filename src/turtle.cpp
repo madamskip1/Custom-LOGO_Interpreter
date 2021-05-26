@@ -159,18 +159,36 @@ void Turtle::getSomeVal(std::vector<std::string> identifiers, Context *context)
     }
     else if (identifiers[0] == "direction")
     {
-        context->returnVariant = direction;
+        context->evaluateValue = direction;
         return;
     }
     else if (identifiers[0] == "hidden")
     {
-        context->returnVariant = hidden;
+        context->evaluateValue = hidden;
         return;
     }
 }
 
 void Turtle::setSomeVal(std::vector<std::string> identifiers, Context *context)
 {
+    if (identifiers.size() == 0)
+    {
+        if (context->evaluateValue.index() != 4)
+            throw "wrong Turtle class assignment";
+
+        Variable* turtleVar = std::get<Variable*>(context->evaluateValue);
+
+        if (turtleVar->type != TokenType::Turtle)
+            throw "Only Turtle type can be assign to Turtle var";
+
+        Turtle* turtle = static_cast<Turtle*>(turtleVar);
+        position = turtle->position;
+        brush = turtle->brush;
+        hidden = turtle->hidden;
+        direction = turtle->direction;
+        return;
+    }
+
     if (identifiers[0] == "hidden")
     {
         hidden = std::get<bool>(context->setVariant);
