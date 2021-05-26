@@ -18,6 +18,6 @@ bool AST::Boolean::evaluate() const
 
 int AST::Boolean::evaluate(Context* context) const
 {
-    context->evaluateValues.push_back(value);
+    context->evaluateValue = value;
     return 0;
 }

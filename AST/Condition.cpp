@@ -56,14 +56,12 @@ bool AST::Condition::evaluate(Context* context)
 	else if (leftCondition->getNodeType() == AST::NodeType::Expression)
 	{
         (static_cast<AST::Expression*>(leftCondition.get()))->evaluate(context);
-        int leftValue = std::get<int>(context->evaluateValues[0]);
-        context->evaluateValues.clear();
+        int leftValue = std::get<int>(context->evaluateValue);
 
 		if (rightCondition->getNodeType() == AST::NodeType::Expression)
 		{
             (static_cast<AST::Expression*>(rightCondition.get()))->evaluate(context);
-            int rightValue = std::get<int>(context->evaluateValues[0]);
-            context->evaluateValues.clear();
+            int rightValue = std::get<int>(context->evaluateValue);
 
 			if (relationOperator == TokenType::Equal)
 				returnBoolean = (leftValue == rightValue);

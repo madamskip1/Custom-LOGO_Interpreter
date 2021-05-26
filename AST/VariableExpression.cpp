@@ -22,7 +22,7 @@ int AST::VariableExpression::evaluate(Context *context) const
         {
             throw "Variable in expression can be only Integer";
         }
-        context->evaluateValues.push_back(std::get<int>(var->value));
+        context->evaluateValue = std::get<int>(var->value);
         return std::get<int>(var->value);
     }
 }

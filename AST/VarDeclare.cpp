@@ -91,17 +91,30 @@ std::unique_ptr<Variable> AST::VarDeclare::executeClassDeclaration(Context *cont
     std::optional<int> x, y;
 
     classAssignment->getExpression(0)->evaluate(context);
-    x = y = std::get<int>(context->evaluateValues[0]);
+    if (context->evaluateValue.index() == 4)
+    {
+        Variable* evaluatedVar =  std::get<Variable*>(context->evaluateValue);
+        if (evaluatedVar->type != TokenType::Point)
+        {
+            throw "class used to initalize class has to be Point type";
+        }
+        evaluatedVar->getSomeVal({"x"}, context);
+        x = std::get<int>(context->evaluateValue);
 
-    if (context->evaluateValues.size() == 2)
-    {
-        y = std::get<int>(context->evaluateValues[1]);
+        evaluatedVar->getSomeVal({"y"}, context);
+        y = std::get<int>(context->evaluateValue);
     }
-    else if (classAssignment->getExpressionsSize() == 2)
+    else
     {
-        classAssignment->getExpression(1)->evaluate(context);
-        y = std::get<int>(context->evaluateValues[0]);
+        x = y = std::get<int>(context->evaluateValue);
+
+        if (classAssignment->getExpressionsSize() == 2)
+        {
+            classAssignment->getExpression(1)->evaluate(context);
+            y = std::get<int>(context->evaluateValue);
+        }
     }
+
 
 
     if (type == TokenType::Turtle)

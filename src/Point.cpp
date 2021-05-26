@@ -6,43 +6,46 @@
 Point::Point()
 {
     x = y = 0;
+    type = TokenType::Point;
 }
 
 Point::Point(const Point& point)
 {
     x = point.x;
     y = point.y;
+    type = TokenType::Point;
 }
 
 Point::Point(int pos)
 {
     x = y = pos;
+    type = TokenType::Point;
 }
 
 Point::Point(int x, int y)
 {
     this->x = x;
     this->y = y;
+    type = TokenType::Point;
 }
 
 void Point::getSomeVal(std::vector<std::string> identifiers, Context *context)
 {
     if (identifiers.size() == 0)
     {
-        context->evaluateValues.push_back(x);
-        context->evaluateValues.push_back(y);
+        context->evaluateValue = this;
         return;
     }
 
     if (identifiers[0] == "x")
     {
-        context->evaluateValues.push_back(x);;
+        context->evaluateValue = x;
         return;
     }
 
     if (identifiers[0] == "y")
     {
-        context->evaluateValues.push_back(y);
+        context->evaluateValue = y;
         return;
     }
 
@@ -51,6 +54,13 @@ void Point::getSomeVal(std::vector<std::string> identifiers, Context *context)
 
 void Point::setSomeVal(std::vector<std::string> identifiers, Context *context)
 {
+    if (identifiers.size() == 0)
+    {
+        if (context->evaluateValue.index() != 4)
+            throw "wrong Point class assignment";
+
+
+    }
     if (identifiers.size() != 1)
         throw "wrong level of identifier";
 

@@ -26,14 +26,12 @@ void AST::AssignmentStatement::execute(Context* context)
     }
     else
     {
-        tempIdentifiers = identifiers;
+        tempIdentifiers = std::vector<std::string>();
     }
 
-    context->evaluateValues.clear();
     assign->evaluate(context);
-    context->setVariant = context->evaluateValues[0];
+    context->setVariant = context->evaluateValue;
     var->setSomeVal(tempIdentifiers, context);
-    context->evaluateValues.clear();
 }
 
 std::string AST::AssignmentStatement::getIdentifier(int index) const

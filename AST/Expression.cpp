@@ -8,8 +8,6 @@ AST::Expression::Expression()
 
 int AST::Expression::evaluate(Context* context) const
 {
-    context->evaluateValues.clear();
-
     if (isOnlyId())
     {
         std::vector<std::string> identifiers = getIdentifiers();
@@ -20,8 +18,7 @@ int AST::Expression::evaluate(Context* context) const
     }
 
     childrenExpressions[0]->evaluate(context);
-    int val = std::get<int>(context->evaluateValues[0]);
-    context->evaluateValues.clear();
+    int val = std::get<int>(context->evaluateValue);
 
     int val2 = 0;
     TokenType op;
@@ -29,8 +26,7 @@ int AST::Expression::evaluate(Context* context) const
     for (std::size_t i = 1; i < childrenExpressions.size(); i++)
     {
         childrenExpressions[i]->evaluate(context);
-        val2 = std::get<int>(context->evaluateValues[0]);
-        context->evaluateValues.clear();
+        val2 = std::get<int>(context->evaluateValue);
 
         op = operators[i - 1];
 
@@ -47,7 +43,7 @@ int AST::Expression::evaluate(Context* context) const
     if (negativeOperator)
         val *= -1;
 
-    context->evaluateValues.push_back(val);
+    context->evaluateValue = val;
     return val;
 }
 

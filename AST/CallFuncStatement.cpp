@@ -50,13 +50,9 @@ void AST::CallFuncStatement::execute(Context* context)
                 if (!argAdded)
                 {
                     arg->evaluate(context);
-                    qDebug() << "Val";
-                    if (context->evaluateValues[0].index() == 1)
-                    {
-                        qDebug() << std::get<int>(context->evaluateValues[0]);
-                    }
+
                     tempVar = std::make_unique<Variable>();
-                    tempVar->value = context->evaluateValues[0];
+                    tempVar->value = context->evaluateValue;
                     newContext.args.emplace(param->getName(), tempVar.get());
                     tempVars.push_back(std::move(tempVar));
                 }
@@ -90,14 +86,19 @@ void AST::CallFuncStatement::execute(Context* context)
             for (auto& arg : arguments)
             {
                 arg->evaluate(context);
-                for (std::size_t j = 0; j < context->evaluateValues.size(); j++)
+                if (context->evaluateValue.index() == 4)
+                {
+                    newContext->args.emplace(std::string("arg").append(std::to_string(i)), std::get<Variable*>(context->evaluateValue));
+                }
+                else
                 {
                     tempVar = std::make_unique<Variable>();
-                    tempVar->value = context->evaluateValues[j];
+                    tempVar->value = context->evaluateValue;
                     newContext->args.emplace(std::string("arg").append(std::to_string(i)), tempVar.get());
                     tempVars.push_back(std::move(tempVar));
-                    i++;
                 }
+
+                i++;
             }
             turtle->callFunction(std::vector<std::string>(identifiers.begin() +1, identifiers.end()), newContext);
         }

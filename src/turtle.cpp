@@ -115,14 +115,26 @@ void Turtle::callFunction(std::vector<std::string> identifiers, Context *context
     }
     else if (identifiers[0] == "moveTo")
     {
-        qDebug() << "Dupa1";
-        int arg_x = std::get<int>(context->args.at("arg0")->value);
-        qDebug() << "Dupa2";
-        qDebug() << arg_x;
-        qDebug() << "Dupa3";
-        int arg_y = std::get<int>(context->args.at("arg1")->value);
-        qDebug() << "Dupa4";
-        qDebug() << arg_y;
+        int arg_x, arg_y;
+
+        if (context->args.at("arg0")->type == TokenType::Point)
+        {
+            Point* point = static_cast<Point*>(context->args.at("arg0"));
+            arg_x = point->x;
+            arg_y = point->y;
+        }
+        else if (context->args.at("arg0")->type == TokenType::Turtle)
+        {
+            Turtle* turtle = static_cast<Turtle*>(context->args.at("arg0"));
+            arg_x = turtle->position.x;
+            arg_y = turtle->position.y;
+        }
+        else
+        {
+            arg_x = std::get<int>(context->args.at("arg0")->value);
+            arg_y = std::get<int>(context->args.at("arg1")->value);
+        }
+
         moveTo(arg_x, arg_y);
     }
 
@@ -130,7 +142,12 @@ void Turtle::callFunction(std::vector<std::string> identifiers, Context *context
 
 void Turtle::getSomeVal(std::vector<std::string> identifiers, Context *context)
 {
-    if (identifiers[0] == "pos")
+    if (identifiers.size() == 0)
+    {
+        context->evaluateValue = this;
+        return;
+    }
+    else if (identifiers[0] == "pos")
     {
         position.getSomeVal(std::vector<std::string>(identifiers.begin() + 1, identifiers.end()), context);
         return;

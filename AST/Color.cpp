@@ -8,7 +8,7 @@ AST::Color::Color(std::string color) : colorHex(color)
 
 int AST::Color::evaluate(Context* context) const
 {
-    context->evaluateValues.push_back(getColor());
+    context->evaluateValue = getColor();
     return 0;
 }
 
