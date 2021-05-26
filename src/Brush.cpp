@@ -26,16 +26,22 @@ bool Brush::getEnabled() const
 
 void Brush::getSomeVal(std::vector<std::string> identifiers, Context *context)
 {
+    if (identifiers.size() == 0)
+    {
+        context->evaluateValue = this;
+        return;
+    }
     if (identifiers[0] == "size")
     {
         context->evaluateValue = size;
         return;
     }
-    else if(identifiers[0] == "enabled")
+    if(identifiers[0] == "enabled")
     {
         context->evaluateValue = enabled;
+        return;
     }
-    else if (identifiers[0] == "color")
+    if (identifiers[0] == "color")
     {
         if (identifiers.size() == 1 || identifiers[1] == "hex")
         {
@@ -62,6 +68,19 @@ void Brush::getSomeVal(std::vector<std::string> identifiers, Context *context)
 
 void Brush::setSomeVal(std::vector<std::string> identifiers, Context *context)
 {
+    if (identifiers.size() == 0)
+    {
+        if (context->evaluateValue.index() != 4)
+            throw "wrong Brush assignment";
+
+        Variable* pointVar = std::get<Variable*>(context->evaluateValue);
+
+        Brush* brush = static_cast<Brush*>(pointVar);
+        size = brush->getSize();
+        enabled = brush->getEnabled();
+        color = brush->getColor();
+        return;
+    }
     if (identifiers[0] == "color")
     {
         color = std::get<std::string>(context->setVariant);
