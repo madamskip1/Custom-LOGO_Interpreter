@@ -59,9 +59,17 @@ void Point::setSomeVal(std::vector<std::string> identifiers, Context *context)
         if (context->evaluateValue.index() != 4)
             throw "wrong Point class assignment";
 
+        Variable* pointVar = std::get<Variable*>(context->evaluateValue);
 
+        if (pointVar->type != TokenType::Point)
+            throw "Only Point type can be assign to Point var";
+
+        Point* point = static_cast<Point*>(pointVar);
+        x = point->x;
+        y = point->y;
+        return;
     }
-    if (identifiers.size() != 1)
+    if (identifiers.size() > 1)
         throw "wrong level of identifier";
 
     if (identifiers[0] == "x")

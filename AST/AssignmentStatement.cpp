@@ -39,7 +39,6 @@ std::string AST::AssignmentStatement::getIdentifier(int index) const
     return identifiers[index];
 }
 
-
 AST::Assignable* AST::AssignmentStatement::getAssign() const
 {
     return assign.get();
