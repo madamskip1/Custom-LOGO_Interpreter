@@ -19,10 +19,11 @@ void AST::CallFuncStatement::execute(Context* context)
             if (getArgumentsSize() != defFunc->getParametersSize())
                 throw "wrong number of arguments";
 
-            Context* newContext = new Context();
+            Context newContext;
             // Przes³aæ w nim parametry
-
-            defFunc->executeFunction(newContext);
+            newContext.setDrawingBoard(context->getDrawingBoardPtr());
+            newContext.setTurtleBoard(context->getTurtleBoardPtr());
+            defFunc->executeFunction(&newContext);
         }
         else if (context->hasStdLibFunction(identifiers[0]))
         {

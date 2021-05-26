@@ -144,22 +144,26 @@ void Turtle::setSomeVal(std::vector<std::string> identifiers, Context *context)
     {
         hidden = std::get<bool>(context->setVariant);
         context->setVariant = std::monostate{};
+        emit turtleMoved();
         return;
     }
     else if (identifiers[0] == "direction")
     {
         direction = std::get<int>(context->setVariant);
         context->setVariant = std::monostate{};
+        emit turtleMoved();
         return;
     }
     else if (identifiers[0] == "brush")
     {
         brush.setSomeVal(std::vector<std::string>(identifiers.begin() + 1, identifiers.end()), context);
+        emit turtleMoved();
         return;
     }
     else if (identifiers[0] == "pos")
     {
         position.setSomeVal(std::vector<std::string>(identifiers.begin() + 1, identifiers.end()), context);
+        emit turtleMoved();
         return;
     }
 }

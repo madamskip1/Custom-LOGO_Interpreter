@@ -14,8 +14,8 @@ namespace AST
 
         virtual int evaluate(Context* context) const;
 
-        virtual bool isOnlyId(Context* context) const;
-        virtual std::vector<std::string> getIdentifiers(Context* context) const;
+        virtual bool isOnlyId() const;
+        virtual std::vector<std::string> getIdentifiers() const;
 
         std::string getIdentifier(const int& index = 0) const;
 

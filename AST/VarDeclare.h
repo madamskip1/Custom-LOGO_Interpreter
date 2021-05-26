@@ -36,6 +36,5 @@ namespace AST
         std::unique_ptr<Variable> executeClassDeclaration(Context* context);
         std::unique_ptr<Turtle> createTurtle(Context* context, std::optional<int> x = std::nullopt, std::optional<int> y = std::nullopt);
         std::unique_ptr<Point> createPoint(std::optional<int> x = std::nullopt, std::optional<int> y = std::nullopt);
-        int resolveClassExpression(Context* context, int index = 0);
     };
 }

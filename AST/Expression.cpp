@@ -8,13 +8,30 @@ AST::Expression::Expression()
 
 int AST::Expression::evaluate(Context* context) const
 {
+    context->evaluateValues.clear();
+
+    if (isOnlyId())
+    {
+        std::vector<std::string> identifiers = getIdentifiers();
+        Variable* var = context->getVariable(identifiers[0]);
+        identifiers.erase(identifiers.begin());
+        var->getSomeVal(identifiers, context);
+        return 0;
+    }
+
     int val = childrenExpressions[0]->evaluate(context);
+    val = std::get<int>(context->evaluateValues[0]);
+    context->evaluateValues.clear();
+
     int val2 = 0;
     TokenType op;
 
-    for (int i = 1; i < childrenExpressions.size(); i++)
+    for (std::size_t i = 1; i < childrenExpressions.size(); i++)
     {
         val2 = childrenExpressions[i]->evaluate(context);
+        val2 = std::get<int>(context->evaluateValues[0]);
+        context->evaluateValues.clear();
+
         op = operators[i - 1];
 
         if (op == TokenType::Plus)
@@ -30,23 +47,24 @@ int AST::Expression::evaluate(Context* context) const
     if (negativeOperator)
         val *= -1;
 
+    context->evaluateValues.push_back(val);
     return val;
 }
 
-bool AST::Expression::isOnlyId(Context *context) const
+bool AST::Expression::isOnlyId() const
 {
     if (childrenExpressions.size() != 1)
         return false;
 
-    return childrenExpressions[0]->isOnlyId((context));
+    return childrenExpressions[0]->isOnlyId();
 }
 
-std::vector<std::string> AST::Expression::getIdentifiers(Context *context) const
+std::vector<std::string> AST::Expression::getIdentifiers() const
 {
     if (childrenExpressions.size() != 1)
         throw "expression isn't just identifiers";
 
-    return childrenExpressions[0]->getIdentifiers(context);
+    return childrenExpressions[0]->getIdentifiers();
 }
 
 

@@ -6,6 +6,9 @@ AST::DefFuncStatement::DefFuncStatement() : Node(AST::NodeType::DefFuncStatement
 
 void AST::DefFuncStatement::executeFunction(Context* context)
 {
+    // TODO: set args to context
+
+    instructionsBlock->execute(context);
 }
 
 const void AST::DefFuncStatement::setName(std::string name)

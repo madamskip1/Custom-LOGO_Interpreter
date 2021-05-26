@@ -2,10 +2,11 @@
 #define BRUSH_H
 #include <vector>
 #include <string>
-
+#include "Variable.h"
 class Context;
 
 class Brush
+        : public Variable
 {
  public:
     static const int DEFAULT_SIZE;
@@ -17,8 +18,8 @@ class Brush
     std::string getColor() const;
     bool getEnabled() const;
 
-    void getSomeVal(std::vector<std::string> identifiers, Context *context);
-    void setSomeVal(std::vector<std::string> identifiers, Context* context);
+    virtual void getSomeVal(std::vector<std::string> identifiers, Context *context);
+    virtual void setSomeVal(std::vector<std::string> identifiers, Context* context);
 
 private:
     int size;

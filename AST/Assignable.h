@@ -7,7 +7,8 @@ namespace AST
 		public AST::Node
 	{
 	public:
-        virtual bool isOnlyId(Context* context) const { return false; }
+        virtual bool isOnlyId() const { return false; }
+        virtual int evaluate(Context*) const { return 0; };
 	};
 
 }

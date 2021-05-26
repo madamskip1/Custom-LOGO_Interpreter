@@ -22,12 +22,12 @@ int AST::VariableExpression::evaluate(Context *context) const
         {
             throw "Variable in expression can be only Integer";
         }
-
+        context->evaluateValues.push_back(std::get<int>(var->value));
         return std::get<int>(var->value);
     }
 }
 
-bool AST::VariableExpression::isOnlyId(Context *context) const
+bool AST::VariableExpression::isOnlyId() const
 {
     if (identifiers.size() > 0)
         return true;
@@ -35,7 +35,7 @@ bool AST::VariableExpression::isOnlyId(Context *context) const
     return false;
 }
 
-std::vector<std::string> AST::VariableExpression::getIdentifiers(Context *context) const
+std::vector<std::string> AST::VariableExpression::getIdentifiers() const
 {
     return identifiers;
 }

@@ -12,6 +12,7 @@ namespace AST
 
 		const bool getValue() const;
 		bool evaluate() const;
+        int evaluate(Context* context) const;
 	private:
 		bool value;
 	};

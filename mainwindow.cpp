@@ -60,7 +60,14 @@ void MainWindow::on_pushButton_clicked()
     if (!logger.hasAnyError())
     {
         Interpreter interpreter(std::move(program), this->ui->drawingBoard, this->ui->turtleBoard);
-        interpreter.run();
+        try
+        {
+            interpreter.run();
+        }
+        catch(std::exception e)
+        {
+            qDebug() << e.what();
+        }
     }
 
     QString output = QString::fromStdString(logger.toString());

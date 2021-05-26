@@ -89,50 +89,20 @@ std::unique_ptr<Variable> AST::VarDeclare::executeClassDeclaration(Context *cont
         throw "wrong number of class arguments";
 
     std::optional<int> x, y;
-    x = y = std::nullopt;
 
-    if (classAssignment->getExpressionsSize() == 1)
+    classAssignment->getExpression(0)->evaluate(context);
+    x = y = std::get<int>(context->evaluateValues[0]);
+
+    if (context->evaluateValues.size() == 2)
     {
-        AST::Expression* expression = classAssignment->getExpression(0);
-        if (expression->isOnlyId(context))
-        {
-            std::vector<std::string> identifiers = expression->getIdentifiers(context);
-            if (identifiers.size() == 1)
-            {
-                Variable* var = context->getVariable(identifiers[0]);
-                TokenType varType = var->type;
-
-                if (varType == TokenType::Point)
-                {
-                    Point* point = static_cast<Point*>(var);
-                    point->getSomeVal(std::vector<std::string>({"x"}), context);
-                    x = std::get<int>(context->returnVariant);
-                    point->getSomeVal(std::vector<std::string>({"y"}), context);
-                    y = std::get<int>(context->returnVariant);
-                    context->returnVariant = std::monostate{};
-                }
-                else
-                {
-                    Turtle* point = static_cast<Turtle*>(var);
-                    point->getSomeVal(std::vector<std::string>({"pos", "x"}), context);
-                    x = std::get<int>(context->returnVariant);
-                    point->getSomeVal(std::vector<std::string>({"pos", "y"}), context);
-                    y = std::get<int>(context->returnVariant);
-                    context->returnVariant = std::monostate{};
-                }
-            }
-        }
+        y = std::get<int>(context->evaluateValues[1]);
+    }
+    else if (classAssignment->getExpressionsSize() == 2)
+    {
+        classAssignment->getExpression(1)->evaluate(context);
+        y = std::get<int>(context->evaluateValues[0]);
     }
 
-    if (!x)
-    {
-        x = y = resolveClassExpression(context, 0);
-
-        if (classAssignment->getExpressionsSize() == 2)
-        {
-            y = resolveClassExpression(context, 1);
-        }
-    }
 
     if (type == TokenType::Turtle)
         return createTurtle(context, x, y);
@@ -147,9 +117,6 @@ std::unique_ptr<Turtle> AST::VarDeclare::createTurtle(Context* context, std::opt
     turtle->type = type;
     if (x)
     {
-        if(!y)
-            y = *x;
-
         turtle->move(*x, *y);
     }
 
@@ -172,39 +139,3 @@ std::unique_ptr<Point> AST::VarDeclare::createPoint(std::optional<int> x, std::o
 
     return point;
 }
-
-int AST::VarDeclare::resolveClassExpression(Context* context, int index)
-{
-    AST::Expression* expression = classAssignment->getExpression(index);
-
-    if (!expression->isOnlyId(context))
-    {
-        return expression->evaluate(context);
-    }
-
-    std::vector<std::string> identifiers = classAssignment->getExpression(index)->getIdentifiers(context);
-
-    Variable* var = context->getVariable(identifiers[0]);
-    TokenType varType = var->type;
-
-    if (varType == TokenType::Point)
-    {
-        Point* point = static_cast<Point*>(var);
-        point->getSomeVal(std::vector<std::string>(identifiers.begin() + 1, identifiers.end()), context);
-
-        return std::get<int>(context->returnVariant);
-    }
-    else if (varType == TokenType::Turtle)
-    {
-        Turtle* point = static_cast<Turtle*>(var);
-        point->getSomeVal(std::vector<std::string>(identifiers.begin() + 1, identifiers.end()), context);
-        return std::get<int>(context->returnVariant);
-    }
-    else if (identifiers.size() == 1)
-    {
-        return expression->evaluate(context);
-    }
-
-    throw "cant resolve var class expression";
-}
-

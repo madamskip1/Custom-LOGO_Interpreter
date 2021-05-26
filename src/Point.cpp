@@ -27,18 +27,22 @@ Point::Point(int x, int y)
 
 void Point::getSomeVal(std::vector<std::string> identifiers, Context *context)
 {
-    if (identifiers.size() != 1)
-        throw "wrong level of identifier";
+    if (identifiers.size() == 0)
+    {
+        context->evaluateValues.push_back(x);
+        context->evaluateValues.push_back(y);
+        return;
+    }
 
     if (identifiers[0] == "x")
     {
-        context->returnVariant = x;
+        context->evaluateValues.push_back(x);;
         return;
     }
 
     if (identifiers[0] == "y")
     {
-        context->returnVariant = y;
+        context->evaluateValues.push_back(y);
         return;
     }
 

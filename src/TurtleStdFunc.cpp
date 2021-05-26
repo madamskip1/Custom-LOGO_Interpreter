@@ -10,3 +10,4 @@ void allToStart(Context* context)
 {
     context->getTurtleBoardPtr()->setAllToStart();
 }
+

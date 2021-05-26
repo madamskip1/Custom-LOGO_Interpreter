@@ -10,6 +10,11 @@ CONFIG += c++11
 
 INCLUDEPATH += $$PWD/include
 
+QMAKE_CXXFLAGS_WARN_OFF = -Wunused-parameter
+QMAKE_CXXFLAGS_WARN_OFF = -Wno-unused-parameter
+QMAKE_CXXFLAGS_WARN_OFF -= -Wunused-parameter
+QMAKE_CXXFLAGS_WARN_OFF -= -Wno-unused-parameter
+
 SOURCES += \
     AST/Assignable.cpp \
     AST/AssignmentStatement.cpp \

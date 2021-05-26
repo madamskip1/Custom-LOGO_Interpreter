@@ -38,8 +38,8 @@ public:
     int direction;
 
     void callFunction(std::vector<std::string> identifiers, Context* context);
-    void getSomeVal(std::vector<std::string> identifiers, Context* context);
-    void setSomeVal(std::vector<std::string> identifiers, Context *context);
+    virtual void getSomeVal(std::vector<std::string> identifiers, Context* context);
+    virtual void setSomeVal(std::vector<std::string> identifiers, Context *context);
 
 signals:
     void turtleMoved();

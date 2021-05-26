@@ -28,33 +28,33 @@ void Brush::getSomeVal(std::vector<std::string> identifiers, Context *context)
 {
     if (identifiers[0] == "size")
     {
-        context->returnVariant = size;
+        context->evaluateValues.push_back(size);
         return;
     }
     else if(identifiers[0] == "enabled")
     {
-        context->returnVariant = enabled;
+        context->evaluateValues.push_back(enabled);
     }
     else if (identifiers[0] == "color")
     {
-        if (identifiers[1] == "hex")
+        if (identifiers.size() == 1 || identifiers[1] == "hex")
         {
-            context->returnVariant = color;
+            context->evaluateValues.push_back(color);
             return;
         }
         if (identifiers[1] == "R")
         {
-            context->returnVariant = getColorR();
+            context->evaluateValues.push_back(getColorR());
             return;
         }
         else if (identifiers[1] == "G")
         {
-            context->returnVariant = getColorG();
+            context->evaluateValues.push_back(getColorG());
             return;
         }
         if (identifiers[1] == "R")
         {
-            context->returnVariant = getColorB();
+           context->evaluateValues.push_back(getColorB());
             return;
         }
     }

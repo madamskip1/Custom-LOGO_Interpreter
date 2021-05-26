@@ -8,7 +8,9 @@ AST::Number::Number(int value) : value(value)
 
 int AST::Number::evaluate(Context* context) const
 {
-    return (negativeOperator ? (value * -1) : value);
+    int val = (negativeOperator ? (value * -1) : value);
+    context->evaluateValues.push_back(val);
+    return val;
 }
 
 const int AST::Number::getValue() const
