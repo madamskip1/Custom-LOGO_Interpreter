@@ -5,10 +5,6 @@ AST::DefFuncStatement::DefFuncStatement() : Node(AST::NodeType::DefFuncStatement
 {
 }
 
-AST::DefFuncStatement::~DefFuncStatement()
-{
-    qDebug() << "DUPADEFF FUNC";
-}
 
 void AST::DefFuncStatement::executeFunction(Context* context)
 {

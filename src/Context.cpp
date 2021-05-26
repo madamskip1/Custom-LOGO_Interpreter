@@ -57,12 +57,23 @@ void Context::addDefFunction(AST::DefFuncStatement* defFunction)
 
 void Context::addVariable(std::unique_ptr<Variable> variable)
 {
+    if (args.find(variable->name) != args.cend())
+    {
+        throw "cant declare var with same name as parameter";
+    }
+
 	curScope->addVariable(std::move(variable));
 }
 
 Variable* Context::getVariable(std::string name)
 {
-	return curScope->getVariable(name);
+    Variable* var = curScope->getVariable(name);
+    if (var)
+        return var;
+
+    var = args[name];
+
+    return var;
 }
 
 

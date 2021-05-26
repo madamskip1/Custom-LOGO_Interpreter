@@ -26,7 +26,7 @@ public:
     void left(const int& angle);
     void right(const int& angle);
     void toStart();
-    void move(int x, int y);
+    void moveTo(int x, int y);
 
     void toggleVisible();
     void hide();

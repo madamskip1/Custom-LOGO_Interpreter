@@ -14,7 +14,7 @@ class Context
 public:
     std::variant<std::monostate, int, std::string, bool, Variable*> setVariant;
     std::vector<std::variant<std::monostate, int, std::string, bool, Variable*>> evaluateValues;
-    std::vector<AST::Node*> args;
+    std::map<std::string, Variable*> args;
     std::variant<std::monostate, int, std::string, bool> returnVariant;
 	TokenType returnType = TokenType::UNKNOWN;
 

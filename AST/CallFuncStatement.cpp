@@ -8,7 +8,7 @@ AST::CallFuncStatement::CallFuncStatement()
 
 void AST::CallFuncStatement::execute(Context* context)
 {
-    //std::size_t argumentsSize = arguments.size();
+    std::size_t argumentsSize = arguments.size();
 
     if (identifiers.size() == 1) 
     {
@@ -19,7 +19,49 @@ void AST::CallFuncStatement::execute(Context* context)
             if (getArgumentsSize() != defFunc->getParametersSize())
                 throw "wrong number of arguments";
 
+            std::variant<std::monostate, int, std::string, bool, Variable*> temp;
+            std::vector<std::unique_ptr<Variable>> tempVars;
+            std::unique_ptr<Variable> tempVar;
+            std::vector<std::string> identifiers;
+
             Context newContext;
+            bool argAdded;
+            for (std::size_t i = 0; i < argumentsSize; i++)
+            {
+                argAdded = false;
+                auto& arg = arguments[i];
+                Parameter* param = defFunc->getParameter(i);
+
+                if (arg->isOnlyId())
+                {
+                    identifiers = arg->getIdentifiers();
+                    if (identifiers.size() == 1)
+                    {
+                        Variable* var = context->getVariable(identifiers[0]);
+                        if (var->type != param->getType())
+                        {
+                           throw "args type isn't equal to param type";
+                        }
+                        newContext.args.emplace(param->getName(), context->getVariable(identifiers[0]));
+                        argAdded = true;
+                    }
+                }
+
+                if (!argAdded)
+                {
+                    arg->evaluate(context);
+                    qDebug() << "Val";
+                    if (context->evaluateValues[0].index() == 1)
+                    {
+                        qDebug() << std::get<int>(context->evaluateValues[0]);
+                    }
+                    tempVar = std::make_unique<Variable>();
+                    tempVar->value = context->evaluateValues[0];
+                    newContext.args.emplace(param->getName(), tempVar.get());
+                    tempVars.push_back(std::move(tempVar));
+                }
+            }
+
             // Przes³aæ w nim parametry
             newContext.setDrawingBoard(context->getDrawingBoardPtr());
             newContext.setTurtleBoard(context->getTurtleBoardPtr());
@@ -33,14 +75,29 @@ void AST::CallFuncStatement::execute(Context* context)
     }
     else if (identifiers.size() > 1)
     {
+        std::vector<std::unique_ptr<Variable>> tempVars;
+
         Variable* firstIdVar = context->getVariable(identifiers[0]);
         if (firstIdVar->type == TokenType::Turtle)
         {
             Turtle* turtle = static_cast<Turtle*>(firstIdVar);
             Context* newContext = new Context();
+
+            std::vector<std::unique_ptr<Variable>> tempVars;
+            std::unique_ptr<Variable> tempVar;
+
+            int i = 0;
             for (auto& arg : arguments)
             {
-                newContext->args.push_back(arg.get());
+                arg->evaluate(context);
+                for (std::size_t j = 0; j < context->evaluateValues.size(); j++)
+                {
+                    tempVar = std::make_unique<Variable>();
+                    tempVar->value = context->evaluateValues[j];
+                    newContext->args.emplace(std::string("arg").append(std::to_string(i)), tempVar.get());
+                    tempVars.push_back(std::move(tempVar));
+                    i++;
+                }
             }
             turtle->callFunction(std::vector<std::string>(identifiers.begin() +1, identifiers.end()), newContext);
         }

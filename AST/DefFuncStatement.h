@@ -15,8 +15,8 @@ namespace AST
 	{
 	public:
 		DefFuncStatement();
-        ~DefFuncStatement();
-		void executeFunction(Context* context);
+
+        void executeFunction(Context* context);
 
 		const void setName(const std::string name);
 		const void setInstructionsBlock(std::unique_ptr<AST::InstructionsBlock> block);

@@ -10,6 +10,7 @@ Turtle::Turtle(DrawingBoard* drawingBoardPtr)
 {
     toStart();
     board = drawingBoardPtr;
+
 }
 
 Turtle::~Turtle()
@@ -55,7 +56,7 @@ void Turtle::toStart()
     emit turtleMoved();
 }
 
-void Turtle::move(int x, int y)
+void Turtle::moveTo(int x, int y)
 {
     position.x = x;
     position.y = y;
@@ -96,13 +97,12 @@ void Turtle::callFunction(std::vector<std::string> identifiers, Context *context
 {
     if (identifiers[0] == "go")
     {
-        AST::Expression* distanceToGo = static_cast<AST::Expression*>(context->args[0]);
-        go(distanceToGo->evaluate(context));
+        go(std::get<int>(context->args.at("arg0")->value));
+        return;
     }
     if (identifiers[0] == "left" || identifiers[0] == "right")
     {
-        AST::Expression* rotate = static_cast<AST::Expression*>(context->args[0]);
-        int angle = rotate->evaluate(context);
+        int angle = std::get<int>(context->args.at("arg0")->value);
         if (identifiers[0] == "right")
         {
             right(angle);
@@ -111,7 +111,21 @@ void Turtle::callFunction(std::vector<std::string> identifiers, Context *context
         {
             left(angle);
         }
+        return;
     }
+    else if (identifiers[0] == "moveTo")
+    {
+        qDebug() << "Dupa1";
+        int arg_x = std::get<int>(context->args.at("arg0")->value);
+        qDebug() << "Dupa2";
+        qDebug() << arg_x;
+        qDebug() << "Dupa3";
+        int arg_y = std::get<int>(context->args.at("arg1")->value);
+        qDebug() << "Dupa4";
+        qDebug() << arg_y;
+        moveTo(arg_x, arg_y);
+    }
+
 }
 
 void Turtle::getSomeVal(std::vector<std::string> identifiers, Context *context)

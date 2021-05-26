@@ -11,7 +11,7 @@ namespace AST
 	{
 	public:
         Parameter() = delete;
-        ~Parameter();
+
         Parameter(TokenType parameterType, std::string parameterName);
 
 		std::string getName() const;

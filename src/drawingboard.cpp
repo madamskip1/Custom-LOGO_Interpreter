@@ -35,5 +35,6 @@ void DrawingBoard::drawLine(const QPoint &start, const QPoint &end, const QColor
 void DrawingBoard::clean()
 {
     board = QPixmap(DrawingBoard::BOARD_WIDTH, DrawingBoard::BOARD_HEIGHT);
+    update();
 }
 

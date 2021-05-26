@@ -117,7 +117,7 @@ std::unique_ptr<Turtle> AST::VarDeclare::createTurtle(Context* context, std::opt
     turtle->type = type;
     if (x)
     {
-        turtle->move(*x, *y);
+        turtle->moveTo(*x, *y);
     }
 
     TurtleBoard* turtleBoard = context->getTurtleBoardPtr();
