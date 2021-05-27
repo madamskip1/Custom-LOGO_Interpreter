@@ -31,7 +31,7 @@ AST::VarDeclare::VarDeclare(TokenType type, std::string identifier, std::unique_
 
 void AST::VarDeclare::execute(Context* context)
 {
-    std::unique_ptr<Variable> var;
+    std::shared_ptr<Variable> var;
 
     var = executeClassDeclaration(context);
     if (var)
@@ -40,11 +40,11 @@ void AST::VarDeclare::execute(Context* context)
         return;
     }
 
-    var = std::make_unique<Variable>();
+    var = std::make_shared<Variable>();
     var->name = identifier;
     var->type = type;
 
-    context->addVariable(std::move(var));
+    context->addVariable(var);
 
     if (assignment)
     {
@@ -72,7 +72,7 @@ AST::AssignmentStatement* AST::VarDeclare::getAssignment() const
     return assignment.get();
 }
 
-std::unique_ptr<Variable> AST::VarDeclare::executeClassDeclaration(Context *context)
+std::shared_ptr<Variable> AST::VarDeclare::executeClassDeclaration(Context *context)
 {
     if (type != TokenType::Turtle && type != TokenType::Point)
         return nullptr;
@@ -123,9 +123,9 @@ std::unique_ptr<Variable> AST::VarDeclare::executeClassDeclaration(Context *cont
         return createPoint(x, y);
 }
 
-std::unique_ptr<Turtle> AST::VarDeclare::createTurtle(Context* context, std::optional<int> x, std::optional<int> y)
+std::shared_ptr<Turtle> AST::VarDeclare::createTurtle(Context* context, std::optional<int> x, std::optional<int> y)
 {
-    std::unique_ptr<Turtle> turtle = std::make_unique<Turtle>(context->getDrawingBoardPtr());
+    std::shared_ptr<Turtle> turtle = std::make_shared<Turtle>(context->getDrawingBoardPtr());
     turtle->name = identifier;
     turtle->type = type;
     if (x)
@@ -139,13 +139,13 @@ std::unique_ptr<Turtle> AST::VarDeclare::createTurtle(Context* context, std::opt
     return turtle;
 }
 
-std::unique_ptr<Point> AST::VarDeclare::createPoint(std::optional<int> x, std::optional<int> y)
+std::shared_ptr<Point> AST::VarDeclare::createPoint(std::optional<int> x, std::optional<int> y)
 {
-    std::unique_ptr<Point> point;
+    std::shared_ptr<Point> point;
     if (!x)
-        point = std::make_unique<Point>();
+        point = std::make_shared<Point>();
 
-    point = std::make_unique<Point>(*x, *y);
+    point = std::make_shared<Point>(*x, *y);
 
     point->name = identifier;
     point->type = type;

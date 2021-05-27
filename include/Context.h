@@ -34,10 +34,10 @@ public:
     AST::DefFuncStatement* getDefFunction(std::string name) const;
     std::function<void(Context*)> getStdLibFunction(std::string name) const;
 
-    void addVariable(std::unique_ptr<Variable> variable);
+    void addVariable(std::shared_ptr<Variable> variable);
     void removeVariable(std::string identifier);
-
     Variable* getVariable(std::string name);
+    std::vector<std::shared_ptr<Variable>> getAllCurrentVariables();
 
     bool hasFunction(std::string name) const;
     bool hasStdLibFunction(std::string name) const;

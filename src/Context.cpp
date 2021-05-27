@@ -55,20 +55,18 @@ void Context::addDefFunction(AST::DefFuncStatement* defFunction)
 	defFunctions[name] = defFunction;
 }
 
-void Context::addVariable(std::unique_ptr<Variable> variable)
+void Context::addVariable(std::shared_ptr<Variable> variable)
 {
     if (args.find(variable->name) != args.cend())
     {
         throw "cant declare var with same name as parameter";
     }
 
-    curScope->addVariable(std::move(variable));
+    curScope->addVariable(variable);
 }
 
 void Context::removeVariable(std::string identifier)
 {
-
-
     curScope->removeVariable(identifier);
 }
 
@@ -83,6 +81,10 @@ Variable* Context::getVariable(std::string name)
     return var;
 }
 
+std::vector<std::shared_ptr<Variable> > Context::getAllCurrentVariables()
+{
+    return curScope->getAllVariables();
+}
 
 AST::DefFuncStatement* Context::getDefFunction(std::string name) const
 {

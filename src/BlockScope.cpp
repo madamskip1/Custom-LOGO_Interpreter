@@ -21,14 +21,14 @@ BlockScope* BlockScope::getUpperScope() const
 }
 
 
-void BlockScope::addVariable(std::unique_ptr<Variable> var)
+void BlockScope::addVariable(std::shared_ptr<Variable> var)
 {
 	std::string identifier = var->name;
 	if (hasVariableInAnyScope(identifier))
 	{
 		throw "Variable already defined";
 	}
-    variables[identifier] = std::move(var);
+    variables[identifier] = var;
 }
 
 void BlockScope::removeVariable(std::string identifier)
@@ -76,5 +76,19 @@ Variable* BlockScope::getVariable(std::string name)
 		return upperScope->getVariable(name);
 	}
 
-	return nullptr;
+    return nullptr;
+}
+
+std::vector<std::shared_ptr<Variable>> BlockScope::getAllVariables()
+{
+    std::vector<std::shared_ptr<Variable>> toReturn;
+    if (upperScope != nullptr)
+        toReturn = upperScope->getAllVariables();
+
+    for (const auto& variable : variables)
+    {
+        toReturn.push_back(variable.second);
+    }
+
+    return toReturn;
 }

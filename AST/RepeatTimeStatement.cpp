@@ -12,11 +12,11 @@ void runThread(std::unique_ptr<Context> context, std::unique_ptr<AST::Instructio
         std::this_thread::sleep_for(std::chrono::milliseconds(insidePeriod));
         for (int i = 0; i < insideHowManyTime; i++)
         {
+            std::this_thread::sleep_for(std::chrono::milliseconds(insidePeriod));
             insideBlock->execute(insideContext.get());
 
-            insideContext->getDrawingBoardPtr()->drawLine(QPoint(50, 50*i), QPoint(10, 50*i), Qt::blue, 80);
             insideContext->getDrawingBoardPtr()->updateBoard();
-            std::this_thread::sleep_for(std::chrono::milliseconds(insidePeriod));
+            insideContext->getTurtleBoardPtr()->updateBoard();
         }
     };
 
@@ -54,7 +54,11 @@ void AST::RepeatTimeStatement::execute(Context *context)
     std::unique_ptr<Context> newContext = std::make_unique<Context>();
     newContext->setDrawingBoard(context->getDrawingBoardPtr());
     newContext->setTurtleBoard(context->getTurtleBoardPtr());
-
+    std::vector<std::shared_ptr<Variable>> currentVariables = context->getAllCurrentVariables();
+    for (auto var : currentVariables)
+    {
+        newContext->addVariable(var);
+    }
     runThread(std::move(newContext), std::move(instructionsBlock), period, howManyTime);
 }
 

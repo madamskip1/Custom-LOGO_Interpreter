@@ -52,6 +52,7 @@ void TurtleBoard::removeTurtle(Turtle *turtle)
 void TurtleBoard::updateBoard()
 {
     redrawTurtles();
+    update();
 }
 
 void TurtleBoard::redrawTurtles()

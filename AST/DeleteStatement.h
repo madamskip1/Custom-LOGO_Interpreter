@@ -13,7 +13,7 @@ namespace AST
         DeleteStatement() = delete;
         DeleteStatement(std::string id);
 
-        virtual void execute(Context* context);
+        virtual void execute(Context* context) override;
 
     private:
         std::string identifier;

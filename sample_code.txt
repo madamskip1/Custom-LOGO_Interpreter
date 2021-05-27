@@ -188,5 +188,18 @@ testUseReturnedIntAsParameter(testReturnInt());
 Integer toDelete = 200;
 delete toDelete;
 
-Integer toDelete = 300;
+Integer toDelete = 450;
 Turtle zolwWithDeleteInt(toDelete, toDelete);
+zolwWithDeleteInt.go(111);
+delete zolwWithDeleteInt;
+
+Turtle zolwInRepeatTime(toDelete, toDelete);
+
+repeatTime(450, 6)
+{
+	zolwInRepeatTime.go(100);
+	zolwInRepeatTime.right(60);
+	Turtle new;
+	new.direction = 180;
+	new.go(20);
+}
