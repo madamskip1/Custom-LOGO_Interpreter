@@ -62,7 +62,14 @@ void Context::addVariable(std::unique_ptr<Variable> variable)
         throw "cant declare var with same name as parameter";
     }
 
-	curScope->addVariable(std::move(variable));
+    curScope->addVariable(std::move(variable));
+}
+
+void Context::removeVariable(std::string identifier)
+{
+
+
+    curScope->removeVariable(identifier);
 }
 
 Variable* Context::getVariable(std::string name)

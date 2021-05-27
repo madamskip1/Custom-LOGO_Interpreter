@@ -11,6 +11,7 @@ public:
     ~BlockScope();
 
     void addVariable(std::unique_ptr<Variable> var);
+    void removeVariable(std::string identifier);
 
     Variable* getVariable(std::string name);
     BlockScope* getUpperScope() const;

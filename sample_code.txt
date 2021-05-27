@@ -184,3 +184,9 @@ Integer intFromReturnValue = testReturnInt();
 Turtle zolw(intFromReturnValue, intFromReturnValue);
 
 testUseReturnedIntAsParameter(testReturnInt());
+
+Integer toDelete = 200;
+delete toDelete;
+
+Integer toDelete = 300;
+Turtle zolwWithDeleteInt(toDelete, toDelete);

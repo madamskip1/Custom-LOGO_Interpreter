@@ -72,6 +72,9 @@ std::unique_ptr<AST::Node> Parser::parseInstruction()
     if (node)
         return node;
 
+   node = parseDeleteStatement();
+   if (node)
+       return node;
 
     return nullptr;
 }
@@ -118,7 +121,7 @@ std::unique_ptr<AST::Node> Parser::parseIfStatement()
         return nullptr;
 
     /*
-        wyj¹tek w addError i hasta la vista
+        wyjï¿½tek w addError i hasta la vista
     */
     if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
         return nullptr;
@@ -685,6 +688,21 @@ std::unique_ptr<AST::ReturnStatement> Parser::parseReturnStatement()
     consumeTokenIfType_Otherwise_AddLog(TokenType::Semicolon, LogType::MissingSemicolon);
 
     return returnStatement;
+}
+
+std::unique_ptr<AST::DeleteStatement> Parser::parseDeleteStatement()
+{
+    if (!consumeTokenIfType(TokenType::Delete))
+        return nullptr;
+
+    Token token = getToken();
+
+    if (!consumeTokenIfType_Otherwise_AddError(TokenType::Identifier, LogType::DeleteMissingIdentifier))
+        return nullptr;
+
+    consumeTokenIfType_Otherwise_AddLog(TokenType::Semicolon, LogType::MissingSemicolon);
+
+    return std::make_unique<AST::DeleteStatement>(token.getStringValue());
 }
 
 std::vector<std::string> Parser::parseIdentifiers()

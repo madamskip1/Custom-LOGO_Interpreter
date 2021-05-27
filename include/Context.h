@@ -31,9 +31,11 @@ public:
     TurtleBoard* getTurtleBoardPtr() const;
 
 	void addDefFunction(AST::DefFuncStatement* defFunction);
-	void addVariable(std::unique_ptr<Variable> variable);
     AST::DefFuncStatement* getDefFunction(std::string name) const;
     std::function<void(Context*)> getStdLibFunction(std::string name) const;
+
+    void addVariable(std::unique_ptr<Variable> variable);
+    void removeVariable(std::string identifier);
 
     Variable* getVariable(std::string name);
 

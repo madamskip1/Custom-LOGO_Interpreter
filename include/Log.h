@@ -22,7 +22,8 @@ enum class LogType
 	NotEndOfFile,
 	BadReturnStatement,
 	UnknownAssignable,
-	BadCondition
+    BadCondition,
+    DeleteMissingIdentifier
 };
 
 class Log
@@ -66,6 +67,7 @@ private:
 		{ LogType::NotEndOfFile, "Nie udalo sie przetworzyc do konca." },
 		{ LogType::BadReturnStatement, "Blad skladniowy w klauzyli Return" },
 		{ LogType::UnknownAssignable, "Nie rozpoznanu rodzaju przypisania wartosci" },
-		{ LogType::BadCondition, "Zle wyrazenie warunkowe" }
+        { LogType::BadCondition, "Zle wyrazenie warunkowe" },
+        { LogType::DeleteMissingIdentifier, "Brakuje identyfikatora przy delete" }
 	};
 };

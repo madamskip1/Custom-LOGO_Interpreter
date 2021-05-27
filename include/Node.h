@@ -31,7 +31,8 @@ namespace AST
 		Boolean,
 		Variable,
 		Color,
-		ReturnStatement
+        ReturnStatement,
+        DeleteStatement
 	};
 
 	class Node

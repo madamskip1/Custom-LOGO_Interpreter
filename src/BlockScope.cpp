@@ -28,7 +28,22 @@ void BlockScope::addVariable(std::unique_ptr<Variable> var)
 	{
 		throw "Variable already defined";
 	}
-	variables[identifier] = std::move(var);
+    variables[identifier] = std::move(var);
+}
+
+void BlockScope::removeVariable(std::string identifier)
+{
+    if (hasVariableInThisScope(identifier))
+    {
+        variables[identifier].reset();
+        variables.erase(identifier);
+        return;
+    }
+
+    if (upperScope == nullptr)
+        throw "Var wasn't declared, cant delete";
+
+    upperScope->removeVariable(identifier);
 }
 
 bool BlockScope::hasVariableInThisScope(std::string name)

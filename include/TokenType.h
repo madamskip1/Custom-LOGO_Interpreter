@@ -107,4 +107,5 @@ static const std::unordered_map<std::string, TokenType> KeywordToTokenType =
 	{ "Boolean", TokenType::Boolean },
 	{ "true", TokenType::True },
 	{ "false", TokenType::False },
+    { "delete", TokenType::Delete }
 };

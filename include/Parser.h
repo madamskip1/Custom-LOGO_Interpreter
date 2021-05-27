@@ -18,6 +18,7 @@
 #include "../AST/AssignmentStatement.h"
 #include "../AST/ClassAssignment.h"
 #include "../AST/ReturnStatement.h"
+#include "../AST/DeleteStatement.h"
 
 
 class Parser
@@ -62,6 +63,7 @@ private:
 	std::unique_ptr<AST::Node> parseRelationCondition();
 
 	std::unique_ptr<AST::ReturnStatement> parseReturnStatement();
+    std::unique_ptr<AST::DeleteStatement> parseDeleteStatement();
 
 	std::vector<std::string> parseIdentifiers();
 

@@ -24,6 +24,7 @@ SOURCES += \
     AST/Color.cpp \
     AST/Condition.cpp \
     AST/DefFuncStatement.cpp \
+    AST/DeleteStatement.cpp \
     AST/Expression.cpp \
     AST/IfStatement.cpp \
     AST/InstructionsBlock.cpp \
@@ -73,6 +74,7 @@ HEADERS += \
     AST/Color.h \
     AST/Condition.h \
     AST/DefFuncStatement.h \
+    AST/DeleteStatement.h \
     AST/Expression.h \
     AST/IfStatement.h \
     AST/InstructionsBlock.h \
@@ -85,6 +87,7 @@ HEADERS += \
     AST/ReturnStatement.h \
     AST/VarDeclare.h \
     AST/VariableExpression.h \
+    deletestatement.h \
     include/BlockScope.h \
     include/Brush.h \
     include/Context.h \
