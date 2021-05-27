@@ -26,29 +26,6 @@ TEST_CASE("String as source", "[stringReader]")
 	REQUIRE(reader.isEof() == false);
 }
 
-
-TEST_CASE("File as source", "[fileReader]")
-{
-	SourceReader reader;
-	reader.setSourceFile("fileReader_TestFile.txt");
-
-	// getCharacter TEST
-	REQUIRE(reader.getCharacter() == 'T');
-	REQUIRE(reader.getCharNumber() == 1);
-	REQUIRE(reader.getLineNumber() == 1);
-	REQUIRE(reader.isEof() == false);
-
-	// getNextCharacter TEST
-	REQUIRE(reader.getNextCharacter() == 'e');
-	REQUIRE(reader.getCharNumber() == 1);
-	REQUIRE(reader.getLineNumber() == 1);
-	REQUIRE(reader.isEof() == false);
-	REQUIRE(reader.getCharacter() == 'e');
-	REQUIRE(reader.getCharNumber() == 2);
-	REQUIRE(reader.getLineNumber() == 1);
-	REQUIRE(reader.isEof() == false);
-}
-
 TEST_CASE("End of line", "[endOfLine]")
 {
 	SourceReader reader;

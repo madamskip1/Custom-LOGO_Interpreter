@@ -1,18 +1,19 @@
 #include "SourceReader.h"
 #include "Lexer.h"
 #include "Parser.h"
-#include "IfStatement.h"
-#include "RepeatStatement.h"
-#include "RepeatTimeStatement.h"
-#include "Expression.h"
-#include "Condition.h"
-#include "Number.h"
-#include "Boolean.h"
-#include "DefFuncStatement.h"
-#include "CallFuncStatement.h"
-#include "AssignmentStatement.h"
-#include "VariableAST.h"
-#include "Color.h"
+#include "Context.h"
+#include "../AST/IfStatement.h"
+#include "../AST/RepeatStatement.h"
+#include "../AST/RepeatTimeStatement.h"
+#include "../AST/Expression.h"
+#include "../AST/Condition.h"
+#include "../AST/Number.h"
+#include "../AST/Boolean.h"
+#include "../AST/DefFuncStatement.h"
+#include "../AST/CallFuncStatement.h"
+#include "../AST/AssignmentStatement.h"
+#include "../AST/VariableExpression.h"
+#include "../AST/Color.h"
 
 #pragma warning(push, 0)        
 #include "catch.hpp"
@@ -33,6 +34,7 @@ TEST_CASE("IFStatement", "[parser]")
 	Lexer lexer(reader);
 	Logger logger;
 	Parser parser(lexer, logger);
+    Context context;
 
 	SECTION("without else")
 	{
@@ -62,7 +64,9 @@ TEST_CASE("IFStatement", "[parser]")
 		REQUIRE(trueBlock->getNodeType() == AST::NodeType::InstructionsBlock);
 		REQUIRE(!ifStatement->hasElseBlock());
 
-		REQUIRE(condition->evaluate() == true);
+        condition->evaluate(&context);
+        REQUIRE(context.evaluateValue.index() == 3);
+        REQUIRE(std::get<bool>(context.evaluateValue));
 	}
 
 	SECTION("with else")
@@ -95,7 +99,8 @@ TEST_CASE("IFStatement", "[parser]")
 		AST::InstructionsBlock* elseBlock = ifStatement->getElseBlockNode();
 		REQUIRE(trueBlock->getNodeType() == AST::NodeType::InstructionsBlock);
 
-		REQUIRE(condition->evaluate() == true);
+        condition->evaluate(&context);
+        REQUIRE(std::get<bool>(context.evaluateValue) == true);
 	}
 }
 
@@ -107,6 +112,8 @@ TEST_CASE("RepeatStatement", "[parser]")
 	Lexer lexer(reader);
 	Logger logger;
 	Parser parser(lexer, logger);
+    Context context;
+
 
 	reader.setSourceString("repeat(50) {}");
 
@@ -128,7 +135,8 @@ TEST_CASE("RepeatStatement", "[parser]")
 	AST::InstructionsBlock* instructionsBlock = repeatStatement->getInstructuionsBlock();
 	REQUIRE(instructionsBlock->getNodeType() == AST::NodeType::InstructionsBlock);
 
-	REQUIRE(expression->evaluate() == 50);
+    expression->evaluate(&context);
+    REQUIRE(std::get<int>(context.evaluateValue) == 50);
 }
 
 TEST_CASE("RepeatTimeStatement", "[parser]")
@@ -137,6 +145,7 @@ TEST_CASE("RepeatTimeStatement", "[parser]")
 	Lexer lexer(reader);
 	Logger logger;
 	Parser parser(lexer, logger);
+    Context context;
 
 	SECTION("only period")
 	{
@@ -159,7 +168,8 @@ TEST_CASE("RepeatTimeStatement", "[parser]")
 		AST::InstructionsBlock* instructionsBlock = repeatTimeStatement->getInstructuionsBlock();
 		REQUIRE(instructionsBlock->getNodeType() == AST::NodeType::InstructionsBlock);
 
-		REQUIRE(expression->evaluate() == 22);
+        expression->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == 22);
 	}
 
 	SECTION("period and how many time")
@@ -181,7 +191,9 @@ TEST_CASE("RepeatTimeStatement", "[parser]")
 		REQUIRE(number->getValue() == 22);
 		REQUIRE(!number->getNegativeOperator());
 
-		REQUIRE(expression->evaluate() == 22);
+
+        expression->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == 22);
 
 		expression = repeatTimeStatement->getHowManyTime();
 		REQUIRE(expression->getChildrenExpressionSize() == 1);
@@ -195,7 +207,8 @@ TEST_CASE("RepeatTimeStatement", "[parser]")
 		AST::InstructionsBlock* instructionsBlock = repeatTimeStatement->getInstructuionsBlock();
 		REQUIRE(instructionsBlock->getNodeType() == AST::NodeType::InstructionsBlock);
 
-		REQUIRE(expression->evaluate() == 50);
+        expression->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == 50);
 	}
 }
 
@@ -206,6 +219,7 @@ TEST_CASE("Expressions", "[parser]")
 	Lexer lexer(reader);
 	Logger logger;
 	Parser parser(lexer, logger);
+    Context context;
 
 	SECTION("Simple expression - just digit (zero)")
 	{
@@ -224,7 +238,8 @@ TEST_CASE("Expressions", "[parser]")
 		REQUIRE(number->getValue() == 0);
 		REQUIRE(!number->getNegativeOperator());
 
-		REQUIRE(expression->evaluate() == 0);
+        expression->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == 0);
 
 	}
 	
@@ -245,7 +260,8 @@ TEST_CASE("Expressions", "[parser]")
 		REQUIRE(number->getValue() == 95);
 		REQUIRE(number->getNegativeOperator());
 
-		REQUIRE(expression->evaluate() == -95);
+        expression->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == -95);
 	}
 
 	SECTION("math operation (+, -, *, /) without bracket")
@@ -308,8 +324,8 @@ TEST_CASE("Expressions", "[parser]")
 		REQUIRE(number->getValue() == 20);
 		REQUIRE(!number->getNegativeOperator());
 
-
-		REQUIRE(expression->evaluate() == -102);
+        expression->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == -102);
 	}
 
 	SECTION("expression with brackets")
@@ -351,7 +367,8 @@ TEST_CASE("Expressions", "[parser]")
 		REQUIRE(number->getValue() == 2);
 		REQUIRE(number->getNegativeOperator());
 
-		REQUIRE(expression->evaluate() == 3);
+        expression->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == 3);
 	}
 
 	SECTION("expression fun call")
@@ -412,6 +429,8 @@ TEST_CASE("Conditions", "[parser]")
 	Lexer lexer(reader);
 	Logger logger;
 	Parser parser(lexer, logger);
+    Context context;
+
 
 	SECTION("simple condition - boolean word")
 	{
@@ -440,11 +459,9 @@ TEST_CASE("Conditions", "[parser]")
 		AST::Boolean* boolean = dynamic_cast<AST::Boolean*>(booleanCondition->getLeftCondition());
 		REQUIRE(boolean->getValue());
 
-
-		REQUIRE(condition->evaluate() == true);
+        condition->evaluate(&context);
+        REQUIRE(std::get<bool>(context.evaluateValue) == true);
 	}
-
-
 
 	SECTION("simple relation Operator")
 	{
@@ -486,7 +503,8 @@ TEST_CASE("Conditions", "[parser]")
 		REQUIRE(number->getValue() == 3);
 		REQUIRE(number->getNegativeOperator());
 
-		REQUIRE(condition->evaluate() == false);
+        condition->evaluate(&context);
+        REQUIRE(std::get<bool>(context.evaluateValue) == false);
 	}
 
 	SECTION("AND and OR operators, not ")
@@ -516,7 +534,7 @@ TEST_CASE("Conditions", "[parser]")
 		REQUIRE(booleanCondition->getNotOperator());
 		REQUIRE(booleanCondition->getLeftCondition()->getNodeType() == AST::NodeType::Boolean);
 		AST::Boolean* boolean = dynamic_cast<AST::Boolean*>(booleanCondition->getLeftCondition());
-	//	REQUIRE(boolean->getValue());
+        REQUIRE(boolean->getValue());
 		
 		booleanCondition = dynamic_cast<AST::Condition*>(andCondition->getRightCondition());
 		REQUIRE(booleanCondition->getLeftCondition() != nullptr);
@@ -524,7 +542,7 @@ TEST_CASE("Conditions", "[parser]")
 		REQUIRE(!booleanCondition->getNotOperator());
 		REQUIRE(booleanCondition->getLeftCondition()->getNodeType() == AST::NodeType::Boolean);
 		boolean = dynamic_cast<AST::Boolean*>(booleanCondition->getLeftCondition());
-	//	REQUIRE(!boolean->getValue());
+        REQUIRE(!boolean->getValue());
 		
 		andCondition = dynamic_cast<AST::Condition*>(condition->getRightCondition());
 		REQUIRE(andCondition->getLeftCondition() != nullptr);
@@ -536,10 +554,9 @@ TEST_CASE("Conditions", "[parser]")
 		REQUIRE(booleanCondition->getRightCondition() == nullptr);
 		REQUIRE(!booleanCondition->getNotOperator());
 		REQUIRE(booleanCondition->getLeftCondition()->getNodeType() == AST::NodeType::Boolean);
-		boolean = dynamic_cast<AST::Boolean*>(andCondition->getLeftCondition());
-	//	REQUIRE(boolean->getValue());
 
-		REQUIRE(condition->evaluate() == true);
+        condition->evaluate(&context);
+        REQUIRE(std::get<bool>(context.evaluateValue) == true);
 	}
 
 	SECTION("Brackets")
@@ -642,6 +659,7 @@ TEST_CASE("def function", "[parser]")
 	Lexer lexer(reader);
 	Logger logger;
 	Parser parser(lexer, logger);
+    Context context;
 
 	SECTION("simple function, without parameters, without return type")
 	{
@@ -761,6 +779,7 @@ TEST_CASE("call function", "[parser]")
 	Lexer lexer(reader);
 	Logger logger;
 	Parser parser(lexer, logger);
+    Context context;
 
 	SECTION("simple call function")
 	{
@@ -800,7 +819,8 @@ TEST_CASE("call function", "[parser]")
 		REQUIRE(expressionFactor->getValue() == 153);
 		REQUIRE(!expressionFactor->getNegativeOperator());
 
-		REQUIRE(expression->evaluate() == 153);
+        expression->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == 153);
 	}
 
 	SECTION("call function with more arguments")
@@ -828,7 +848,8 @@ TEST_CASE("call function", "[parser]")
 		REQUIRE(argNumber->getValue() == 160);
 		REQUIRE(!argNumber->getNegativeOperator());
 
-		REQUIRE(arg->evaluate() == 160);
+        arg->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == 160);
 
 		arg = callFunc->getArgument(1);
 		REQUIRE(arg->getChildrenExpressionSize() == 1);
@@ -838,7 +859,8 @@ TEST_CASE("call function", "[parser]")
 		REQUIRE(argNumber->getValue() == 20);
 		REQUIRE(argNumber->getNegativeOperator());
 
-		REQUIRE(arg->evaluate() == -20);
+        arg->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == -20);
 
 		arg = callFunc->getArgument(2);
 		REQUIRE(arg->getChildrenExpressionSize() == 1);
@@ -848,7 +870,8 @@ TEST_CASE("call function", "[parser]")
 		REQUIRE(argNumber->getValue() == 10);
 		REQUIRE(!argNumber->getNegativeOperator());
 
-		REQUIRE(arg->evaluate() == 10);
+        arg->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == 10);
 	}
 
 	SECTION("call function multi level ID")
@@ -894,7 +917,8 @@ TEST_CASE("call function", "[parser]")
 		REQUIRE(argNumber->getValue() == 1);
 		REQUIRE(!argNumber->getNegativeOperator());
 
-		REQUIRE(arg->evaluate() == 1);
+        arg->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == 1);
 
 		arg = callFunc->getArgument(1);
 		REQUIRE(arg->getChildrenExpressionSize() == 1);
@@ -904,7 +928,8 @@ TEST_CASE("call function", "[parser]")
 		REQUIRE(argNumber->getValue() == 2);
 		REQUIRE(argNumber->getNegativeOperator());
 
-		REQUIRE(arg->evaluate() == -2);
+        arg->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == -2);
 
 		arg = callFunc->getArgument(2);
 		REQUIRE(arg->getChildrenExpressionSize() == 1);
@@ -914,7 +939,8 @@ TEST_CASE("call function", "[parser]")
 		REQUIRE(argNumber->getValue() == 3);
 		REQUIRE(!argNumber->getNegativeOperator());
 
-		REQUIRE(arg->evaluate() == 3);
+        arg->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == 3);
 	}
 }
 
@@ -925,6 +951,7 @@ TEST_CASE("Var declartion", "[parser]")
 	Lexer lexer(reader);
 	Logger logger;
 	Parser parser(lexer, logger);
+    Context context;
 
 	SECTION("simple declare var")
 	{
@@ -960,7 +987,8 @@ TEST_CASE("Var declartion", "[parser]")
 
 		AST::Expression* expression = dynamic_cast<AST::Expression*>(assignmentStatement->getAssign());
 
-		REQUIRE(expression->evaluate() == 4);
+        expression->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == 4);
 	}
 }
 
@@ -970,6 +998,7 @@ TEST_CASE("assign", "[parser]")
 	Lexer lexer(reader);
 	Logger logger;
 	Parser parser(lexer, logger);
+    Context context;
 
 	SECTION("simple assign")
 	{
@@ -984,7 +1013,9 @@ TEST_CASE("assign", "[parser]")
 		REQUIRE(assignmentStatement->getAssign()->getNodeType() == AST::NodeType::Expression);
 
 		AST::Expression* expression = dynamic_cast<AST::Expression*>(assignmentStatement->getAssign());
-		REQUIRE(expression->evaluate() == -20);
+
+        expression->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == -20);
 	}
 
 	SECTION("multi level id assign and calc Func")
@@ -1051,6 +1082,7 @@ TEST_CASE("declare class-type", "[parser]")
 	Lexer lexer(reader);
 	Logger logger;
 	Parser parser(lexer, logger);
+    Context context;
 
 	SECTION("simple declare")
 	{
@@ -1107,7 +1139,8 @@ TEST_CASE("declare class-type", "[parser]")
 		REQUIRE(expressionFactor->getValue() == 20);
 		REQUIRE(!expressionFactor->getNegativeOperator());
 
-		REQUIRE(expression->evaluate() == 20);
+        expression->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == 20);
 
 		node = rootNode->getChild(1);
 		REQUIRE(node->getNodeType() == AST::NodeType::VarDeclare);
@@ -1131,7 +1164,8 @@ TEST_CASE("declare class-type", "[parser]")
 		REQUIRE(expressionFactor->getValue() == 10);
 		REQUIRE(expressionFactor->getNegativeOperator());
 
-		REQUIRE(expression->evaluate() == -10);
+        expression->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == -10);
 	}
 
 	SECTION("declare with multi args")
@@ -1165,7 +1199,8 @@ TEST_CASE("declare class-type", "[parser]")
 		REQUIRE(expressionFactor->getValue() == 20);
 		REQUIRE(!expressionFactor->getNegativeOperator());
 
-		REQUIRE(expression->evaluate() == 20);
+        expression->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == 20);
 
 		REQUIRE(classAssign->getExpression(1)->getNodeType() == AST::NodeType::Expression);
 		expression = classAssign->getExpression(1);
@@ -1177,7 +1212,8 @@ TEST_CASE("declare class-type", "[parser]")
 		REQUIRE(expressionFactor->getValue() == 10);
 		REQUIRE(!expressionFactor->getNegativeOperator());
 
-		REQUIRE(expression->evaluate() == 10);
+        expression->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == 10);
 
 		REQUIRE(classAssign->getExpression(2)->getNodeType() == AST::NodeType::Expression);
 
@@ -1190,8 +1226,8 @@ TEST_CASE("declare class-type", "[parser]")
 		REQUIRE(expressionFactor->getValue() == 0);
 		REQUIRE(!expressionFactor->getNegativeOperator());
 
-		REQUIRE(expression->evaluate() == 0);
-
+        expression->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == 0);
 
 		node = rootNode->getChild(1);
 		REQUIRE(node->getNodeType() == AST::NodeType::VarDeclare);
@@ -1216,7 +1252,8 @@ TEST_CASE("declare class-type", "[parser]")
 		REQUIRE(expressionFactor->getValue() == 10);
 		REQUIRE(expressionFactor->getNegativeOperator());
 		
-		REQUIRE(expression->evaluate() == -10);
+        expression->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == -10);
 		
 		REQUIRE(classAssign->getExpression(1)->getNodeType() == AST::NodeType::Expression);
 		expression = classAssign->getExpression(1);
@@ -1228,7 +1265,8 @@ TEST_CASE("declare class-type", "[parser]")
 		REQUIRE(expressionFactor->getValue() == 20);
 		REQUIRE(expressionFactor->getNegativeOperator());
 
-		REQUIRE(expression->evaluate() == -20);
+        expression->evaluate(&context);
+        REQUIRE(std::get<int>(context.evaluateValue) == -20);
 	}
 }
 
@@ -1238,6 +1276,7 @@ TEST_CASE("color var decl")
 	Lexer lexer(reader);
 	Logger logger;
 	Parser parser(lexer, logger);
+    Context context;
 
 	SECTION("simple declare")
 	{
@@ -1284,6 +1323,7 @@ TEST_CASE("Block of instructions", "[parser]")
 	Lexer lexer(reader);
 	Logger logger;
 	Parser parser(lexer, logger);
+    Context context;
 
 	SECTION("empty block")
 	{
@@ -1362,6 +1402,7 @@ test5 = "#654321";
 	Lexer lexer(reader);
 	Logger logger;
 	Parser parser(lexer, logger);
+    Context context;
 
 	reader.setSourceString(code);
 
@@ -1375,7 +1416,9 @@ test5 = "#654321";
 
 	AST::RepeatStatement* repeat = dynamic_cast<AST::RepeatStatement*>(rootNode->getChild(0));
 	AST::Expression* period = dynamic_cast<AST::Expression*>(repeat->getHowManyTime());
-	REQUIRE(period->evaluate() == 10);
+
+    period->evaluate(&context);
+    REQUIRE(std::get<int>(context.evaluateValue) == 10);
 
 	AST::Node* block = repeat->getInstructuionsBlock();
 	REQUIRE(block->getChildrenSize() == 1);
@@ -1385,7 +1428,8 @@ test5 = "#654321";
 	REQUIRE(callFunc->getIdentifier(0) == "zolw1");
 	REQUIRE(callFunc->getIdentifier(1) == "go");
 	REQUIRE(callFunc->getArgumentsSize() == 1);
-	REQUIRE(callFunc->getArgument(0)->evaluate() == -30);
+    callFunc->getArgument(0)->evaluate(&context);
+    REQUIRE(std::get<int>(context.evaluateValue) == -30);
 
 
 
@@ -1433,7 +1477,8 @@ test5 = "#654321";
 	REQUIRE(callFunc->getIdentifier(0) == "zolw");
 	REQUIRE(callFunc->getIdentifier(1) == "go");
 	REQUIRE(callFunc->getArgumentsSize() == 1);
-	REQUIRE(callFunc->getArgument(0)->evaluate() == 0);
+    callFunc->getArgument(0)->evaluate(&context);
+    REQUIRE(std::get<int>(context.evaluateValue) == 0);
 
 	AST::Node* elseBlock = ifStatement->getElseBlockNode();
 	REQUIRE(elseBlock->getChildrenSize() == 1);
@@ -1447,10 +1492,9 @@ test5 = "#654321";
 
 	AST::AssignmentStatement* assignmentStatement = dynamic_cast<AST::AssignmentStatement*>(varDeclare->getAssignment());
 	expression = dynamic_cast<AST::Expression*>(assignmentStatement->getAssign());
-	REQUIRE(expression->evaluate() == 20);
 
-
-
+    expression->evaluate(&context);
+    REQUIRE(std::get<int>(context.evaluateValue) == 20);
 
 	REQUIRE(rootNode->getChild(2)->getNodeType() == AST::NodeType::VarDeclare);
 
@@ -1478,10 +1522,13 @@ test5 = "#654321";
 	REQUIRE(classAssign->getExpression(0)->getNodeType() == AST::NodeType::Expression);
 	REQUIRE(classAssign->getExpression(1)->getNodeType() == AST::NodeType::Expression);
 	expression = classAssign->getExpression(0);
-	REQUIRE(expression->evaluate() == 20);
-	expression = classAssign->getExpression(1);
-	REQUIRE(expression->evaluate() == 10);
 
+    expression->evaluate(&context);
+    REQUIRE(std::get<int>(context.evaluateValue) == 20);
+	expression = classAssign->getExpression(1);
+
+    expression->evaluate(&context);
+    REQUIRE(std::get<int>(context.evaluateValue) == 10);
 
 
 

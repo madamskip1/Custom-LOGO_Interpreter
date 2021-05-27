@@ -56,6 +56,11 @@ SOURCES += \
     src/drawingboard.cpp \
     src/turtle.cpp \
     src/turtleboard.cpp \
+    tests/Tests_Lexer.cpp \
+    tests/Tests_MainFile.cpp \
+    tests/Tests_Parser.cpp \
+    tests/Tests_ParserErrors.cpp \
+    tests/Tests_SourceReader.cpp
 
 FORMS += \
     mainwindow.ui
@@ -106,4 +111,5 @@ HEADERS += \
     include/drawingboard.h \
     include/turtle.h \
     include/turtleboard.h \
-    mainwindow.h
+    mainwindow.h \
+    tests/catch.hpp
