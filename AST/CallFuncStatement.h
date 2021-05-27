@@ -11,7 +11,7 @@ namespace AST
 	public:
 		CallFuncStatement();
 
-		virtual void execute(Context* context);
+        virtual void execute(Context* context) override;
 
 		const void addArgument(std::unique_ptr<Expression> arg);
 		const void addIdentifier(const std::string id);

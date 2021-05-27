@@ -19,7 +19,7 @@ namespace AST
 		VarDeclare(TokenType type, std::string identifier, std::unique_ptr<AST::AssignmentStatement> assignStatement);
 		VarDeclare(TokenType type, std::string identifier, std::unique_ptr<AST::ClassAssignment> classAssign);
 
-		virtual void execute(Context* context);
+        virtual void execute(Context* context) override;
 
 		TokenType getType() const;
 		std::string getIdentifier() const;

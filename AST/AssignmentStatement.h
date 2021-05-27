@@ -13,7 +13,7 @@ namespace AST
 		AssignmentStatement() = delete;
 		AssignmentStatement(std::vector<std::string> ids, std::unique_ptr<AST::Assignable> assignable);
 
-		void execute(Context* context);
+        void execute(Context* context) override;
 
 		std::string getIdentifier(int index = 0) const;
 		AST::Assignable* getAssign() const;

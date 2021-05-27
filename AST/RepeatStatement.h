@@ -14,7 +14,7 @@ namespace AST
 		RepeatStatement() = delete;
 		RepeatStatement(std::unique_ptr<AST::Expression> howManyTime, std::unique_ptr<AST::InstructionsBlock> block);
 
-		virtual void execute(Context* context);
+        virtual void execute(Context* context) override;
 
 		AST::Expression* getHowManyTime() const;
 		AST::InstructionsBlock* getInstructuionsBlock() const;

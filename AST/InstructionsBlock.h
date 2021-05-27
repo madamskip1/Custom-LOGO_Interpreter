@@ -11,7 +11,7 @@ namespace AST
 	{
 	public:
 		InstructionsBlock();
-		virtual void execute(Context* context);
+        virtual void execute(Context* context) override;
 	private:
 	};
 }

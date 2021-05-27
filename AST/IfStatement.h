@@ -14,7 +14,7 @@ namespace AST
 		IfStatement() = delete;
 		IfStatement(std::unique_ptr<AST::Node> condition, std::unique_ptr <AST::InstructionsBlock> trueBlock, std::unique_ptr <AST::InstructionsBlock> elseBlock = nullptr);
 
-		virtual void execute(Context* context);
+        virtual void execute(Context* context) override;
 
 		const bool hasElseBlock() const;
 		AST::InstructionsBlock* getTrueBlockNode() const;

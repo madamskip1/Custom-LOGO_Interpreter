@@ -12,9 +12,9 @@ namespace AST
 	{
 	public:
 		Expression();
-        virtual int evaluate(Context* context) const;
 
-        virtual bool isOnlyId() const;
+        virtual int evaluate(Context* context) const override;
+        virtual bool isOnlyId() const override;
         virtual std::vector<std::string> getIdentifiers() const;
 
 		const void addChildExpression(std::unique_ptr<AST::Expression> child);

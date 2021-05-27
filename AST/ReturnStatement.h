@@ -11,7 +11,7 @@ namespace AST
 		ReturnStatement();
 		ReturnStatement(std::unique_ptr<AST::Assignable> returnAssignable);
 
-		virtual void execute(Context* context);
+        virtual void execute(Context* context) override;
 
 		AST::Assignable* getReturn() const;
 

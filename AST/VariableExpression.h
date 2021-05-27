@@ -12,10 +12,10 @@ namespace AST
         VariableExpression() = delete;
         VariableExpression(std::vector<std::string> variableIdentifiers);
 
-        virtual int evaluate(Context* context) const;
+        virtual int evaluate(Context* context) const override;
 
-        virtual bool isOnlyId() const;
-        virtual std::vector<std::string> getIdentifiers() const;
+        virtual bool isOnlyId() const override;
+        virtual std::vector<std::string> getIdentifiers() const override;
 
         std::string getIdentifier(const int& index = 0) const;
 
