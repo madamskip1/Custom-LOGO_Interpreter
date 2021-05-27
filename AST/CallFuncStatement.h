@@ -25,5 +25,9 @@ namespace AST
 	private:
 		std::vector<std::unique_ptr<Expression>> arguments;
 		std::vector<std::string> identifiers;
+
+        bool executeStdLibFunc(Context* context);
+        bool executeDefinedFunc(Context* context);
+        void executeTurtleFunc(Context* context);
 	};
 }

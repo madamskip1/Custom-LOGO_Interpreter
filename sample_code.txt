@@ -1,0 +1,165 @@
+Boolean test = true;
+test = false;
+
+Integer test2 = 20;
+test2 = 30;
+
+Integer x = 200;
+Integer y = 220;
+Turtle zolw1(x,y);
+zolw1.brush.color = "#B03A2E";
+Turtle zolw11(x + 100, y+100);
+zolw11.brush.color = zolw1.brush.color;
+
+Point point1(300, 350);
+point1.x = 20;
+Turtle zolw2(point1);
+zolw2.brush.color = "#27AE60";
+Turtle zolw22(point1.x, point1.y + 40);
+zolw22.go(80);
+Boolean hide = true;
+zolw22.hidden = hide;
+Point point2(point1.x, 400);
+Turtle zolw3;
+Color colorZolw3 = "#17202A"
+zolw3.brush.size = 4;
+zolw3.brush.color = colorZolw3;
+
+zolw1.go(50);
+zolw2.right(90);
+zolw3.direction = 100;
+
+Turtle zolw4(100, 100);
+Turtle zolw5(zolw4.pos.x, 50);
+zolw5.right(50);
+
+Turtle zolwRepeatUnder(400, 400);
+Turtle zolwRepeat(zolwRepeatUnder.pos);
+
+zolwRepeatUnder.brush.color = "#5F6A6A";
+
+zolwRepeat.brush.size = 5;
+
+Integer doBrush = 1;
+Boolean doBrushFlag = true;
+
+repeat(4) {
+	if (doBrush == 1)
+	{
+		doBrushFlag = true;
+		doBrush = doBrush - 1;
+	}
+	else
+	{
+		doBrushFlag = false;
+		doBrush = doBrush + 1;
+	}
+
+	zolwRepeatUnder.right(90);
+	zolwRepeatUnder.go(40);
+
+	zolwRepeat.brush.enabled = doBrushFlag;
+	zolwRepeat.right(90);
+	zolwRepeat.go(40);
+	
+	
+	Turtle testinRepeat(20, 20);
+	testinRepeat.direction = 180;
+	testinRepeat.go(100);
+}
+
+
+Integer funcInt = 200;
+Boolean doBrushFunc = false;
+testFunc(x + 50, doBrushFunc);
+
+funcInt = 120;
+doBrushFunc = false;
+testFunc(funcInt + 20, doBrushFunc);
+
+funcInt = 70;
+doBrushFunc = true;
+testFunc(funcInt + 10, doBrushFunc);
+
+
+function testFunc(Integer testInt, Boolean doBrush) // first parse all func def
+{
+	Turtle zolw;
+	zolw.go(20);
+	zolw.brush.enabled = doBrush;
+	zolw.go(testInt);
+	zolw.brush.enabled = true;
+	zolw.right(90);
+	zolw.go(testInt);
+}
+
+Turtle zolwMoveTo;
+zolwMoveTo.brush.color = "#8E44AD";
+zolwMoveTo.left(90);
+zolwMoveTo.go(40);
+zolwMoveTo.moveTo(350, 500);
+zolwMoveTo.go(40);
+zolwMoveTo.moveTo(point1);
+zolwMoveTo.go(40);
+zolwMoveTo.moveTo(zolw1);
+zolwMoveTo.go(40);
+
+Point toAssignPoint(111, 222);
+Point testAssignPoint;
+testAssignPoint = toAssignPoint;
+Turtle turtlecos(testAssignPoint);
+turtlecos.go(100);
+turtlecos.brush = zolw3.brush;
+turtlecos.go(100);
+
+Turtle showPos(425, 411);
+showPos.right(34);
+Turtle showPosAssign;
+showPosAssign.pos = showPos.pos;
+showPosAssign.direction = showPos.direction;
+showPos.direction = 300;
+
+
+Color colorToAssign = "#D7BDE2";
+Color col = colorToAssign;
+Turtle turtle(20, 20);
+turtle.right(100);
+turtle.brush.color = col;
+turtle.go(200);
+
+function test(Turtle testTurtle)
+{
+	testTurtle.go(200);
+}
+
+Turtle testTurtle;
+testTurtle.go(20);
+testTurtle.right(20);
+test(testTurtle);
+
+function testFuncWithMathOp(Integer intTest)
+{
+	Turtle testTurtle;
+	testTurtle.go(intTest);
+}
+
+testFuncWithMathOp(2 * 2 + 2 - 2 * 30 / 2 - 10 + 300);
+
+Turtle toAssign1(100, 100);
+toAssign1.brush.color = "#FAD7A0";
+toAssign1.brush.size = 4;
+toAssign1.direction = 22;
+
+Turtle toAssign2;
+toAssign2 = toAssign1;
+toAssign2.go(80);
+    
+	
+
+repeatTime(1500, 8)
+{
+	Turtle zolwInRepeatTime;
+	zolwInRepeatTime.go(100);
+}	
+	
+	
