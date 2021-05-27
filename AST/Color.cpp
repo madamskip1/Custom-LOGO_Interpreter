@@ -6,7 +6,7 @@ AST::Color::Color(std::string color) : colorHex(color)
     nodeType = NodeType::Color;
 }
 
-void AST::Color::evaluate(Context* context) const
+void AST::Color::evaluate(Context* context)
 {
     context->evaluateValue = getColor();
 }

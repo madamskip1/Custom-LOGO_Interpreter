@@ -11,6 +11,9 @@ void AST::InstructionsBlock::execute(Context* context)
 
 	for (const auto& node : children)
 	{
+        if (context->returnVariant.index() != 0)
+            break;
+
 		node->execute(context);
 	}
 

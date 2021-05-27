@@ -14,9 +14,9 @@ class Context
 public:
     std::variant<std::monostate, int, std::string, bool, Variable*> setVariant;
     std::variant<std::monostate, int, std::string, bool, Variable*> evaluateValue;
-    std::variant<std::monostate, int, std::string, bool, Variable*> returnVariant;
     std::unordered_map<std::string, Variable*> args;
 
+    std::variant<std::monostate, int, std::string, bool, Variable*> returnVariant;
     TokenType returnType = TokenType::UNKNOWN;
 
 

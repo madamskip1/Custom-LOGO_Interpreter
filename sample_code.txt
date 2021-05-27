@@ -163,3 +163,24 @@ repeatTime(1500, 8)
 }	
 	
 	
+Integer function testReturnInt()
+{
+	Turtle zolw;
+	zolw.go(200);
+	return 100;
+	
+	Turtle zolw2;
+	zolw2.right(810);
+	zolw2.go(200);
+}
+
+function testUseReturnedIntAsParameter(Integer testInt)
+{
+	Turtle zolw(testInt * 4, testInt * 4);
+	zolw.go(testInt);
+}
+
+Integer intFromReturnValue = testReturnInt();
+Turtle zolw(intFromReturnValue, intFromReturnValue);
+
+testUseReturnedIntAsParameter(testReturnInt());

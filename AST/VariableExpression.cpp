@@ -8,7 +8,7 @@ AST::VariableExpression::VariableExpression(std::vector<std::string> variableIde
     identifiers = variableIdentifiers;
 }
 
-void AST::VariableExpression::evaluate(Context *context) const
+void AST::VariableExpression::evaluate(Context *context)
 {
     if (identifiers.size() == 1)
     {

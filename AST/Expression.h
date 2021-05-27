@@ -13,7 +13,7 @@ namespace AST
 	public:
 		Expression();
 
-        virtual void evaluate(Context* context) const override;
+        virtual void evaluate(Context* context) override;
         virtual bool isOnlyId() const override;
         virtual std::vector<std::string> getIdentifiers() const;
 

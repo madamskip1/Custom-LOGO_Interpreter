@@ -16,7 +16,7 @@ bool AST::Boolean::evaluate() const
 	return value;
 }
 
-void AST::Boolean::evaluate(Context* context) const
+void AST::Boolean::evaluate(Context* context)
 {
     context->evaluateValue = value;
 }

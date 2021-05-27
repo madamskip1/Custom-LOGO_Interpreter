@@ -8,8 +8,6 @@ AST::DefFuncStatement::DefFuncStatement() : Node(AST::NodeType::DefFuncStatement
 
 void AST::DefFuncStatement::executeFunction(Context* context)
 {
-    // TODO: set args to context
-
     instructionsBlock->execute(context);
 }
 

@@ -10,7 +10,7 @@ namespace AST
 	public:
 		Number(int value);
 
-        virtual void evaluate(Context* context) const override;
+        virtual void evaluate(Context* context) override;
 
 		const int getValue() const;
 	private:

@@ -24,6 +24,12 @@ void AST::CallFuncStatement::execute(Context* context)
     }
 }
 
+void AST::CallFuncStatement::evaluate(Context *context)
+{
+    execute(context);
+    context->evaluateValue = context->returnVariant;
+}
+
 const void AST::CallFuncStatement::addArgument(std::unique_ptr<AST::Expression> arg)
 {
     arguments.push_back(std::move(arg));
@@ -126,7 +132,7 @@ bool AST::CallFuncStatement::executeDefinedFunc(Context *context)
         newContext.setTurtleBoard(context->getTurtleBoardPtr());
         defFunc->executeFunction(&newContext);
         // TODO: set return value in context, return value from exec
-
+        context->returnVariant = newContext.returnVariant;
         return true;
     }
 

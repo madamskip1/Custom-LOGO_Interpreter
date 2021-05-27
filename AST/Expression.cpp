@@ -6,7 +6,7 @@ AST::Expression::Expression()
     nodeType = NodeType::Expression;
 }
 
-void AST::Expression::evaluate(Context* context) const
+void AST::Expression::evaluate(Context* context)
 {
     if (isOnlyId())
     {

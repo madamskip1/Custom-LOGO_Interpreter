@@ -6,7 +6,7 @@ AST::Number::Number(int value) : value(value)
     nodeType = AST::NodeType::Number;
 }
 
-void AST::Number::evaluate(Context* context) const
+void AST::Number::evaluate(Context* context)
 {
     int val = (negativeOperator ? (value * -1) : value);
     context->evaluateValue = val;

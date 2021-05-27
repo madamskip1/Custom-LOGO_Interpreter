@@ -8,7 +8,7 @@ namespace AST
 	{
 	public:
         virtual bool isOnlyId() const { return false; }
-        virtual void evaluate(Context*) const {};
+        virtual void evaluate(Context*) {};
 	};
 
 }
