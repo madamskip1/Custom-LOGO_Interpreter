@@ -35,8 +35,7 @@ void Point::getSomeVal(std::vector<std::string> identifiers, Context *context)
     {
         context->evaluateValue = this;
     }
-
-    if (identifiers[0] == "x")
+    else if (identifiers[0] == "x")
     {
         context->evaluateValue = x;
     }
