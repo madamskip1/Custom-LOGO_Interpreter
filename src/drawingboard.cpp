@@ -7,7 +7,7 @@
 
 DrawingBoard::DrawingBoard(QWidget *parent) : QWidget(parent)
 {
-    clean();
+    cleanBoard();
 }
 
 void DrawingBoard::paintEvent(QPaintEvent *event)
@@ -23,18 +23,23 @@ void DrawingBoard::paintEvent(QPaintEvent *event)
 }
 
 
-void DrawingBoard::drawLine(const QPoint &start, const QPoint &end, const QColor color, const int &penwidth)
+void DrawingBoard::drawLine(const QPoint &start, const QPoint &end, const QColor& color, const int &penwidth)
 {
     QPainter painter(&board);
     painter.setPen(QPen(color, penwidth));
     painter.drawLine(start, end);
     int rad = penwidth / 2 + 2;
-    update(QRect(start, end).normalized().adjusted(-rad, -rad, rad, rad));
+    //update(QRect(start, end).normalized().adjusted(-rad, -rad, rad, rad));
 }
 
-void DrawingBoard::clean()
+void DrawingBoard::cleanBoard()
 {
     board = QPixmap(DrawingBoard::BOARD_WIDTH, DrawingBoard::BOARD_HEIGHT);
+    update();
+}
+
+void DrawingBoard::updateBoard()
+{
     update();
 }
 

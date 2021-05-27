@@ -145,27 +145,26 @@ void Turtle::getSomeVal(std::vector<std::string> identifiers, Context *context)
     if (identifiers.size() == 0)
     {
         context->evaluateValue = this;
-        return;
     }
     else if (identifiers[0] == "pos")
     {
         position.getSomeVal(std::vector<std::string>(identifiers.begin() + 1, identifiers.end()), context);
-        return;
     }
     else if (identifiers[0] == "brush")
     {
         brush.getSomeVal(std::vector<std::string>(identifiers.begin() + 1, identifiers.end()), context);
-        return;
     }
     else if (identifiers[0] == "direction")
     {
         context->evaluateValue = direction;
-        return;
     }
     else if (identifiers[0] == "hidden")
     {
         context->evaluateValue = hidden;
-        return;
+    }
+    else
+    {
+        throw "identifier not recognized";
     }
 }
 
@@ -186,34 +185,32 @@ void Turtle::setSomeVal(std::vector<std::string> identifiers, Context *context)
         brush = turtle->brush;
         hidden = turtle->hidden;
         direction = turtle->direction;
-        return;
     }
-
-    if (identifiers[0] == "hidden")
+    else if (identifiers[0] == "hidden")
     {
         hidden = std::get<bool>(context->setVariant);
         context->setVariant = std::monostate{};
         emit turtleMoved();
-        return;
     }
     else if (identifiers[0] == "direction")
     {
         direction = std::get<int>(context->setVariant);
         context->setVariant = std::monostate{};
         emit turtleMoved();
-        return;
     }
     else if (identifiers[0] == "brush")
     {
         brush.setSomeVal(std::vector<std::string>(identifiers.begin() + 1, identifiers.end()), context);
         emit turtleMoved();
-        return;
     }
     else if (identifiers[0] == "pos")
     {
         position.setSomeVal(std::vector<std::string>(identifiers.begin() + 1, identifiers.end()), context);
         emit turtleMoved();
-        return;
+    }
+    else
+    {
+        throw "identifier not recognized";
     }
 }
 

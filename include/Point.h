@@ -17,8 +17,8 @@ public:
     int x;
     int y;
 
-    virtual void getSomeVal(std::vector<std::string> identifiers, Context* context);
-    virtual void setSomeVal(std::vector<std::string> identifiers, Context* context);
+    virtual void getSomeVal(std::vector<std::string> identifiers, Context* context) override;
+    virtual void setSomeVal(std::vector<std::string> identifiers, Context* context) override;
 };
 
 #endif // POINT_H

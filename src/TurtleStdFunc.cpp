@@ -3,7 +3,7 @@
 
 void clean(Context* context)
 {
-    context->getDrawingBoardPtr()->clean();
+    context->getDrawingBoardPtr()->cleanBoard();
 }
 
 void allToStart(Context* context)

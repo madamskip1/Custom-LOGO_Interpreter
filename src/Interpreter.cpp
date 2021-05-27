@@ -11,6 +11,7 @@ void Interpreter::run()
 	lookForDefFunctions();
 
 	std::size_t rootNodeChildrenSize = programNode->getChildrenSize();
+
     for (std::size_t i = 0; i < rootNodeChildrenSize; i++)
 	{
 		AST::Node* curNode = programNode->getChild(i);

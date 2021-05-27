@@ -29,40 +29,41 @@ void Brush::getSomeVal(std::vector<std::string> identifiers, Context *context)
     if (identifiers.size() == 0)
     {
         context->evaluateValue = this;
-        return;
     }
-    if (identifiers[0] == "size")
+    else if (identifiers[0] == "size")
     {
         context->evaluateValue = size;
-        return;
     }
-    if(identifiers[0] == "enabled")
+    else if(identifiers[0] == "enabled")
     {
         context->evaluateValue = enabled;
-        return;
     }
-    if (identifiers[0] == "color")
+    else if (identifiers[0] == "color")
     {
         if (identifiers.size() == 1 || identifiers[1] == "hex")
         {
             context->evaluateValue = color;
-            return;
         }
-        if (identifiers[1] == "R")
+        else if (identifiers[1] == "R")
         {
             context->evaluateValue = getColorR();
-            return;
         }
         else if (identifiers[1] == "G")
         {
             context->evaluateValue =getColorG();
-            return;
         }
-        if (identifiers[1] == "R")
+        else if (identifiers[1] == "R")
         {
            context->evaluateValue = getColorB();
-            return;
         }
+        else
+        {
+            throw "identifier not recognized";
+        }
+    }
+    else
+    {
+        throw "identifier not recognized";
     }
 }
 
@@ -79,25 +80,21 @@ void Brush::setSomeVal(std::vector<std::string> identifiers, Context *context)
         size = brush->getSize();
         enabled = brush->getEnabled();
         color = brush->getColor();
-        return;
     }
-    if (identifiers[0] == "color")
+    else if (identifiers[0] == "color")
     {
         color = std::get<std::string>(context->setVariant);
         context->setVariant = std::monostate{};
-        return;
     }
     else if (identifiers[0] == "size")
     {
         size = std::get<int>(context->setVariant);
         context->setVariant = std::monostate{};
-        return;
     }
     else if (identifiers[0] == "enabled")
     {
         enabled = std::get<bool>(context->setVariant);
         context->setVariant = std::monostate{};
-        return;
     }
 }
 

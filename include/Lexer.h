@@ -1,5 +1,5 @@
 #pragma once
-#include <map>
+#include <unordered_map>
 #include <string>
 #include "Token.h"
 #include "SourceReader.h"
@@ -28,5 +28,5 @@ private:
 
 	const bool isComment() const;
 
-	const static std::map<std::string, int> lexerConfig;
+    const static std::unordered_map<std::string, int> lexerConfig;
 };

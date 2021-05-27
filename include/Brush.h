@@ -18,8 +18,8 @@ class Brush
     std::string getColor() const;
     bool getEnabled() const;
 
-    virtual void getSomeVal(std::vector<std::string> identifiers, Context *context);
-    virtual void setSomeVal(std::vector<std::string> identifiers, Context* context);
+    virtual void getSomeVal(std::vector<std::string> identifiers, Context *context)  override;
+    virtual void setSomeVal(std::vector<std::string> identifiers, Context* context)  override;
 
 private:
     int size;

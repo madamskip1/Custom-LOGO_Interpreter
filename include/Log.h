@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <map>
+#include <unordered_map>
 #include "TokenType.h"
 
 enum class LogType
@@ -47,7 +47,7 @@ private:
 	
 	std::string lineAndPos_toString() const;
 
-	const std::map<LogType, std::string> LogTypeToMsg =
+    const std::unordered_map<LogType, std::string> LogTypeToMsg =
 	{
 		{ LogType::MissingElem, "NULL" },
 		{ LogType::MissingSemicolon, "Brakuje srednika" },

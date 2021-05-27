@@ -22,7 +22,7 @@ void TurtleBoard::drawTurtle(QPoint top, QPoint bottomLeft, QPoint bottomRight, 
     points[2] = bottomRight;
     painter.drawPolygon(points, 3);
 
-    update();
+   // update();
 }
 
 void TurtleBoard::setAllToStart()
@@ -35,7 +35,7 @@ void TurtleBoard::addTurtle(Turtle *turtle)
 {
     turtles.push_back(turtle);
     turtle->setTurtleBoard(this);
-    QObject::connect(turtle, &Turtle::turtleMoved, this, &TurtleBoard::redrawTurtles);
+   // QObject::connect(turtle, &Turtle::turtleMoved, this, &TurtleBoard::redrawTurtles);
     redrawTurtles();
 }
 
@@ -46,6 +46,11 @@ void TurtleBoard::removeTurtle(Turtle *turtle)
     {
         turtles.erase(iterator);
     }
+    redrawTurtles();
+}
+
+void TurtleBoard::updateBoard()
+{
     redrawTurtles();
 }
 

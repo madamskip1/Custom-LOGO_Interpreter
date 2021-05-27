@@ -3,13 +3,15 @@
 #include <string>
 #include <variant>
 
-class Token {
+class Token
+{
 public:
 	int getIntValue() const;
 	std::string getStringValue() const;
 	const bool isInvalidOrUnknown();
 
 	const bool isType(const TokenType& typeToCheck) const;
+
 
 
 	TokenType type = TokenType::UNKNOWN;

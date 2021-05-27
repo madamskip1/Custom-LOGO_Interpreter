@@ -1,7 +1,7 @@
 #include "Lexer.h"
 #include <iostream>
 
-const std::map<std::string, int> Lexer::lexerConfig =
+const std::unordered_map<std::string, int> Lexer::lexerConfig =
 {
 	{ "maxNumOfDigits", 9 }
 };
@@ -189,7 +189,7 @@ const bool Lexer::tryToMakeIDorKeywordOrDatatypes()
 		nextChar = source.getNextCharacter();
 	}
 
-	std::map<std::string, TokenType>::const_iterator keywordIterator = KeywordToTokenType.find(name);
+    std::unordered_map<std::string, TokenType>::const_iterator keywordIterator = KeywordToTokenType.find(name);
 
 	if (keywordIterator != KeywordToTokenType.end())
 	{
@@ -218,7 +218,7 @@ const bool Lexer::tryToMakeMathOperator()
 		return false;
 	}
 
-	std::map<char, TokenType>::const_iterator operatorType = MathOperatorsToTokenType.find(firstCharacter);
+    std::unordered_map<char, TokenType>::const_iterator operatorType = MathOperatorsToTokenType.find(firstCharacter);
 
 	curToken.type = std::get<1>(*operatorType);
 

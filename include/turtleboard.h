@@ -19,6 +19,8 @@ public:
     void addTurtle(Turtle* turtle);
     void removeTurtle(Turtle* turtle);
 
+    void updateBoard();
+
 public slots:
     void redrawTurtles();
 
@@ -27,7 +29,7 @@ private:
 
     QPixmap board;
     QVector<Turtle*> turtles;
-
+    QPainter* thisPainter;
 };
 
 #endif // TURTLEBOARD_H

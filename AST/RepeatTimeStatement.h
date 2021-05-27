@@ -14,6 +14,8 @@ namespace AST
 		RepeatTimeStatement(std::unique_ptr<AST::Expression> period, std::unique_ptr<AST::InstructionsBlock> block);
 		RepeatTimeStatement(std::unique_ptr<AST::Expression> period, std::unique_ptr<AST::Expression> howManyTime, std::unique_ptr<AST::InstructionsBlock> block);
 
+        virtual void execute(Context* context);
+
 		AST::Expression* getPeriod() const;
 		AST::Expression* getHowManyTime() const;
 		AST::InstructionsBlock* getInstructuionsBlock() const;

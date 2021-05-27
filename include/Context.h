@@ -1,5 +1,5 @@
 #pragma once
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <variant>
 #include "../AST/Node.h"
@@ -14,15 +14,15 @@ class Context
 public:
     std::variant<std::monostate, int, std::string, bool, Variable*> setVariant;
     std::variant<std::monostate, int, std::string, bool, Variable*> evaluateValue;
-    std::map<std::string, Variable*> args;
+    std::unordered_map<std::string, Variable*> args;
     std::variant<std::monostate, int, std::string, bool> returnVariant;
-	TokenType returnType = TokenType::UNKNOWN;
+    TokenType returnType = TokenType::UNKNOWN;
 
 
-	Context();
+    Context();
 
-	void addNewScope();
-	void removeScope();
+    void addNewScope();
+    void removeScope();
 
     void setDrawingBoard(DrawingBoard* board);
     void setTurtleBoard(TurtleBoard* board);
@@ -31,20 +31,20 @@ public:
 
 	void addDefFunction(AST::DefFuncStatement* defFunction);
 	void addVariable(std::unique_ptr<Variable> variable);
-	Variable* getVariable(std::string name);
-
-	AST::DefFuncStatement* getDefFunction(std::string name) const;
+    AST::DefFuncStatement* getDefFunction(std::string name) const;
     std::function<void(Context*)> getStdLibFunction(std::string name) const;
+
+    Variable* getVariable(std::string name);
 
     bool hasFunction(std::string name) const;
     bool hasStdLibFunction(std::string name) const;
     bool hasReturn() const;
 
 private:
-    std::map<std::string, AST::DefFuncStatement*> defFunctions;
-    std::map<std::string, std::function<void(Context*)>> stdLibFunctions;
-	BlockScope* rootScope; // Global
-	BlockScope* curScope;
+    std::unordered_map<std::string, AST::DefFuncStatement*> defFunctions;
+    std::unordered_map<std::string, std::function<void(Context*)>> stdLibFunctions;
+    BlockScope* rootScope; // Global scope
+    BlockScope* curScope;
 	
     DrawingBoard* drawingBoard;
     TurtleBoard* turtleBoard;

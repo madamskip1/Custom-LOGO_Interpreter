@@ -1,5 +1,5 @@
 #pragma once
-#include <map>
+#include <unordered_map>
 #include <array>
 #include <string>
 
@@ -84,7 +84,7 @@ enum class TokenType : unsigned int
 
 const std::array<char, 4> mathOperators = { '+', '-', '/', '*' };
 
-static const std::map<char, TokenType> MathOperatorsToTokenType =
+static const std::unordered_map<char, TokenType> MathOperatorsToTokenType =
 {
 	{ '+', TokenType::Plus },
 	{ '-', TokenType::Minus },
@@ -92,7 +92,7 @@ static const std::map<char, TokenType> MathOperatorsToTokenType =
 	{ '*', TokenType::Multiply }
 };
 
-static const std::map<std::string, TokenType> KeywordToTokenType =
+static const std::unordered_map<std::string, TokenType> KeywordToTokenType =
 {
 	{ "repeat", TokenType::Repeat },
 	{ "repeatTime", TokenType::RepeatTime },

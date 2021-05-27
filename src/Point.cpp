@@ -34,26 +34,27 @@ void Point::getSomeVal(std::vector<std::string> identifiers, Context *context)
     if (identifiers.size() == 0)
     {
         context->evaluateValue = this;
-        return;
     }
 
     if (identifiers[0] == "x")
     {
         context->evaluateValue = x;
-        return;
     }
-
-    if (identifiers[0] == "y")
+    else if (identifiers[0] == "y")
     {
         context->evaluateValue = y;
-        return;
     }
-
-    throw "identifier not recognized";
+    else
+    {
+        throw "identifier not recognized";
+    }
 }
 
 void Point::setSomeVal(std::vector<std::string> identifiers, Context *context)
 {
+    if (identifiers.size() > 1)
+        throw "wrong level of identifier";
+
     if (identifiers.size() == 0)
     {
         if (context->evaluateValue.index() != 4)
@@ -67,24 +68,19 @@ void Point::setSomeVal(std::vector<std::string> identifiers, Context *context)
         Point* point = static_cast<Point*>(pointVar);
         x = point->x;
         y = point->y;
-        return;
     }
-    if (identifiers.size() > 1)
-        throw "wrong level of identifier";
-
-    if (identifiers[0] == "x")
+    else if (identifiers[0] == "x")
     {
         x = std::get<int>(context->setVariant);
         context->setVariant = std::monostate{};
-        return;
     }
-
-    if (identifiers[0] == "y")
+    else if (identifiers[0] == "y")
     {
         y = std::get<int>(context->setVariant);
         context->setVariant = std::monostate{};
-        return;
     }
-
-    throw "identifier not recognized";
+    else
+    {
+        throw "identifier not recognized";
+    }
 }

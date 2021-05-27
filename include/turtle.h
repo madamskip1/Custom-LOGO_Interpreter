@@ -17,6 +17,7 @@ class Turtle
         : public QObject, public Variable
 {
     Q_OBJECT
+
 public:
     Turtle(DrawingBoard* drawingBoardPtr);
     ~Turtle();
@@ -38,8 +39,8 @@ public:
     int direction;
 
     void callFunction(std::vector<std::string> identifiers, Context* context);
-    virtual void getSomeVal(std::vector<std::string> identifiers, Context* context);
-    virtual void setSomeVal(std::vector<std::string> identifiers, Context *context);
+    virtual void getSomeVal(std::vector<std::string> identifiers, Context* context) override;
+    virtual void setSomeVal(std::vector<std::string> identifiers, Context *context) override;
 
 signals:
     void turtleMoved();
