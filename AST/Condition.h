@@ -28,5 +28,7 @@ namespace AST
 		std::unique_ptr<AST::Node> rightCondition = nullptr;
 		TokenType relationOperator;
         bool notOperator = false;
+
+        bool evaluateConditionOrBoolean(Node* node, Context* context = nullptr);
 	};
 }

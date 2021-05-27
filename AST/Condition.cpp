@@ -13,46 +13,29 @@ bool AST::Condition::evaluate(Context* context)
 
 	if (leftCondition->getNodeType() == NodeType::Condition || leftCondition->getNodeType() == AST::NodeType::Boolean)
 	{
-		if (leftCondition->getNodeType() == AST::NodeType::Condition)
-		{
-            returnBoolean = (static_cast<AST::Condition*>(leftCondition.get()))->evaluate(context);
-		}
-		else
-		{
-            returnBoolean = (static_cast<AST::Boolean*>(leftCondition.get()))->evaluate();
-		}
+        returnBoolean = evaluateConditionOrBoolean(leftCondition.get(), context);
 
+        if (rightCondition)
+        {
+            if (rightCondition->getNodeType() == AST::NodeType::Condition || rightCondition->getNodeType() == AST::NodeType::Boolean)
+            {
+                bool rightBoolean = evaluateConditionOrBoolean(rightCondition.get(), context);
 
-		if (rightCondition)
-		{
-			if (rightCondition->getNodeType() == AST::NodeType::Condition || rightCondition->getNodeType() == AST::NodeType::Boolean)
-			{
-				bool rightBoolean;
-				if (rightCondition->getNodeType() == AST::NodeType::Condition)
-				{
-                    rightBoolean = (static_cast<AST::Condition*>(rightCondition.get()))->evaluate(context);
-				}
-				else
-				{
-                    rightBoolean = (static_cast<AST::Boolean*>(rightCondition.get()))->evaluate();
-				}
-
-				
-				if (relationOperator == TokenType::And)
-				{
-					returnBoolean = (returnBoolean && rightBoolean);
-				}
-				else
-				{
-					returnBoolean = (returnBoolean || rightBoolean);
-				}
-			}
-			else
-			{
-				return false;
-			}
-		}
-	}
+                if (relationOperator == TokenType::And)
+                {
+                    returnBoolean = (returnBoolean && rightBoolean);
+                }
+                else
+                {
+                    returnBoolean = (returnBoolean || rightBoolean);
+                }
+            }
+            else
+            {
+                return false; // expression arent directly cast to boolean
+            }
+        }
+    }
 	else if (leftCondition->getNodeType() == AST::NodeType::Expression)
 	{
         (static_cast<AST::Expression*>(leftCondition.get()))->evaluate(context);
@@ -78,7 +61,7 @@ bool AST::Condition::evaluate(Context* context)
 		}
 		else
 		{
-			return false;
+            return false; // expression arent directly cast to boolean => we need 2 expressions and operator
 		}
 	}
 	else
@@ -129,5 +112,17 @@ const bool AST::Condition::getNotOperator() const
 
 const TokenType AST::Condition::getRelationOperator() const
 {
-	return relationOperator;
+    return relationOperator;
+}
+
+bool AST::Condition::evaluateConditionOrBoolean(Node* node, Context *context)
+{
+    if (node->getNodeType() == AST::NodeType::Condition)
+    {
+        return (static_cast<AST::Condition*>(node))->evaluate(context);
+    }
+    else
+    {
+        return (static_cast<AST::Boolean*>(node))->evaluate();
+    }
 }
