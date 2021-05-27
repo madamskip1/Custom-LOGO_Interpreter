@@ -18,6 +18,14 @@
 #include "catch.hpp"
 #pragma warning(pop)
 
+/*
+ *	This test scenerios were depreced
+ *	*->evaluate() now use Context as parameter (was no arg)
+ *	*->evaluate() now return nothing (was return int)
+ *	*->evaluate() evaluated value now stored in context as std::variant
+ *	
+ *	TODO: FIX ALL CASSES to new evaluate method
+ */
 
 TEST_CASE("IFStatement", "[parser]")
 {

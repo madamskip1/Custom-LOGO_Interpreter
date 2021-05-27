@@ -6,7 +6,7 @@ AST::Expression::Expression()
     nodeType = NodeType::Expression;
 }
 
-int AST::Expression::evaluate(Context* context) const
+void AST::Expression::evaluate(Context* context) const
 {
     if (isOnlyId())
     {
@@ -14,7 +14,7 @@ int AST::Expression::evaluate(Context* context) const
         Variable* var = context->getVariable(identifiers[0]);
         identifiers.erase(identifiers.begin());
         var->getSomeVal(identifiers, context);
-        return 0;
+        return;
     }
 
     childrenExpressions[0]->evaluate(context);
@@ -44,7 +44,6 @@ int AST::Expression::evaluate(Context* context) const
         val *= -1;
 
     context->evaluateValue = val;
-    return val;
 }
 
 bool AST::Expression::isOnlyId() const

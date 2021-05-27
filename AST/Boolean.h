@@ -12,7 +12,8 @@ namespace AST
 
 		const bool getValue() const;
 		bool evaluate() const;
-        int evaluate(Context* context) const override;
+        virtual void evaluate(Context* context) const override;
+
 	private:
 		bool value;
 	};

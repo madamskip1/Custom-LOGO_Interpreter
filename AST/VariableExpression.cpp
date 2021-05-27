@@ -8,7 +8,7 @@ AST::VariableExpression::VariableExpression(std::vector<std::string> variableIde
     identifiers = variableIdentifiers;
 }
 
-int AST::VariableExpression::evaluate(Context *context) const
+void AST::VariableExpression::evaluate(Context *context) const
 {
     if (identifiers.size() == 1)
     {
@@ -23,7 +23,6 @@ int AST::VariableExpression::evaluate(Context *context) const
             throw "Variable in expression can be only Integer";
         }
         context->evaluateValue = std::get<int>(var->value);
-        return std::get<int>(var->value);
     }
 }
 

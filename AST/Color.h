@@ -10,7 +10,7 @@ namespace AST
 	public:
 		Color(std::string color);
 
-        virtual int evaluate(Context* context) const override;
+        virtual void evaluate(Context* context) const override;
 
 		const void setColor(std::string color);
 		std::string getColor() const;

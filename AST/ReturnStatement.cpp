@@ -19,14 +19,13 @@ void AST::ReturnStatement::execute(Context* context)
 	if (type == TokenType::Integer)
 	{
 		Expression* number = static_cast<Expression*>(returnAssignable.get());
-        context->returnVariant = number->evaluate(context);
-		return;
+        number->evaluate(context);
+        context->returnVariant = context->evaluateValue;
 	}
 	else if (type == TokenType::Boolean)
 	{
 		Boolean* boolean = static_cast<Boolean*>(returnAssignable.get());
 		context->returnVariant = boolean->evaluate();
-		return;
 	}
 }
 

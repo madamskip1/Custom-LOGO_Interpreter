@@ -12,7 +12,7 @@ namespace AST
         VariableExpression() = delete;
         VariableExpression(std::vector<std::string> variableIdentifiers);
 
-        virtual int evaluate(Context* context) const override;
+        virtual void evaluate(Context* context) const override;
 
         virtual bool isOnlyId() const override;
         virtual std::vector<std::string> getIdentifiers() const override;

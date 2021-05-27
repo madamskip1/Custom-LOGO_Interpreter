@@ -10,7 +10,8 @@ AST::RepeatStatement::RepeatStatement(std::unique_ptr<AST::Expression> howManyTi
 
 void AST::RepeatStatement::execute(Context* context)
 {
-    int repeat = howManyTimeExpression->evaluate(context);
+    howManyTimeExpression->evaluate(context);
+    int repeat = std::get<int>(context->evaluateValue);
 
 	for (int i = 0; i < repeat; i++)
 	{

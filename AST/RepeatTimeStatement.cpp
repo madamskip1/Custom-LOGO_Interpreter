@@ -40,9 +40,16 @@ AST::RepeatTimeStatement::RepeatTimeStatement(std::unique_ptr<AST::Expression> p
 
 void AST::RepeatTimeStatement::execute(Context *context)
 {
-    int period = periodExpression->evaluate(context);
+    periodExpression->evaluate(context);
+    int period = std::get<int>(context->evaluateValue);
     // max 10 iterations
-    int howManyTime = (howManyTimeExpression != nullptr ? howManyTimeExpression->evaluate(context) : 10);
+    int howManyTime = 10;
+
+    if (howManyTimeExpression != nullptr)
+    {
+        howManyTimeExpression->evaluate(context);
+        howManyTime = std::get<int>(context->evaluateValue);
+    }
 
     std::unique_ptr<Context> newContext = std::make_unique<Context>();
     newContext->setDrawingBoard(context->getDrawingBoardPtr());
