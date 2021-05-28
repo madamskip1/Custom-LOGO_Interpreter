@@ -1,11 +1,11 @@
 #pragma once
 #include <string>
-#include "Assignable.h"
+#include "Expression.h"
 
 namespace AST
 {
 	class Color :
-		public AST::Assignable
+        public AST::Expression
 	{
 	public:
 		Color(std::string color);

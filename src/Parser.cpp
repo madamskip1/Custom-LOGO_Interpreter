@@ -7,6 +7,7 @@
 #include "../AST/RepeatTimeStatement.h"
 #include "../AST/RepeatConditionStatement.h"
 #include "../AST/Expression.h"
+#include "../AST/ArithmeticExpression.h"
 #include "../AST/Number.h"
 #include "../AST/Condition.h"
 #include "../AST/Boolean.h"
@@ -120,7 +121,7 @@ std::unique_ptr<AST::Node> Parser::parseIfStatement()
     if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
         return nullptr;
 
-    std::unique_ptr<AST::Node> condition = parseCondition();
+    std::unique_ptr<AST::Node> condition = parseConditionExpression();
 
     if (!condition)
         return nullptr;
@@ -222,7 +223,7 @@ std::unique_ptr<AST::Node> Parser::parseRepeatConditionStatement()
     if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
         return nullptr;
 
-    std::unique_ptr<AST::Node> condition = parseCondition();
+    std::unique_ptr<AST::Node> condition = parseConditionExpression();
 
     if (!condition)
         return nullptr;
@@ -417,7 +418,7 @@ std::unique_ptr<AST::AssignmentStatement> Parser::parseAssignment(std::vector<st
 std::unique_ptr<AST::Assignable> Parser::parseAssignable()
 {
     Token token = getToken();
-
+/*
     if (checkCurTokenType({ TokenType::True, TokenType::False }))
     {
         std::unique_ptr<AST::Assignable> assignable = std::make_unique<AST::Boolean>(checkCurTokenType(TokenType::True));
@@ -432,7 +433,7 @@ std::unique_ptr<AST::Assignable> Parser::parseAssignable()
         
         return assignable;
     }
-
+*/
     std::unique_ptr<AST::Assignable> assignable = parseExpression();
     
     if (assignable)
@@ -494,19 +495,105 @@ std::unique_ptr<AST::Parameter> Parser::parseParameter()
 
 std::unique_ptr<AST::Expression> Parser::parseExpression()
 {
-    std::unique_ptr<AST::Expression> termExpression = parseTermExpression();
+    return parseConditionExpression();
+}
+
+std::unique_ptr<AST::Expression> Parser::parseConditionExpression()
+{
+    std::unique_ptr<AST::Expression> andCondition = parseAndConditionExpression();
+    if (!andCondition)
+        return nullptr;
+
+    std::unique_ptr<AST::Condition> condition = std::make_unique<AST::Condition>();
+    condition->addChildExpression(std::move(andCondition));
+
+    while (consumeTokenIfType(TokenType::Or))
+    {
+        andCondition = parseAndConditionExpression();
+        if (!andCondition)
+            return nullptr;
+
+        condition->addChildExpression(std::move(andCondition));
+    }
+
+    return condition;
+}
+
+std::unique_ptr<AST::Expression> Parser::parseAndConditionExpression()
+{
+    std::unique_ptr<AST::Expression> relationCondition = parseRelationConditionExpression();
+    if (!relationCondition)
+        return nullptr;
+
+    std::unique_ptr<AST::Condition> andCondition = std::make_unique<AST::Condition>();
+    andCondition->addChildExpression(std::move(relationCondition));
+
+    while (consumeTokenIfType(TokenType::And))
+    {
+        relationCondition = parseRelationConditionExpression();
+        if (!relationCondition)
+            return nullptr;
+        andCondition->addChildExpression(std::move(relationCondition));
+    }
+
+    return andCondition;
+}
+
+std::unique_ptr<AST::Expression> Parser::parseRelationConditionExpression()
+{
+    bool notOperator = consumeTokenIfType(TokenType::NotOperator);
+
+    if (checkCurTokenType({ TokenType::True, TokenType::False }))
+    {
+        bool boolean = getAndConsumeToken().type == TokenType::True;
+        std::unique_ptr<AST::Boolean> booleanWord = std::make_unique<AST::Boolean>(boolean);
+        booleanWord->setNegativeOp(notOperator);
+
+        return booleanWord;
+    }
+
+    Token token = getToken();
+    std::unique_ptr<AST::Expression> expression = parseArithmeticAddExpression();
+    if (!expression)
+    {
+        logger.addNewError(LogType::BadCondition, token);
+        return nullptr;
+    }
+
+    std::unique_ptr<AST::Condition> relationCondition = std::make_unique<AST::Condition>();
+    relationCondition->setNegativeOp(notOperator);
+    relationCondition->addChildExpression(std::move(expression));
+
+    if (checkCurTokenType({ TokenType::Equal, TokenType::NotEqual, TokenType::Less, TokenType::Greater, TokenType::LessOrEqual, TokenType::GreaterOrEqual }))
+    {
+        TokenType relOp = getAndConsumeToken().type;
+        std::unique_ptr<AST::Expression> secondExpression = parseArithmeticAddExpression();
+
+        if(!secondExpression)
+            return nullptr;
+
+        relationCondition->setRelationOperator(relOp);
+        relationCondition->addChildExpression(std::move(secondExpression));
+    }
+
+    return relationCondition;
+}
+
+std::unique_ptr<AST::Expression> Parser::parseArithmeticAddExpression()
+{
+    std::unique_ptr<AST::Expression> termExpression = parseArithmeticMultiExpression();
     
     if (!termExpression)
         return nullptr;
 
-    std::unique_ptr<AST::Expression> expression = std::make_unique<AST::Expression>();
+    std::unique_ptr<AST::ArithmeticExpression> expression = std::make_unique<AST::ArithmeticExpression>();
     expression->addChildExpression(std::move(termExpression));
     
     Token token = getToken();
 
     while (consumeTokenIfType({ TokenType::Plus, TokenType::Minus }))
     {
-        termExpression = parseTermExpression();
+        termExpression = parseArithmeticMultiExpression();
         if (!termExpression)
             return nullptr;
 
@@ -521,14 +608,14 @@ std::unique_ptr<AST::Expression> Parser::parseExpression()
     return expression;
 }
 
-std::unique_ptr<AST::Expression> Parser::parseTermExpression()
+std::unique_ptr<AST::Expression> Parser::parseArithmeticMultiExpression()
 {
     std::unique_ptr<AST::Expression> factorExpression = parseFactorExpression();
 
     if (!factorExpression)
         return nullptr;
 
-    std::unique_ptr<AST::Expression> termExpression = std::make_unique<AST::Expression>();
+    std::unique_ptr<AST::ArithmeticExpression> termExpression = std::make_unique<AST::ArithmeticExpression>();
     termExpression->addChildExpression(std::move(factorExpression));
 
     Token token = getToken();
@@ -563,7 +650,7 @@ std::unique_ptr<AST::Expression> Parser::parseFactorExpression()
 
     if (consumeTokenIfType(TokenType::RoundBracketOpen))
     {
-        std::unique_ptr<AST::Expression> factorExpression = parseExpression();
+        std::unique_ptr<AST::Expression> factorExpression = parseConditionExpression();
         
         if (!factorExpression)
             return nullptr;
@@ -597,107 +684,14 @@ std::unique_ptr<AST::Expression> Parser::parseFactorExpression()
 
         return var;
     }
+    if (checkCurTokenType(TokenType::ColorValue))
+    {
+        std::unique_ptr<AST::Color> color = std::make_unique<AST::Color>(getAndConsumeToken().getStringValue());
+        return color;
+    }
 
     logger.addNewError(LogType::BadExpression, getToken());
     return nullptr;
-}
-
-std::unique_ptr<AST::Node> Parser::parseCondition()
-{
-    std::unique_ptr<AST::Node> andCondition = parseAndCondition();
-    if (!andCondition)
-        return nullptr;
-
-    std::unique_ptr<AST::Condition> condition = std::make_unique<AST::Condition>();
-    condition->setLeftCondition(std::move(andCondition));
-
-    while (consumeTokenIfType(TokenType::Or))
-    {
-        andCondition = parseAndCondition();
-        if (!andCondition)
-            return nullptr;
-
-        condition->setRightCondition(std::move(andCondition));
-    }
-
-    return condition;
-}
-
-std::unique_ptr<AST::Node> Parser::parseAndCondition()
-{
-    std::unique_ptr<AST::Node> relationCondition = parseRelationCondition();
-    if (!relationCondition)
-        return nullptr;
-
-    std::unique_ptr<AST::Condition> andCondition = std::make_unique<AST::Condition>();
-    andCondition->setLeftCondition(std::move(relationCondition));
-    
-    while (consumeTokenIfType(TokenType::And))
-    {
-        relationCondition = parseRelationCondition();
-        if (!relationCondition)
-            return nullptr;
-        andCondition->setRightCondition(std::move(relationCondition));
-    }
-
-    return andCondition;
-}
-
-std::unique_ptr<AST::Node> Parser::parseRelationCondition()
-{
-    bool notOperator = consumeTokenIfType(TokenType::NotOperator);
-
-    if (checkCurTokenType({ TokenType::True, TokenType::False }))
-    {
-        bool boolean = getAndConsumeToken().type == TokenType::True;
-        std::unique_ptr<AST::Boolean> booleanWord = std::make_unique<AST::Boolean>(boolean);
-        std::unique_ptr<AST::Condition> conditionBoolean = std::make_unique<AST::Condition>();
-
-        conditionBoolean->setLeftCondition(std::move(booleanWord));
-        conditionBoolean->setNotOperator(notOperator);
-
-        return conditionBoolean;
-    }
-
-    if (consumeTokenIfType(TokenType::RoundBracketOpen))
-    {
-        std::unique_ptr<AST::Node> condition = parseCondition();
-        if (!condition)
-            return nullptr;
-
-        if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketClose, LogType::MissingCurlyBracketClose))
-            return nullptr;
-
-        AST::Condition* tempCon = static_cast<AST::Condition*>(condition.get());
-        tempCon->setNotOperator(notOperator);
-        return condition;
-    }
-
-    Token token = getToken();
-    std::unique_ptr<AST::Node> expression = parseExpression();
-    if (!expression)
-    {
-        logger.addNewError(LogType::BadCondition, token);
-        return nullptr;
-    }
-
-
-    std::unique_ptr<AST::Condition> relationCondition = std::make_unique<AST::Condition>();
-    if (checkCurTokenType({ TokenType::Equal, TokenType::NotEqual, TokenType::Less, TokenType::Greater, TokenType::LessOrEqual, TokenType::GreaterOrEqual }))
-    {
-        TokenType relOp = getAndConsumeToken().type;
-        std::unique_ptr<AST::Node> secondExpression = parseExpression();
-
-        if(!secondExpression)
-            return nullptr;
-
-        relationCondition->setRelationOperator(relOp);
-        relationCondition->setRightCondition(std::move(secondExpression));
-    }
-
-    relationCondition->setLeftCondition(std::move(expression));
-
-    return relationCondition;
 }
 
 std::unique_ptr<AST::ReturnStatement> Parser::parseReturnStatement()

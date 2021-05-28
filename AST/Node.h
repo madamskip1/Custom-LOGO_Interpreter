@@ -17,6 +17,7 @@ namespace AST
         RepeatConditionStatement,
 		InstructionsBlock,
 		Expression,
+        ArithmeticExpression,
 		ExpressionTerm,
 		ExpressionFactor,
 		DefFuncStatement,

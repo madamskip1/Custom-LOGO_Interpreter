@@ -16,6 +16,7 @@ QMAKE_CXXFLAGS_WARN_OFF -= -Wunused-parameter
 QMAKE_CXXFLAGS_WARN_OFF -= -Wno-unused-parameter
 
 SOURCES += \
+    AST/ArithmeticExpression.cpp \
     AST/Assignable.cpp \
     AST/AssignmentStatement.cpp \
     AST/Boolean.cpp \
@@ -57,11 +58,6 @@ SOURCES += \
     src/drawingboard.cpp \
     src/turtle.cpp \
     src/turtleboard.cpp \
-    tests/Tests_Lexer.cpp \
-    tests/Tests_MainFile.cpp \
-    tests/Tests_Parser.cpp \
-    tests/Tests_ParserErrors.cpp \
-    tests/Tests_SourceReader.cpp
 
 FORMS += \
     mainwindow.ui
@@ -72,6 +68,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    AST/ArithmeticExpression.h \
     AST/Assignable.h \
     AST/AssignmentStatement.h \
     AST/Boolean.h \

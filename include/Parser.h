@@ -56,12 +56,15 @@ private:
 	std::unique_ptr<AST::Parameter> parseParameter();
 
 	std::unique_ptr<AST::Expression> parseExpression();
-	std::unique_ptr<AST::Expression> parseTermExpression();
-	std::unique_ptr<AST::Expression> parseFactorExpression();
 
-	std::unique_ptr<AST::Node> parseCondition();
-	std::unique_ptr<AST::Node> parseAndCondition();
-	std::unique_ptr<AST::Node> parseRelationCondition();
+    std::unique_ptr<AST::Expression> parseConditionExpression();
+    std::unique_ptr<AST::Expression> parseAndConditionExpression();
+    std::unique_ptr<AST::Expression> parseRelationConditionExpression();
+
+    std::unique_ptr<AST::Expression> parseArithmeticAddExpression();
+    std::unique_ptr<AST::Expression> parseArithmeticMultiExpression();
+
+    std::unique_ptr<AST::Expression> parseFactorExpression();
 
 	std::unique_ptr<AST::ReturnStatement> parseReturnStatement();
     std::unique_ptr<AST::DeleteStatement> parseDeleteStatement();

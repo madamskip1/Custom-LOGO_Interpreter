@@ -3,48 +3,46 @@
 #include "Boolean.h"
 #include "../include/Context.h"
 
-AST::Condition::Condition() : AST::Node(AST::NodeType::Condition)
+AST::Condition::Condition()
 {
+    nodeType = AST::NodeType::Condition;
 }
 
 void AST::Condition::evaluate(Context* context)
 {
-	bool returnBoolean = false;
+    std::variant<std::monostate, int, std::string, bool, Variable*> curValue;
 
-	if (leftCondition->getNodeType() == NodeType::Condition || leftCondition->getNodeType() == AST::NodeType::Boolean)
-	{
-        returnBoolean = evaluateConditionOrBoolean(leftCondition.get(), context);
+    bool returnBoolean = false;
+    childrenExpressions[0]->evaluate(context);
+    curValue = context->evaluateValue;
 
-        if (rightCondition)
+    if (curValue.index() == 3)
+    {
+        returnBoolean = std::get<bool>(context->evaluateValue);
+
+        if (childrenExpressions.size() == 2)
         {
-            if (rightCondition->getNodeType() == AST::NodeType::Condition || rightCondition->getNodeType() == AST::NodeType::Boolean)
-            {
-                bool rightBoolean = evaluateConditionOrBoolean(rightCondition.get(), context);
+            childrenExpressions[1]->evaluate((context));
+            bool rightBoolean = std::get<bool>(context->evaluateValue);
 
-                if (relationOperator == TokenType::And)
-                {
-                    returnBoolean = (returnBoolean && rightBoolean);
-                }
-                else
-                {
-                    returnBoolean = (returnBoolean || rightBoolean);
-                }
+            if (relationOperator == TokenType::And)
+            {
+                returnBoolean = (returnBoolean && rightBoolean);
             }
             else
             {
-                context->evaluateValue = false;
-                return; // expression arent directly cast to boolean
+                returnBoolean = (returnBoolean || rightBoolean);
             }
         }
+
     }
-	else if (leftCondition->getNodeType() == AST::NodeType::Expression)
+    else if (curValue.index() == 1)
 	{
-        (static_cast<AST::Expression*>(leftCondition.get()))->evaluate(context);
         int leftValue = std::get<int>(context->evaluateValue);
 
-		if (rightCondition->getNodeType() == AST::NodeType::Expression)
-		{
-            (static_cast<AST::Expression*>(rightCondition.get()))->evaluate(context);
+        if (childrenExpressions.size() == 2)
+        {
+            childrenExpressions[1]->evaluate((context));
             int rightValue = std::get<int>(context->evaluateValue);
 
 			if (relationOperator == TokenType::Equal)
@@ -62,56 +60,31 @@ void AST::Condition::evaluate(Context* context)
 		}
 		else
 		{
-            context->evaluateValue = false;
-            return;// expression arent directly cast to boolean => we need 2 expressions and operator
-		}
+            return;
+        }
 	}
+    else if (curValue.index() == 2 || curValue.index() == 4 )
+    {
+        return;
+    }
 	else
 	{
         context->evaluateValue = false;
         return;
 	}
 
-	if (notOperator)
+    if (negativeOperator)
 		returnBoolean = !returnBoolean;
 
     context->evaluateValue = returnBoolean;
 }
 
-const void AST::Condition::setLeftCondition(std::unique_ptr<AST::Node> condition)
-{
-	leftCondition = std::move(condition);
-}
-
-const void AST::Condition::setRightCondition(std::unique_ptr<AST::Node> condition)
-{
-	rightCondition = std::move(condition);
-}
 
 const void AST::Condition::setRelationOperator(const TokenType& relOp)
 {
 	relationOperator = relOp;
 }
 
-const void AST::Condition::setNotOperator(const bool& notOp)
-{
-	notOperator = notOp;
-}
-
-AST::Node* AST::Condition::getLeftCondition() const
-{
-	return leftCondition.get();
-}
-
-AST::Node* AST::Condition::getRightCondition() const
-{
-	return rightCondition.get();
-}
-
-const bool AST::Condition::getNotOperator() const
-{
-	return notOperator;
-}
 
 const TokenType AST::Condition::getRelationOperator() const
 {
@@ -122,13 +95,4 @@ bool AST::Condition::evaluateConditionOrBoolean(Node* node, Context *context)
 {
     node->evaluate(context);
     return std::get<bool>(context->evaluateValue);
-    /*
-    if (node->getNodeType() == AST::NodeType::Condition)
-    {
-        return (static_cast<AST::Condition*>(node))->evaluate(context);
-    }
-    else
-    {
-        return (static_cast<AST::Boolean*>(node))->evaluate();
-    }*/
 }

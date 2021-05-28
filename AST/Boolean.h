@@ -1,11 +1,12 @@
 #pragma once
 #include "Condition.h"
 #include "Assignable.h"
+#include "Expression.h"
 
 namespace AST
 {
 	class Boolean :
-		public AST::Assignable
+        public AST::Condition
 	{
 	public:
 		Boolean(bool val);

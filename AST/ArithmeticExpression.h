@@ -2,20 +2,21 @@
 #include <vector>
 #include <memory>
 #include "include/TokenType.h"
-#include "AST/Node.h"
+#include "Node.h"
 #include "Assignable.h"
+#include "Expression.h"
 
 namespace AST
 {
-	class Expression :
-		public AST::Assignable
+	class ArithmeticExpression :
+        public AST::Expression
 	{
 	public:
-		Expression();
+		ArithmeticExpression();
 
-        virtual void evaluate(Context*) override {};
+        virtual void evaluate(Context* context) override;
         virtual bool isOnlyId() const override;
-        virtual std::vector<std::string> getIdentifiers() const;
+        virtual std::vector<std::string> getIdentifiers() const override;
 
 		const void addChildExpression(std::unique_ptr<AST::Expression> child);
 		const void addOperator(const TokenType& op);
