@@ -115,19 +115,23 @@ std::shared_ptr<Variable> AST::VarDeclare::executeClassDeclaration(Context *cont
         }
     }
 
-
+    std::shared_ptr<Variable> var;
 
     if (type == TokenType::Turtle)
-        return createTurtle(context, x, y);
+        var = createTurtle(context, x, y);
     else
-        return createPoint(x, y);
+        var = createPoint(x, y);
+
+    var->name = identifier;
+    var->type = type;
+
+    return var;
 }
 
 std::shared_ptr<Turtle> AST::VarDeclare::createTurtle(Context* context, std::optional<int> x, std::optional<int> y)
 {
     std::shared_ptr<Turtle> turtle = std::make_shared<Turtle>(context->getDrawingBoardPtr());
-    turtle->name = identifier;
-    turtle->type = type;
+
     if (x)
     {
         turtle->moveTo(*x, *y);
@@ -136,6 +140,8 @@ std::shared_ptr<Turtle> AST::VarDeclare::createTurtle(Context* context, std::opt
     TurtleBoard* turtleBoard = context->getTurtleBoardPtr();
     turtleBoard->addTurtle(turtle.get());
 
+    turtle->name = identifier;
+    turtle->type = type;
     return turtle;
 }
 
@@ -149,6 +155,5 @@ std::shared_ptr<Point> AST::VarDeclare::createPoint(std::optional<int> x, std::o
 
     point->name = identifier;
     point->type = type;
-
     return point;
 }

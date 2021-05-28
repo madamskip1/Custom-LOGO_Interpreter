@@ -159,6 +159,7 @@ toAssign2.go(80);
 repeatTime(1500, 8)
 {
 	Turtle zolwInRepeatTime;
+	zolwInRepeatTime.direction = 222;
 	zolwInRepeatTime.go(100);
 }	
 	
@@ -167,6 +168,7 @@ Integer function testReturnInt()
 {
 	Turtle zolw;
 	zolw.go(200);
+	
 	return 100;
 	
 	Turtle zolw2;
@@ -174,10 +176,11 @@ Integer function testReturnInt()
 	zolw2.go(200);
 }
 
+
 function testUseReturnedIntAsParameter(Integer testInt)
 {
 	Turtle zolw(testInt * 4, testInt * 4);
-	zolw.go(testInt);
+	zolw.go(testInt); 
 }
 
 Integer intFromReturnValue = testReturnInt();
@@ -193,7 +196,7 @@ Turtle zolwWithDeleteInt(toDelete, toDelete);
 zolwWithDeleteInt.go(111);
 delete zolwWithDeleteInt;
 
-Turtle zolwInRepeatTime(toDelete, toDelete);
+Turtle zolwInRepeatTime(350, toDelete);
 
 repeatTime(450, 6)
 {

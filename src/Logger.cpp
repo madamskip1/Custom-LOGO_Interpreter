@@ -7,7 +7,12 @@ std::string Logger::toString() const
 	for (const auto& log : logs)
 		string += log->toString() + "\n";
 
-	return string;
+    return string;
+}
+
+void Logger::clearLogs()
+{
+    logs.clear();
 }
 
 const void Logger::newLog(const LogType& logType, const Token& token)

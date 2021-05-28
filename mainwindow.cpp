@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QFileDialog>
 #include "turtle.h"
 #include "Parser.h"
 #include "Lexer.h"
@@ -25,12 +26,32 @@ void MainWindow::on_pushButton_clicked()
 {
     QString input = this->ui->inputBox->toPlainText();
 
+    runScript(input.toStdString(), false);
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, "Otwórz plik");
+        if(fileName == "") return;
+
+    runScript(fileName.toStdString(), true);
+}
+
+void MainWindow::runScript(std::string scriptString, bool isFile)
+{
     SourceReader reader;
     Lexer lexer(reader);
     Logger logger;
     Parser parser(lexer, logger);
 
-    reader.setSourceString(input.toStdString());
+    if(isFile)
+    {
+        reader.setSourceFile(scriptString);
+    }
+    else
+    {
+        reader.setSourceString(scriptString);
+    }
 
     std::unique_ptr<AST::ProgramRootNode> program = parser.parse();
 
@@ -55,10 +76,9 @@ void MainWindow::on_pushButton_clicked()
         }
     }
 
+    logger.clearLogs();
+
     QString output = QString::fromStdString(logger.toString());
 
     this->ui->outputBox->setText(output);
-
-    // tutaj interpretować
-
 }

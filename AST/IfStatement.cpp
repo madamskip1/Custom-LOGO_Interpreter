@@ -24,7 +24,6 @@ void AST::IfStatement::execute(Context* context)
 	}
 }
 
-
 const bool AST::IfStatement::hasElseBlock() const
 {
 	return elseBlockNode != nullptr;

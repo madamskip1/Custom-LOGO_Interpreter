@@ -20,15 +20,12 @@ void AST::Expression::evaluate(Context* context)
     childrenExpressions[0]->evaluate(context);
     int val = std::get<int>(context->evaluateValue);
 
-    int val2 = 0;
-    TokenType op;
-
     for (std::size_t i = 1; i < childrenExpressions.size(); i++)
     {
         childrenExpressions[i]->evaluate(context);
-        val2 = std::get<int>(context->evaluateValue);
+        int val2 = std::get<int>(context->evaluateValue);
 
-        op = operators[i - 1];
+        TokenType op = operators[i - 1];
 
         if (op == TokenType::Plus)
             val += val2;

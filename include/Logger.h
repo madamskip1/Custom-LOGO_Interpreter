@@ -10,6 +10,8 @@ class Logger
 public:
 	std::string toString() const;
 
+    void clearLogs();
+
 	const void newLog(const LogType& logType, const Token& token);
 	const void newLog(const LogType& logType, const int& line, const int& firstCharPos, const std::streampos& streamPos, const TokenType& type = TokenType::UNKNOWN);
 	const void addNewError(LogType logType, const Token& token);

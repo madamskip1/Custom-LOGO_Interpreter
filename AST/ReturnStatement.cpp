@@ -15,19 +15,6 @@ AST::ReturnStatement::ReturnStatement(std::unique_ptr<AST::Assignable> returnAss
 
 void AST::ReturnStatement::execute(Context* context)
 {
-/*	TokenType type = context->returnType;
-	if (type == TokenType::Integer)
-	{
-		Expression* number = static_cast<Expression*>(returnAssignable.get());
-        number->evaluate(context);
-        context->returnVariant = context->evaluateValue;
-	}
-	else if (type == TokenType::Boolean)
-	{
-		Boolean* boolean = static_cast<Boolean*>(returnAssignable.get());
-		context->returnVariant = boolean->evaluate();
-	}
-*/
     if (returnAssignable)
     {
         returnAssignable->evaluate(context);

@@ -21,8 +21,12 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void on_pushButton_2_clicked();
+
 private:
     Ui::MainWindow *ui;
     std::unique_ptr<Context> mainContext = nullptr;
+
+    void runScript(std::string scriptString, bool isFile = false);
 };
 #endif // MAINWINDOW_H
