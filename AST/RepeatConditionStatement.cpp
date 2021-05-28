@@ -1,4 +1,5 @@
 #include "RepeatConditionStatement.h"
+#include <thread>
 
 AST::RepeatConditionStatement::RepeatConditionStatement(std::unique_ptr<AST::Node> condition, std::unique_ptr<InstructionsBlock> block) : AST::Node(AST::NodeType::RepeatConditionStatement)
 {
@@ -15,7 +16,14 @@ void AST::RepeatConditionStatement::execute(Context* context)
 
 	while (whileCondition)
 	{
-		instructionsBlock->execute(context);
+        if (instructionsBlock->getChildrenSize() > 0)
+        {
+            instructionsBlock->execute(context);
+        }
+        else
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
 		
 		conditionNode->evaluate(context);
 		whileCondition = std::get<bool>(context->evaluateValue);
