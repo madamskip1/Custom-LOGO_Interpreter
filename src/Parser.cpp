@@ -121,7 +121,7 @@ std::unique_ptr<AST::Node> Parser::parseIfStatement()
     if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
         return nullptr;
 
-    std::unique_ptr<AST::Node> condition = parseConditionExpression();
+    std::unique_ptr<AST::Expression> condition = parseConditionExpression();
 
     if (!condition)
         return nullptr;
@@ -514,6 +514,7 @@ std::unique_ptr<AST::Expression> Parser::parseConditionExpression()
             return nullptr;
 
         condition->addChildExpression(std::move(andCondition));
+        condition->setRelationOperator(TokenType::Or);
     }
 
     return condition;
@@ -534,6 +535,7 @@ std::unique_ptr<AST::Expression> Parser::parseAndConditionExpression()
         if (!relationCondition)
             return nullptr;
         andCondition->addChildExpression(std::move(relationCondition));
+        andCondition->setRelationOperator(TokenType::And);
     }
 
     return andCondition;

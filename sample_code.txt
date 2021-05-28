@@ -232,3 +232,13 @@ repeatTime(2000, 10)
 	synchronizationInRepeatTimeTurtle.right(30);
 }
 
+function booleanInArgs(Boolean testBool)
+{
+	if (testBool)
+	{
+		Turtle booleanInArgsTurtle;
+		booleanInArgsTurtle.go(200);
+	}
+}
+
+test(2 + 2 > 3);

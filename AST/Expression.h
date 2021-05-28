@@ -17,14 +17,15 @@ namespace AST
         virtual bool isOnlyId() const override;
         virtual std::vector<std::string> getIdentifiers() const;
 
-		const void addChildExpression(std::unique_ptr<AST::Expression> child);
-		const void addOperator(const TokenType& op);
-		const void setNegativeOp(const bool& negative);
-		const std::size_t getChildrenExpressionSize() const;
+        void addChildExpression(std::unique_ptr<AST::Expression> child);
+        std::size_t getChildrenExpressionSize() const;
+
+        void setNegativeOp(const bool& negative);
+        void addOperator(const TokenType& op);
 
 		AST::Expression* getChildExpression(const int& index) const;
-		const bool getNegativeOperator() const;
-		const TokenType getOperator(const int& index) const;
+        bool getNegativeOperator() const;
+        TokenType getOperator(const int& index) const;
 
 	protected:
 		bool negativeOperator = false;

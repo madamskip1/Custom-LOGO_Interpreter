@@ -8,15 +8,15 @@ AST::Boolean::Boolean(bool val) : value(val)
 
 const bool AST::Boolean::getValue() const
 {
-	return value;
+    return (negativeOperator ? !value : value);
 }
 
 bool AST::Boolean::evaluate() const
 {
-	return value;
+    return getValue();
 }
 
 void AST::Boolean::evaluate(Context* context)
 {
-    context->evaluateValue = value;
+    context->evaluateValue = getValue();
 }

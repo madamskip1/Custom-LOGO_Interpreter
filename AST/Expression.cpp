@@ -23,28 +23,37 @@ std::vector<std::string> AST::Expression::getIdentifiers() const
 }
 
 
-const void AST::Expression::addChildExpression(std::unique_ptr<AST::Expression> child)
+void AST::Expression::addChildExpression(std::unique_ptr<AST::Expression> child)
 {
     childrenExpressions.push_back(std::move(child));
 }
 
-const void AST::Expression::addOperator(const TokenType& op)
+void AST::Expression::addOperator(const TokenType& op)
 {
     operators.push_back(op);
 }
 
-const void AST::Expression::setNegativeOp(const bool& negative)
+void AST::Expression::setNegativeOp(const bool& negative)
 {
     negativeOperator = negative;
 }
 
+size_t AST::Expression::getChildrenExpressionSize() const
+{
+    return childrenExpressions.size();
+}
 
-const bool AST::Expression::getNegativeOperator() const
+AST::Expression *AST::Expression::getChildExpression(const int &index) const
+{
+    return childrenExpressions[index].get();
+}
+
+bool AST::Expression::getNegativeOperator() const
 {
     return negativeOperator;
 }
 
-const TokenType AST::Expression::getOperator(const int& index) const
+TokenType AST::Expression::getOperator(const int& index) const
 {
     return operators[index];
 }

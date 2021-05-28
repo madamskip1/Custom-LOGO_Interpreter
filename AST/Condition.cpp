@@ -60,6 +60,11 @@ void AST::Condition::evaluate(Context* context)
 		}
 		else
 		{
+            if (negativeOperator)
+            {
+                leftValue *= -1;
+                context->evaluateValue = leftValue;
+            }
             return;
         }
 	}
