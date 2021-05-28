@@ -46,9 +46,9 @@ public:
 private:
     std::unordered_map<std::string, AST::DefFuncStatement*> defFunctions;
     std::unordered_map<std::string, std::function<void(Context*)>> stdLibFunctions;
-    BlockScope* rootScope; // Global scope
-    BlockScope* curScope;
 	
+    std::vector<BlockScope> scopes;
+
     DrawingBoard* drawingBoard;
     TurtleBoard* turtleBoard;
 

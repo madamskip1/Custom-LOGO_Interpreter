@@ -3,26 +3,22 @@
 
 Context::Context()
 {
-    rootScope = curScope = new BlockScope(nullptr);
+    addNewScope();
     prepareStdLibFunctions();
 }
 
 
 void Context::addNewScope()
 {
-	BlockScope* newScope = new BlockScope(curScope);
-
-	curScope = newScope;
+    scopes.push_back(BlockScope());
 }
 
 void Context::removeScope()
 {
-    if (curScope == rootScope)
+    if (scopes.size() <= 1)
         return;
 
-    BlockScope* temp = curScope;
-	curScope = curScope->getUpperScope();
-    delete temp;
+    scopes.pop_back();
 }
 
 void Context::setDrawingBoard(DrawingBoard* board)
@@ -62,28 +58,45 @@ void Context::addVariable(std::shared_ptr<Variable> variable)
         throw "cant declare var with same name as parameter";
     }
 
-    curScope->addVariable(variable);
+    scopes.back().addVariable(variable);
 }
 
 void Context::removeVariable(std::string identifier)
 {
-    curScope->removeVariable(identifier);
+    for (auto& scope : scopes)
+    {
+        if (scope.hasVariable(identifier))
+        {
+            scope.removeVariable(identifier);
+            return;
+        }
+    }
 }
 
 Variable* Context::getVariable(std::string name)
 {
-    Variable* var = curScope->getVariable(name);
-    if (var)
-        return var;
+    for (auto& scope : scopes)
+    {
+        if (scope.hasVariable(name))
+        {
+            return scope.getVariable(name);
+        }
+    }
 
-    var = args[name];
-
-    return var;
+    return args[name];
 }
 
-std::vector<std::shared_ptr<Variable> > Context::getAllCurrentVariables()
+std::vector<std::shared_ptr<Variable>> Context::getAllCurrentVariables()
 {
-    return curScope->getAllVariables();
+    std::vector<std::shared_ptr<Variable>> variables;
+
+    for (auto& scope : scopes)
+    {
+        std::vector<std::shared_ptr<Variable>> scopeVariables = scope.getAllVariable();
+        variables.insert(variables.end(), scopeVariables.begin(), scopeVariables.end());
+    }
+
+    return variables;
 }
 
 AST::DefFuncStatement* Context::getDefFunction(std::string name) const

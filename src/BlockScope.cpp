@@ -1,6 +1,6 @@
 #include "BlockScope.h"
 
-BlockScope::BlockScope(BlockScope* upper) : upperScope(upper)
+BlockScope::BlockScope()
 {
 }
 
@@ -14,17 +14,10 @@ BlockScope::~BlockScope()
     variables.clear();
 }
 
-
-BlockScope* BlockScope::getUpperScope() const
-{
-	return upperScope;
-}
-
-
 void BlockScope::addVariable(std::shared_ptr<Variable> var)
 {
 	std::string identifier = var->name;
-	if (hasVariableInAnyScope(identifier))
+    if (hasVariable(identifier))
 	{
 		throw "Variable already defined";
 	}
@@ -33,20 +26,16 @@ void BlockScope::addVariable(std::shared_ptr<Variable> var)
 
 void BlockScope::removeVariable(std::string identifier)
 {
-    if (hasVariableInThisScope(identifier))
+    if (!hasVariable(identifier))
     {
-        variables[identifier].reset();
-        variables.erase(identifier);
-        return;
+        throw "Var wasn't declared, cant delete";
     }
 
-    if (upperScope == nullptr)
-        throw "Var wasn't declared, cant delete";
-
-    upperScope->removeVariable(identifier);
+    variables[identifier].reset();
+    variables.erase(identifier);
 }
 
-bool BlockScope::hasVariableInThisScope(std::string name)
+bool BlockScope::hasVariable(std::string name)
 {
 	if (variables.find(name) != variables.cend())
 		return true;
@@ -54,41 +43,24 @@ bool BlockScope::hasVariableInThisScope(std::string name)
 	return false;
 }
 
-bool BlockScope::hasVariableInAnyScope(std::string name)
-{
-	if (hasVariableInThisScope(name))
-		return true;
-
-	if (upperScope != nullptr)
-		return upperScope->hasVariableInAnyScope(name);
-
-	return false;
-}
-
 Variable* BlockScope::getVariable(std::string name)
 {
-	if (hasVariableInThisScope(name))
+    if (hasVariable(name))
 	{
 		return variables.at(name).get();
-	}
-	else if (hasVariableInAnyScope(name))
-	{
-		return upperScope->getVariable(name);
 	}
 
     return nullptr;
 }
 
-std::vector<std::shared_ptr<Variable>> BlockScope::getAllVariables()
+std::vector<std::shared_ptr<Variable> > BlockScope::getAllVariable()
 {
-    std::vector<std::shared_ptr<Variable>> toReturn;
-    if (upperScope != nullptr)
-        toReturn = upperScope->getAllVariables();
+    std::vector<std::shared_ptr<Variable>> variablesToReturn;
 
-    for (const auto& variable : variables)
+    for (auto& var: variables)
     {
-        toReturn.push_back(variable.second);
+        variablesToReturn.push_back(var.second);
     }
 
-    return toReturn;
+    return variablesToReturn;
 }
