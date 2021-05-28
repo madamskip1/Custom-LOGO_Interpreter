@@ -82,3 +82,11 @@ void MainWindow::runScript(std::string scriptString, bool isFile)
 
     this->ui->outputBox->setText(output);
 }
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    mainContext.reset();
+    this->ui->drawingBoard->cleanBoard();
+    this->ui->drawingBoard->updateBoard();
+    this->ui->turtleBoard->updateBoard();
+}

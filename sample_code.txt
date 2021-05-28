@@ -209,28 +209,6 @@ repeatCondition(repeatConditionInteger > 15)
 	repeatConditionInteger = repeatConditionInteger - 1;
 }
 
-Turtle synchronizationInRepeatTimeTurtle(200, 500);
-synchronizationInRepeatTimeTurtle.brush.color = "#873600";
-Integer synchronizationInRepeatTimeCondition = 20;
-Integer synchronizationInRepeatTimeCounter = 0;
-
-repeatTime(1000, 7)
-{
-	synchronizationInRepeatTimeCounter = synchronizationInRepeatTimeCounter + 1;
-	if (synchronizationInRepeatTimeCounter  >= 5)
-	{
-		synchronizationInRepeatTimeCondition = 10;
-	}
-}
-
-repeatTime(2000, 10)
-{
-	repeatCondition (synchronizationInRepeatTimeCondition > 10)
-	{
-	}
-	synchronizationInRepeatTimeTurtle.go(30);
-	synchronizationInRepeatTimeTurtle.right(30);
-}
 
 function booleanInArgs(Boolean testBool)
 {
@@ -242,3 +220,19 @@ function booleanInArgs(Boolean testBool)
 }
 
 test(2 + 2 > 3);
+
+Boolean function booleanReturnWithMath()
+{
+	return 2 + 2 * 2 < 3 / 3 * 6 + 1; // 6 < 7
+}
+
+Turtle booleanReturnWithMathTurtle;
+booleanReturnWithMathTurtle.left(90 + 33);
+booleanReturnWithMathTurtle.go(60);
+booleanReturnWithMathTurtle.brush.enabled = !booleanReturnWithMath();
+booleanReturnWithMathTurtle.go(60);
+booleanReturnWithMathTurtle.brush.enabled = true;
+booleanReturnWithMathTurtle.go(60);
+
+
+
