@@ -14,6 +14,7 @@ namespace AST
 		IfStatement,
 		RepeatStatement,
 		RepeatTimeStatement,
+        RepeatConditionStatement,
 		InstructionsBlock,
 		Expression,
 		ExpressionTerm,
@@ -44,6 +45,7 @@ namespace AST
 
 		virtual void execute() {};
         virtual void execute(Context*) {};
+        virtual void evaluate(Context*) {};
 
 		NodeType getNodeType() const;
 		

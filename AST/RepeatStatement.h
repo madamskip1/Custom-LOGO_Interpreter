@@ -20,7 +20,7 @@ namespace AST
 		AST::InstructionsBlock* getInstructuionsBlock() const;
 
 	private:
-		std::shared_ptr<AST::Expression> howManyTimeExpression = nullptr;
+        std::unique_ptr<AST::Expression> howManyTimeExpression = nullptr;
 		std::unique_ptr<AST::InstructionsBlock> instructionsBlock = nullptr;
 	};
 }

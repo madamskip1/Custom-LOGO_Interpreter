@@ -32,6 +32,7 @@ SOURCES += \
     AST/Number.cpp \
     AST/Parameter.cpp \
     AST/ProgramRootNode.cpp \
+    AST/RepeatConditionStatement.cpp \
     AST/RepeatStatement.cpp \
     AST/RepeatTimeStatement.cpp \
     AST/ReturnStatement.cpp \
@@ -87,6 +88,7 @@ HEADERS += \
     AST/Number.h \
     AST/Parameter.h \
     AST/ProgramRootNode.h \
+    AST/RepeatConditionStatement.h \
     AST/RepeatStatement.h \
     AST/RepeatTimeStatement.h \
     AST/ReturnStatement.h \

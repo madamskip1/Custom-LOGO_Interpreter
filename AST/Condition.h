@@ -11,7 +11,7 @@ namespace AST
 	public:
 		Condition();
 
-        virtual bool evaluate(Context* context);
+        virtual void evaluate(Context* context);
 	   
 		const void setLeftCondition(std::unique_ptr<AST::Node> condition);
 		const void setRightCondition(std::unique_ptr<AST::Node> condition);

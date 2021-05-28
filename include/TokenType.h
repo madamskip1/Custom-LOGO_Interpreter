@@ -8,6 +8,7 @@ enum class TokenType : unsigned int
 	// Keywords
 	Repeat,
 	RepeatTime,
+    RepeatCondition,
 	Delete,
 	Function,
 	If,
@@ -107,5 +108,6 @@ static const std::unordered_map<std::string, TokenType> KeywordToTokenType =
 	{ "Boolean", TokenType::Boolean },
 	{ "true", TokenType::True },
 	{ "false", TokenType::False },
-    { "delete", TokenType::Delete }
+    { "delete", TokenType::Delete },
+    { "repeatCondition", TokenType::RepeatCondition }
 };

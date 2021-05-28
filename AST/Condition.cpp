@@ -7,7 +7,7 @@ AST::Condition::Condition() : AST::Node(AST::NodeType::Condition)
 {
 }
 
-bool AST::Condition::evaluate(Context* context)
+void AST::Condition::evaluate(Context* context)
 {
 	bool returnBoolean = false;
 
@@ -32,7 +32,8 @@ bool AST::Condition::evaluate(Context* context)
             }
             else
             {
-                return false; // expression arent directly cast to boolean
+                context->evaluateValue = false;
+                return; // expression arent directly cast to boolean
             }
         }
     }
@@ -61,18 +62,20 @@ bool AST::Condition::evaluate(Context* context)
 		}
 		else
 		{
-            return false; // expression arent directly cast to boolean => we need 2 expressions and operator
+            context->evaluateValue = false;
+            return;// expression arent directly cast to boolean => we need 2 expressions and operator
 		}
 	}
 	else
 	{
-		return false;
+        context->evaluateValue = false;
+        return;
 	}
 
 	if (notOperator)
 		returnBoolean = !returnBoolean;
 
-	return returnBoolean;
+    context->evaluateValue = returnBoolean;
 }
 
 const void AST::Condition::setLeftCondition(std::unique_ptr<AST::Node> condition)
@@ -117,6 +120,9 @@ const TokenType AST::Condition::getRelationOperator() const
 
 bool AST::Condition::evaluateConditionOrBoolean(Node* node, Context *context)
 {
+    node->evaluate(context);
+    return std::get<bool>(context->evaluateValue);
+    /*
     if (node->getNodeType() == AST::NodeType::Condition)
     {
         return (static_cast<AST::Condition*>(node))->evaluate(context);
@@ -124,5 +130,5 @@ bool AST::Condition::evaluateConditionOrBoolean(Node* node, Context *context)
     else
     {
         return (static_cast<AST::Boolean*>(node))->evaluate();
-    }
+    }*/
 }

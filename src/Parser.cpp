@@ -5,6 +5,7 @@
 #include "../AST/IfStatement.h"
 #include "../AST/RepeatStatement.h"
 #include "../AST/RepeatTimeStatement.h"
+#include "../AST/RepeatConditionStatement.h"
 #include "../AST/Expression.h"
 #include "../AST/Number.h"
 #include "../AST/Condition.h"
@@ -57,6 +58,10 @@ std::unique_ptr<AST::Node> Parser::parseInstruction()
         return node;
 
     node = parseRepeatTimeStatement();
+    if (node)
+        return node;
+
+    node = parseRepeatConditionStatement();
     if (node)
         return node;
 
@@ -207,6 +212,28 @@ std::unique_ptr<AST::Node> Parser::parseRepeatTimeStatement()
     }
 
     return repeatTimeStatement;
+}
+
+std::unique_ptr<AST::Node> Parser::parseRepeatConditionStatement()
+{
+    if (!consumeTokenIfType(TokenType::RepeatCondition))
+        return nullptr;
+
+    if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketOpen, LogType::MissingRoundBracketOpen))
+        return nullptr;
+
+    std::unique_ptr<AST::Node> condition = parseCondition();
+
+    if (!condition)
+        return nullptr;
+
+    if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketClose, LogType::MissingRoundBracketClose))
+        return nullptr;
+
+    std::unique_ptr<AST::InstructionsBlock> instructionBlock = parseInstructionsBlock();
+
+    std::unique_ptr<AST::RepeatConditionStatement> repeatConditionStatement = std::make_unique<AST::RepeatConditionStatement>(std::move(condition), std::move(instructionBlock));
+    return repeatConditionStatement;
 }
 
 std::unique_ptr<AST::Node> Parser::parseAssignOrCallFunctionStatement()

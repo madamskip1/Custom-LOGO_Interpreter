@@ -12,7 +12,8 @@ AST::IfStatement::IfStatement(std::unique_ptr<AST::Node> condition, std::unique_
 
 void AST::IfStatement::execute(Context* context)
 {
-    bool ifCondition = (static_cast<Condition*>(conditionNode.get()))->evaluate(context);
+    conditionNode->evaluate(context);
+    bool ifCondition = std::get<bool>(context->evaluateValue);
 
 	if (ifCondition)
 	{

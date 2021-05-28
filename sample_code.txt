@@ -206,3 +206,13 @@ repeatTime(450, 6)
 	new.direction = 180;
 	new.go(20);
 }
+
+Integer repeatConditionInteger = 20;
+Turtle repeatConditionTurtle(120, 500);
+
+repeatCondition(repeatConditionInteger > 15)
+{
+	repeatConditionTurtle.go(50);
+	repeatConditionTurtle.right(50);
+	repeatConditionInteger = repeatConditionInteger - 1;
+}

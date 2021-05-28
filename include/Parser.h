@@ -41,6 +41,7 @@ private:
 	std::unique_ptr<AST::Node> parseIfStatement();
 	std::unique_ptr<AST::Node> parseRepeatStatement();
 	std::unique_ptr<AST::Node> parseRepeatTimeStatement();
+    std::unique_ptr<AST::Node> parseRepeatConditionStatement();
 	std::unique_ptr<AST::Node> parseAssignOrCallFunctionStatement();
 	std::unique_ptr<AST::CallFuncStatement> parseCallFunctionStatement(std::vector<std::string> identifiers);
 
