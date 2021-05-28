@@ -118,14 +118,9 @@ std::shared_ptr<Variable> AST::VarDeclare::executeClassDeclaration(Context *cont
     std::shared_ptr<Variable> var;
 
     if (type == TokenType::Turtle)
-        var = createTurtle(context, x, y);
+        return createTurtle(context, x, y);
     else
-        var = createPoint(x, y);
-
-    var->name = identifier;
-    var->type = type;
-
-    return var;
+        return createPoint(x, y);
 }
 
 std::shared_ptr<Turtle> AST::VarDeclare::createTurtle(Context* context, std::optional<int> x, std::optional<int> y)
