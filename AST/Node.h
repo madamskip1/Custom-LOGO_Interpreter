@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 //#include "Context.h"
+#include "Token.h"
 
 class Context;
 
@@ -55,8 +56,11 @@ namespace AST
         std::size_t getChildrenSize() const;
         void releaseChild(const int& index);
 
+        void setToken(Token token);
+
 	protected:
 		AST::NodeType nodeType;
+        Token token;
 
 		std::vector<std::unique_ptr<AST::Node>> children;
 	};

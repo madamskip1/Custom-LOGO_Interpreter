@@ -1,6 +1,7 @@
 #include <stdexcept>
 #include "../include/Context.h"
 #include "TurtleStdFunc.h"
+#include "Logger.h"
 
 
 Context::Context()
@@ -60,6 +61,12 @@ void Context::addVariable(std::shared_ptr<Variable> variable)
         throw "cant declare var with same name as parameter";
     }
 
+    if (hasVariable(variable->name))
+    {
+        Logger::addError(LogType::VarAlreadyDeclared, Token());
+        throw std::runtime_error("Variable already defined");
+    }
+
     scopes.back().addVariable(variable);
 }
 
@@ -85,7 +92,25 @@ Variable* Context::getVariable(std::string name)
         }
     }
 
-    return args[name];
+    if (args.find(name) != args.end())
+    {
+        return args[name];
+    }
+
+    return nullptr;
+}
+
+bool Context::hasVariable(std::string name)
+{
+    for (auto& scope : scopes)
+    {
+        if (scope.hasVariable(name))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 std::vector<std::shared_ptr<Variable>> Context::getAllCurrentVariables()

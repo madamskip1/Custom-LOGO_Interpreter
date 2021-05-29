@@ -48,7 +48,6 @@ SOURCES += \
     src/Lexer.cpp \
     src/Log.cpp \
     src/Logger.cpp \
-    src/Node.cpp \
     src/Parser.cpp \
     src/Point.cpp \
     src/SourceReader.cpp \
@@ -99,7 +98,6 @@ HEADERS += \
     include/Lexer.h \
     include/Log.h \
     include/Logger.h \
-    include/Node.h \
     include/Parser.h \
     include/Point.h \
     include/SourceReader.h \

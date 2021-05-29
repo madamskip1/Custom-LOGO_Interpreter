@@ -115,6 +115,7 @@ std::unique_ptr<AST::InstructionsBlock> Parser::parseInstructionsBlock()
 
 std::unique_ptr<AST::Node> Parser::parseIfStatement()
 {
+    Token ifToken = getToken();
     if (!consumeTokenIfType(TokenType::If))
         return nullptr;
 
@@ -148,11 +149,13 @@ std::unique_ptr<AST::Node> Parser::parseIfStatement()
     }
 
     std::unique_ptr<AST::IfStatement> ifStatement = std::make_unique<AST::IfStatement>(std::move(condition), std::move(trueBlock), std::move(elseBlock));
+    ifStatement->setToken(ifToken);
     return ifStatement;
 }
 
 std::unique_ptr<AST::Node> Parser::parseRepeatStatement()
 {
+    Token repeatToken = getToken();
     if (!consumeTokenIfType(TokenType::Repeat))
         return nullptr;
 
@@ -171,11 +174,13 @@ std::unique_ptr<AST::Node> Parser::parseRepeatStatement()
         return nullptr;
 
     std::unique_ptr<AST::RepeatStatement> repeatStatement = std::make_unique<AST::RepeatStatement>(std::move(howManyTime), std::move(block));
+    repeatStatement->setToken(repeatToken);
     return repeatStatement;
 }
 
 std::unique_ptr<AST::Node> Parser::parseRepeatTimeStatement()
 {
+    Token repeatTimeToken = getToken();
     if (!consumeTokenIfType(TokenType::RepeatTime))
         return nullptr;
 
@@ -211,12 +216,14 @@ std::unique_ptr<AST::Node> Parser::parseRepeatTimeStatement()
     {
         repeatTimeStatement = std::make_unique<AST::RepeatTimeStatement>(std::move(period), std::move(block));
     }
+    repeatTimeStatement->setToken(repeatTimeToken);
 
     return repeatTimeStatement;
 }
 
 std::unique_ptr<AST::Node> Parser::parseRepeatConditionStatement()
 {
+    Token repeatConditionToken = getToken();
     if (!consumeTokenIfType(TokenType::RepeatCondition))
         return nullptr;
 
@@ -234,6 +241,7 @@ std::unique_ptr<AST::Node> Parser::parseRepeatConditionStatement()
     std::unique_ptr<AST::InstructionsBlock> instructionBlock = parseInstructionsBlock();
 
     std::unique_ptr<AST::RepeatConditionStatement> repeatConditionStatement = std::make_unique<AST::RepeatConditionStatement>(std::move(condition), std::move(instructionBlock));
+    repeatConditionStatement->setToken(repeatConditionToken);
     return repeatConditionStatement;
 }
 
@@ -268,6 +276,8 @@ std::unique_ptr<AST::Node> Parser::parseAssignOrCallFunctionStatement()
 
 std::unique_ptr<AST::CallFuncStatement> Parser::parseCallFunctionStatement(std::vector<std::string> identifiers)
 {
+    Token callFuncToken = getToken();
+
     if (!consumeTokenIfType(TokenType::RoundBracketOpen))
         return nullptr;
     
@@ -293,7 +303,7 @@ std::unique_ptr<AST::CallFuncStatement> Parser::parseCallFunctionStatement(std::
     }
 
     callFunc->addIdentifiers(identifiers);
-
+    callFunc->setToken(callFuncToken);
     return callFunc;
 }
 
@@ -308,10 +318,19 @@ std::unique_ptr<AST::Node> Parser::parseVarDeclareORDefFuncWithReturStatement()
     decVarOrDefFunc = parseDefFuncStatement(token.type);
 
     if (decVarOrDefFunc)
+    {
+        decVarOrDefFunc->setToken(token);
         return decVarOrDefFunc;
+    }
 
     decVarOrDefFunc = parseVarDeclare(token.type);
-    return decVarOrDefFunc;
+    if (decVarOrDefFunc)
+    {
+        decVarOrDefFunc->setToken(token);
+        return decVarOrDefFunc;
+    }
+
+    return nullptr;
 }
 
 std::unique_ptr<AST::VarDeclare> Parser::parseVarDeclare(const TokenType& type)
@@ -356,11 +375,13 @@ std::unique_ptr<AST::VarDeclare> Parser::parseVarDeclare(const TokenType& type)
         varDeclare = std::make_unique<AST::VarDeclare>(type, identifier);
     }
 
+    varDeclare->setToken(token);
     return varDeclare;
 }
 
 std::unique_ptr<AST::Node> Parser::parseDefFuncStatement(const TokenType& returnType)
 {
+    Token defFuncToken = getToken();
     if (!consumeTokenIfType(TokenType::Function))
         return nullptr;
     
@@ -401,44 +422,34 @@ std::unique_ptr<AST::Node> Parser::parseDefFuncStatement(const TokenType& return
     defFunc->setInstructionsBlock(std::move(instructionsBlock));
     defFunc->setName(name);
     defFunc->setReturnType(returnType);
+    defFunc->setToken(defFuncToken);
     return defFunc;
 }
 
 std::unique_ptr<AST::AssignmentStatement> Parser::parseAssignment(std::vector<std::string> identifiers)
 {
+    Token token = getToken();
     std::unique_ptr<AST::Assignable> assignable = parseAssignable();
 
     if (!assignable)
         return nullptr;
 
     std::unique_ptr<AST::AssignmentStatement> assign = std::make_unique<AST::AssignmentStatement>(identifiers, std::move(assignable));
-
+    assign->setToken(token);
     return assign;
 }
 
 std::unique_ptr<AST::Assignable> Parser::parseAssignable()
 {
     Token token = getToken();
-/*
-    if (checkCurTokenType({ TokenType::True, TokenType::False }))
-    {
-        std::unique_ptr<AST::Assignable> assignable = std::make_unique<AST::Boolean>(checkCurTokenType(TokenType::True));
-        consumeToken();
 
-        return assignable;
-    }
-
-    if (checkCurTokenType(TokenType::ColorValue))
-    {
-        std::unique_ptr<AST::Assignable> assignable = std::make_unique<AST::Color>(getAndConsumeToken().getStringValue());
-        
-        return assignable;
-    }
-*/
     std::unique_ptr<AST::Assignable> assignable = parseExpression();
     
     if (assignable)
+    {
+        assignable->setToken(token);
         return assignable;
+    }
 
     Logger::addError(LogType::UnknownAssignable, token);
     return nullptr;
@@ -446,6 +457,7 @@ std::unique_ptr<AST::Assignable> Parser::parseAssignable()
 
 std::unique_ptr<AST::ClassAssignment> Parser::parseClassAssignment()
 {
+    Token classAssignToken = getToken();
     if (!consumeTokenIfType(TokenType::RoundBracketOpen))
         return nullptr;
     
@@ -471,6 +483,7 @@ std::unique_ptr<AST::ClassAssignment> Parser::parseClassAssignment()
     if (!consumeTokenIfType_Otherwise_AddError(TokenType::RoundBracketClose, LogType::MissingCurlyBracketClose))
         return nullptr;
 
+    classAssign->setToken(classAssignToken);
     return classAssign;
 }
 
@@ -501,6 +514,7 @@ std::unique_ptr<AST::Expression> Parser::parseExpression()
 
 std::unique_ptr<AST::Expression> Parser::parseConditionExpression()
 {
+    Token conditionToken = getToken();
     std::unique_ptr<AST::Expression> andCondition = parseAndConditionExpression();
     if (!andCondition)
         return nullptr;
@@ -518,11 +532,14 @@ std::unique_ptr<AST::Expression> Parser::parseConditionExpression()
         condition->setRelationOperator(TokenType::Or);
     }
 
+    condition->setToken(conditionToken);
     return condition;
 }
 
 std::unique_ptr<AST::Expression> Parser::parseAndConditionExpression()
 {
+    Token andConditionToken = getToken();
+
     std::unique_ptr<AST::Expression> relationCondition = parseRelationConditionExpression();
     if (!relationCondition)
         return nullptr;
@@ -539,11 +556,14 @@ std::unique_ptr<AST::Expression> Parser::parseAndConditionExpression()
         andCondition->setRelationOperator(TokenType::And);
     }
 
+    andCondition->setToken(andConditionToken);
     return andCondition;
 }
 
 std::unique_ptr<AST::Expression> Parser::parseRelationConditionExpression()
 {
+    Token relConditionToken = getToken();
+
     bool notOperator = consumeTokenIfType(TokenType::NotOperator);
 
     if (checkCurTokenType({ TokenType::True, TokenType::False }))
@@ -551,6 +571,7 @@ std::unique_ptr<AST::Expression> Parser::parseRelationConditionExpression()
         bool boolean = getAndConsumeToken().type == TokenType::True;
         std::unique_ptr<AST::Boolean> booleanWord = std::make_unique<AST::Boolean>(boolean);
         booleanWord->setNegativeOp(notOperator);
+        booleanWord->setToken(relConditionToken);
 
         return booleanWord;
     }
@@ -579,11 +600,14 @@ std::unique_ptr<AST::Expression> Parser::parseRelationConditionExpression()
         relationCondition->addChildExpression(std::move(secondExpression));
     }
 
+    relationCondition->setToken(relConditionToken);
     return relationCondition;
 }
 
 std::unique_ptr<AST::Expression> Parser::parseArithmeticAddExpression()
 {
+    Token addToken = getToken();
+
     std::unique_ptr<AST::Expression> termExpression = parseArithmeticMultiExpression();
     
     if (!termExpression)
@@ -608,11 +632,14 @@ std::unique_ptr<AST::Expression> Parser::parseArithmeticAddExpression()
         token = getToken();
     }
 
+    expression->setToken(addToken);
     return expression;
 }
 
 std::unique_ptr<AST::Expression> Parser::parseArithmeticMultiExpression()
 {
+    Token multiToken = getToken();
+
     std::unique_ptr<AST::Expression> factorExpression = parseFactorExpression();
 
     if (!factorExpression)
@@ -634,18 +661,21 @@ std::unique_ptr<AST::Expression> Parser::parseArithmeticMultiExpression()
         token = getToken();
     }
 
+    termExpression->setToken(multiToken);
     return termExpression;
 }
 
 std::unique_ptr<AST::Expression> Parser::parseFactorExpression()
 {
-    bool negativeOp = consumeTokenIfType(TokenType::Minus);
+    Token factorToken = getToken();
 
+    bool negativeOp = consumeTokenIfType(TokenType::Minus);
 
     if (checkCurTokenType(TokenType::Digit))
     {
         std::unique_ptr<AST::Number> factorExpression = std::make_unique<AST::Number>(getToken().getIntValue());
         factorExpression->setNegativeOp(negativeOp);
+        factorExpression->setToken(factorToken);
         consumeToken();
 
         return factorExpression;
@@ -662,6 +692,7 @@ std::unique_ptr<AST::Expression> Parser::parseFactorExpression()
             return nullptr;
 
         factorExpression->setNegativeOp(negativeOp);
+        factorExpression->setToken(factorToken);
         return factorExpression;
     }
 
@@ -679,17 +710,20 @@ std::unique_ptr<AST::Expression> Parser::parseFactorExpression()
             if (!callFunc)
                 return nullptr;
 
+            callFunc->setToken(factorToken);
             return callFunc;
         }
 
         std::unique_ptr<AST::VariableExpression> var = std::make_unique<AST::VariableExpression>(identifiers);
         var->setNegativeOp(negativeOp);
+        var->setToken(factorToken);
 
         return var;
     }
     if (checkCurTokenType(TokenType::ColorValue))
     {
         std::unique_ptr<AST::Color> color = std::make_unique<AST::Color>(getAndConsumeToken().getStringValue());
+        color->setToken(factorToken);
         return color;
     }
 
@@ -699,6 +733,8 @@ std::unique_ptr<AST::Expression> Parser::parseFactorExpression()
 
 std::unique_ptr<AST::ReturnStatement> Parser::parseReturnStatement()
 {
+    Token returnToken = getToken();
+
     if (!consumeTokenIfType(TokenType::Return))
         return nullptr;
 
@@ -707,15 +743,18 @@ std::unique_ptr<AST::ReturnStatement> Parser::parseReturnStatement()
     if (!assignable)
         return nullptr;
 
-    std::unique_ptr<AST::ReturnStatement> returnStatement = std::make_unique<AST::ReturnStatement>(std::move(assignable));
-
     consumeTokenIfType_Otherwise_AddLog(TokenType::Semicolon, LogType::MissingSemicolon);
+
+    std::unique_ptr<AST::ReturnStatement> returnStatement = std::make_unique<AST::ReturnStatement>(std::move(assignable));
+    returnStatement->setToken(returnToken);
 
     return returnStatement;
 }
 
 std::unique_ptr<AST::DeleteStatement> Parser::parseDeleteStatement()
 {
+    Token deleteToken = getToken();
+
     if (!consumeTokenIfType(TokenType::Delete))
         return nullptr;
 
@@ -726,7 +765,9 @@ std::unique_ptr<AST::DeleteStatement> Parser::parseDeleteStatement()
 
     consumeTokenIfType_Otherwise_AddLog(TokenType::Semicolon, LogType::MissingSemicolon);
 
-    return std::make_unique<AST::DeleteStatement>(token.getStringValue());
+    std::unique_ptr<AST::DeleteStatement> delStatement = std::make_unique<AST::DeleteStatement>(token.getStringValue());
+    delStatement->setToken(deleteToken);
+    return delStatement;
 }
 
 std::vector<std::string> Parser::parseIdentifiers()

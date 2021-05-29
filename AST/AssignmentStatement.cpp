@@ -4,6 +4,8 @@
 #include "AST/Color.h"
 #include "include/Context.h"
 #include <QDebug>
+#include "Logger.h"
+#include <stdexcept>
 
 AST::AssignmentStatement::AssignmentStatement(std::vector<std::string> ids, std::unique_ptr<AST::Assignable> assignable) : AST::Node(AST::NodeType::AssignmentStatement)
 {
@@ -16,7 +18,8 @@ void AST::AssignmentStatement::execute(Context* context)
     Variable* var = context->getVariable(identifiers[0]);
     if (var == nullptr)
     {
-        throw "Variable wasn't declared";
+        Logger::addError(LogType::VarNotDeclared, token);
+        throw std::runtime_error("Variable wasn't declared");
     }
     std::vector<std::string> tempIdentifiers;
 

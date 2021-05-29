@@ -1,5 +1,6 @@
 #include "BlockScope.h"
 #include <stdexcept>
+#include "Logger.h"
 
 BlockScope::BlockScope()
 {

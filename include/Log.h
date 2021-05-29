@@ -23,7 +23,16 @@ enum class LogType
 	BadReturnStatement,
 	UnknownAssignable,
     BadCondition,
-    DeleteMissingIdentifier
+    DeleteMissingIdentifier,
+
+    // execute/evaluate/interpreter
+    VarNotDeclared,
+    VarAlreadyDeclared,
+    FuncNotDefined,
+    NotEqualeNumArgs,
+    ArgTypeNotEqualParameter,
+    WrongClassArgsNum,
+    InitClassNotPointType,
 };
 
 class Log
@@ -51,23 +60,30 @@ private:
     const std::unordered_map<LogType, std::string> LogTypeToMsg =
 	{
 		{ LogType::MissingElem, "NULL" },
-		{ LogType::MissingSemicolon, "Brakuje srednika" },
-		{ LogType::NotRecognizedToken, "Nie udalo sie rozponac tokenu." },
-		{ LogType::MissingRoundBracketOpen, "Oczekiwano nawiasu otwierajacego." },
-		{ LogType::MissingRoundBracketClose, "Oczekiwano nawiasu zamykajacego." },
-		{ LogType::MissingCurlyBracketClose, "Oczekiwano klamre zamykajaca." },
+        { LogType::MissingSemicolon, "Brakuje średnika" },
+        { LogType::NotRecognizedToken, "Nie udało sie rozponać tokenu." },
+        { LogType::MissingRoundBracketOpen, "Oczekiwano nawiasu otwierającego." },
+        { LogType::MissingRoundBracketClose, "Oczekiwano nawiasu zamykającego." },
+        { LogType::MissingCurlyBracketClose, "Oczekiwano klamrę zamykającą." },
 		{ LogType::MissingIdentifier, "Oczekiwano identyfikatora." },
-		{ LogType::MissingIdentifierOrFunctionKeyword, "Oczekiwano identyfikatora lub slowa kluczowego \"function\"." },
+        { LogType::MissingIdentifierOrFunctionKeyword, "Oczekiwano identyfikatora lub słowa kluczowego \"function\"." },
 		{ LogType::CantDefFuncInBlock, "Definiowanie funkcji w bloku jest niedozowlone." },
-		{ LogType::MissingParameter, "Uzyto przecinka, ale nie podano kolejnego parametru." },
-		{ LogType::BadSyntaxParameter, "Brakuje deklaracji typu przed nazwa parametru." },
-		{ LogType::BadExpression, "Zle wyrazenie." },
-		{ LogType::MissingCurlyBracketOpen, "Oczekiwano klamre otwierajaca." },
-		{ LogType::BadSyntax, "Blad skladniowy." },
-		{ LogType::NotEndOfFile, "Nie udalo sie przetworzyc do konca." },
-		{ LogType::BadReturnStatement, "Blad skladniowy w klauzyli Return" },
-		{ LogType::UnknownAssignable, "Nie rozpoznanu rodzaju przypisania wartosci" },
-        { LogType::BadCondition, "Zle wyrazenie warunkowe" },
-        { LogType::DeleteMissingIdentifier, "Brakuje identyfikatora przy delete" }
-	};
+        { LogType::MissingParameter, "Użyto przecinka, ale nie podano kolejnego parametru." },
+        { LogType::BadSyntaxParameter, "Brakuje deklaracji typu przed nazwą parametru." },
+        { LogType::BadExpression, "Złe wyrażenie." },
+        { LogType::MissingCurlyBracketOpen, "Oczekiwano klamrę otwierającą." },
+        { LogType::BadSyntax, "Bład składniowy." },
+        { LogType::NotEndOfFile, "Nie udało sie przetworzyć do końca." },
+        { LogType::BadReturnStatement, "Błąd składniowy w klauzyli Return" },
+        { LogType::UnknownAssignable, "Nie rozpoznanu rodzaju przypisania wartości" },
+        { LogType::BadCondition, "Złe wyrażenie warunkowe" },
+        { LogType::DeleteMissingIdentifier, "Brakuje identyfikatora przy delete" },
+        { LogType::VarNotDeclared, "Zmienna nie została zadeklarowana" },
+        { LogType::VarAlreadyDeclared, "Zmienna jest już zadeklarowana" },
+        { LogType::FuncNotDefined, "Funkcja nie została zdefiniowana" },
+        { LogType::NotEqualeNumArgs, "Podano złą liczbę argumentów funkcji" },
+        { LogType::ArgTypeNotEqualParameter, "Argument ma inny typ niż zdefiniowany parametr" },
+        { LogType::WrongClassArgsNum, "Deklaracja klasy przyjmuje jeden lub dwa argumenty" },
+        { LogType::InitClassNotPointType, "Jedyną klasą, którą można inicjalizować inne klasy jest POINT" }
+    };
 };

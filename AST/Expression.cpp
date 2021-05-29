@@ -1,5 +1,6 @@
 #include "Expression.h"
 #include "../include/Context.h"
+#include <stdexcept>
 
 AST::Expression::Expression()
 {
@@ -17,7 +18,7 @@ bool AST::Expression::isOnlyId() const
 std::vector<std::string> AST::Expression::getIdentifiers() const
 {
     if (childrenExpressions.size() != 1)
-        throw "expression isn't just identifiers";
+        throw std::runtime_error("expression isn't just identifiers");
 
     return childrenExpressions[0]->getIdentifiers();
 }

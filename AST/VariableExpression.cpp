@@ -1,6 +1,8 @@
 #include "VariableExpression.h"
 #include "../include/Context.h"
 #include "../include/Variable.h"
+#include "Logger.h"
+#include <stdexcept>
 
 AST::VariableExpression::VariableExpression(std::vector<std::string> variableIdentifiers)
 {
@@ -15,13 +17,10 @@ void AST::VariableExpression::evaluate(Context *context)
         Variable* var = context->getVariable(identifiers[0]);
         if (var == nullptr)
         {
-            throw "Variable wasn't declared";
+            Logger::addError(LogType::VarNotDeclared, token);
+            throw std::runtime_error("Variable wasn't declared");
         }
 
-        if (var->value.index() != 1)
-        {
-            throw "Variable in expression can be only Integer";
-        }
         context->evaluateValue = std::get<int>(var->value);
     }
 }

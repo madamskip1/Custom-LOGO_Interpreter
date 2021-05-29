@@ -4,6 +4,8 @@
 #include "../include/Context.h"
 #include "../include/Variable.h"
 #include "../include/Point.h"
+#include "Logger.h"
+#include <stdexcept>
 
 AST::VarDeclare::VarDeclare(TokenType type, std::string identifier) : Node(AST::NodeType::VarDeclare)
 {
@@ -86,7 +88,10 @@ std::shared_ptr<Variable> AST::VarDeclare::executeClassDeclaration(Context *cont
     }
 
     if (classAssignment->getExpressionsSize() < 1 && classAssignment->getExpressionsSize() > 2)
-        throw "wrong number of class arguments";
+    {
+        Logger::addError(LogType::WrongClassArgsNum, token);
+        throw std::runtime_error("wrong number of class arguments");
+    }
 
     std::optional<int> x, y;
 
@@ -96,7 +101,8 @@ std::shared_ptr<Variable> AST::VarDeclare::executeClassDeclaration(Context *cont
         Variable* evaluatedVar =  std::get<Variable*>(context->evaluateValue);
         if (evaluatedVar->type != TokenType::Point)
         {
-            throw "class used to initalize class has to be Point type";
+            Logger::addError(LogType::InitClassNotPointType, token);
+            throw std::runtime_error("class used to initalize class has to be Point type");
         }
         evaluatedVar->getSomeVal({"x"}, context);
         x = std::get<int>(context->evaluateValue);

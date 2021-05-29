@@ -37,6 +37,7 @@ public:
     void addVariable(std::shared_ptr<Variable> variable);
     void removeVariable(std::string identifier);
     Variable* getVariable(std::string name);
+    bool hasVariable(std::string name);
     std::vector<std::shared_ptr<Variable>> getAllCurrentVariables();
 
     bool hasFunction(std::string name) const;

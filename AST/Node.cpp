@@ -1,5 +1,6 @@
 #include "Node.h"
 #include "../include/Context.h"
+#include "Token.h"
 
 AST::Node::Node() : nodeType(AST::NodeType::NOTYPE) {};
 
@@ -29,3 +30,9 @@ void AST::Node::releaseChild(const int& index)
 {
     children[index].release();
 }
+
+void AST::Node::setToken(Token token)
+{
+    this->token = token;
+}
+

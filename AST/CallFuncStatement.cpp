@@ -1,5 +1,7 @@
 #include "CallFuncStatement.h"
 #include "../include/Context.h"
+#include "Logger.h"
+#include <stdexcept>
 
 AST::CallFuncStatement::CallFuncStatement()
 {
@@ -16,7 +18,8 @@ void AST::CallFuncStatement::execute(Context* context)
         if (executeDefinedFunc(context))
             return;
 
-        throw "Function not defined";
+        Logger::addError(LogType::FuncNotDefined, token);
+        throw std::runtime_error("Function not defined");
     }
     else if (identifiers.size() > 1)
     {
@@ -85,8 +88,10 @@ bool AST::CallFuncStatement::executeDefinedFunc(Context *context)
         std::size_t argumentsSize = arguments.size();
 
         if (argumentsSize != defFunc->getParametersSize())
-            throw "wrong number of arguments";
-
+        {
+            Logger::addError(LogType::NotEqualeNumArgs, token);
+            throw std::runtime_error("wrong number of arguments");
+        }
         std::vector<std::unique_ptr<Variable>> tempVars;
 
         Context newContext;
@@ -107,7 +112,8 @@ bool AST::CallFuncStatement::executeDefinedFunc(Context *context)
                     Variable* var = context->getVariable(identifiers[0]);
                     if (var->type != param->getType())
                     {
-                       throw "args type isn't equal to param type";
+                        Logger::addError(LogType::ArgTypeNotEqualParameter, token);
+                        throw std::runtime_error("args type isn't equal to param type");
                     }
 
                     newContext.args.emplace(param->getName(), context->getVariable(identifiers[0]));
