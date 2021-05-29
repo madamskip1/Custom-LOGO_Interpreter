@@ -41,8 +41,7 @@ void MainWindow::runScript(std::string scriptString, bool isFile)
 {
     SourceReader reader;
     Lexer lexer(reader);
-    Logger logger;
-    Parser parser(lexer, logger);
+    Parser parser(lexer);
 
     if(isFile)
     {
@@ -55,7 +54,7 @@ void MainWindow::runScript(std::string scriptString, bool isFile)
 
     std::unique_ptr<AST::ProgramRootNode> program = parser.parse();
 
-    if (!logger.hasAnyError())
+    if (!Logger::hasAnyError())
     {
         try
         {
@@ -70,16 +69,14 @@ void MainWindow::runScript(std::string scriptString, bool isFile)
             this->ui->drawingBoard->updateBoard();
             this->ui->turtleBoard->updateBoard();
         }
-        catch(std::exception e)
+        catch(const std::exception& e)
         {
             qDebug() << e.what();
         }
     }
 
-    logger.clearLogs();
-
-    QString output = QString::fromStdString(logger.toString());
-
+    QString output = QString::fromStdString(Logger::toString());
+    Logger::clearLogs();
     this->ui->outputBox->setText(output);
 }
 

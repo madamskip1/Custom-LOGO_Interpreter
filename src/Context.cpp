@@ -1,5 +1,7 @@
+#include <stdexcept>
 #include "../include/Context.h"
 #include "TurtleStdFunc.h"
+
 
 Context::Context()
 {
@@ -46,7 +48,7 @@ void Context::addDefFunction(AST::DefFuncStatement* defFunction)
 	std::string name = defFunction->getName();
 
 	if (hasFunction(name))
-		throw "function already defined";
+        std::runtime_error("function already defined");
 
 	defFunctions[name] = defFunction;
 }

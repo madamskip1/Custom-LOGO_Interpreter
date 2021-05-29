@@ -236,3 +236,25 @@ booleanReturnWithMathTurtle.go(60);
 
 
 
+Turtle synchronizationInRepeatTimeTurtle(200, 500);
+synchronizationInRepeatTimeTurtle.brush.color = "#873600";
+Integer synchronizationInRepeatTimeCondition = 20;
+Integer synchronizationInRepeatTimeCounter = 0;
+
+repeatTime(1000, 7)
+{
+	synchronizationInRepeatTimeCounter = synchronizationInRepeatTimeCounter + 1;
+	if (synchronizationInRepeatTimeCounter  >= 5)
+	{
+		synchronizationInRepeatTimeCondition = 10;
+	}
+}
+
+repeatTime(2000, 10)
+{
+	repeatCondition (synchronizationInRepeatTimeCondition > 10)
+	{
+	}
+	synchronizationInRepeatTimeTurtle.go(30);
+	synchronizationInRepeatTimeTurtle.right(30);
+}

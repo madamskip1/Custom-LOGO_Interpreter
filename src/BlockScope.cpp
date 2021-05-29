@@ -1,4 +1,5 @@
 #include "BlockScope.h"
+#include <stdexcept>
 
 BlockScope::BlockScope()
 {
@@ -19,7 +20,7 @@ void BlockScope::addVariable(std::shared_ptr<Variable> var)
 	std::string identifier = var->name;
     if (hasVariable(identifier))
 	{
-		throw "Variable already defined";
+        throw std::runtime_error("Variable already defined");
 	}
     variables[identifier] = var;
 }

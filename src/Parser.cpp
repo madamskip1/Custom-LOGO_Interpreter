@@ -18,7 +18,7 @@
 #include "../AST/Color.h"
 
 
-Parser::Parser(Lexer& lex, Logger& logger) : lexer(lex), logger(logger)
+Parser::Parser(Lexer& lex) : lexer(lex)
 {
 }
 
@@ -33,14 +33,14 @@ std::unique_ptr<AST::ProgramRootNode> Parser::parseProgram()
 
     std::unique_ptr<AST::Node> node;
 
-    while ((node = parseInstruction()) && !logger.hasAnyError())
+    while ((node = parseInstruction()) && !Logger::hasAnyError())
     {
         rootNode->addChild(std::move(node));
     }
 
     if (!checkCurTokenType(TokenType::EndOfFile))
     {
-        logger.addNewError(LogType::NotEndOfFile, getToken());
+        Logger::addError(LogType::NotEndOfFile, getToken());
     }
 
     return rootNode;
@@ -99,7 +99,7 @@ std::unique_ptr<AST::InstructionsBlock> Parser::parseInstructionsBlock()
     {
         if (node->getNodeType() == AST::NodeType::DefFuncStatement)
         {
-            logger.addNewError(LogType::CantDefFuncInBlock, token);
+            Logger::addError(LogType::CantDefFuncInBlock, token);
             return nullptr;
         }
 
@@ -280,7 +280,7 @@ std::unique_ptr<AST::CallFuncStatement> Parser::parseCallFunctionStatement(std::
             std::unique_ptr<AST::Expression> arg = parseExpression();
             if (!arg)
             {
-                logger.addNewError(LogType::MissingParameter, token);
+                Logger::addError(LogType::MissingParameter, token);
                 return nullptr;
             }
 
@@ -316,10 +316,11 @@ std::unique_ptr<AST::Node> Parser::parseVarDeclareORDefFuncWithReturStatement()
 
 std::unique_ptr<AST::VarDeclare> Parser::parseVarDeclare(const TokenType& type)
 {
-	std::string identifier = getToken().getStringValue();
+    Token token = getToken();
 
 	if (!consumeTokenIfType_Otherwise_AddError(TokenType::Identifier, LogType::MissingIdentifierOrFunctionKeyword))
 		return nullptr;
+    std::string identifier = token.getStringValue();
 
     std::unique_ptr<AST::ClassAssignment> classAssign;
     std::unique_ptr<AST::AssignmentStatement> assign;
@@ -439,7 +440,7 @@ std::unique_ptr<AST::Assignable> Parser::parseAssignable()
     if (assignable)
         return assignable;
 
-    logger.addNewError(LogType::UnknownAssignable, token);
+    Logger::addError(LogType::UnknownAssignable, token);
     return nullptr;
 }
 
@@ -450,7 +451,7 @@ std::unique_ptr<AST::ClassAssignment> Parser::parseClassAssignment()
     
     if (checkCurTokenType(TokenType::RoundBracketClose))
     {
-        logger.addNewError(LogType::BadExpression, getToken());
+        Logger::addError(LogType::BadExpression, getToken());
         return nullptr;
     }
 
@@ -479,7 +480,7 @@ std::unique_ptr<AST::Parameter> Parser::parseParameter()
     
     if (!consumeTokenIfType({ TokenType::ColorVar, TokenType::Integer, TokenType::Turtle, TokenType::Point, TokenType::Boolean }))
     {
-        logger.newLog(LogType::BadSyntaxParameter, getToken());
+        Logger::addError(LogType::BadSyntaxParameter, getToken());
         return nullptr;
     }
 
@@ -558,7 +559,7 @@ std::unique_ptr<AST::Expression> Parser::parseRelationConditionExpression()
     std::unique_ptr<AST::Expression> expression = parseArithmeticAddExpression();
     if (!expression)
     {
-        logger.addNewError(LogType::BadCondition, token);
+        Logger::addError(LogType::BadCondition, token);
         return nullptr;
     }
 
@@ -692,7 +693,7 @@ std::unique_ptr<AST::Expression> Parser::parseFactorExpression()
         return color;
     }
 
-    logger.addNewError(LogType::BadExpression, getToken());
+    Logger::addError(LogType::BadExpression, getToken());
     return nullptr;
 }
 
@@ -747,7 +748,7 @@ std::vector<std::string> Parser::parseIdentifiers()
         }
         else
         {
-            logger.addNewError(LogType::MissingIdentifier, getToken());
+            Logger::addError(LogType::MissingIdentifier, getToken());
             return std::vector<std::string>();
         }
 
@@ -807,7 +808,7 @@ const bool Parser::consumeTokenIfType_Otherwise_AddLog(const TokenType& tokenTyp
     if (consumeTokenIfType(tokenType))
         return true;
 
-    logger.newLog(logType, getToken());
+    Logger::addLog(logType, getToken());
     return false;
 }
 
@@ -816,7 +817,7 @@ const bool Parser::consumeTokenIfType_Otherwise_AddError(const TokenType& tokenT
     if (consumeTokenIfType(tokenType))
         return true;
 
-    logger.addNewError(logType, getToken());
+    Logger::addError(logType, getToken());
     return false;
 }
 

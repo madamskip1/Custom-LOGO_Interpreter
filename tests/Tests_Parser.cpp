@@ -32,8 +32,7 @@ TEST_CASE("IFStatement", "[parser]")
 {
     SourceReader reader;
     Lexer lexer(reader);
-    Logger logger;
-    Parser parser(lexer, logger);
+    Parser parser(lexer);
     Context context;
 
     SECTION("without else")
@@ -100,8 +99,7 @@ TEST_CASE("RepeatStatement", "[parser]")
 {
     SourceReader reader;
     Lexer lexer(reader);
-    Logger logger;
-    Parser parser(lexer, logger);
+    Parser parser(lexer);
     Context context;
 
 
@@ -142,8 +140,7 @@ TEST_CASE("RepeatTimeStatement", "[parser]")
 {
     SourceReader reader;
     Lexer lexer(reader);
-    Logger logger;
-    Parser parser(lexer, logger);
+    Parser parser(lexer);
     Context context;
 
     SECTION("only period")
@@ -241,8 +238,7 @@ TEST_CASE("Expressions", "[parser]")
 {
     SourceReader reader;
     Lexer lexer(reader);
-    Logger logger;
-    Parser parser(lexer, logger);
+    Parser parser(lexer);
     Context context;
 
     SECTION("Simple expression - just digit (zero)")
@@ -465,8 +461,7 @@ TEST_CASE("Conditions", "[parser]")
 {
     SourceReader reader;
     Lexer lexer(reader);
-    Logger logger;
-    Parser parser(lexer, logger);
+    Parser parser(lexer);
     Context context;
 
 
@@ -578,8 +573,7 @@ TEST_CASE("def function", "[parser]")
 {
     SourceReader reader;
     Lexer lexer(reader);
-    Logger logger;
-    Parser parser(lexer, logger);
+    Parser parser(lexer);
     Context context;
 
     SECTION("simple function, without parameters, without return type")
@@ -695,8 +689,7 @@ TEST_CASE("call function", "[parser]")
 {
     SourceReader reader;
     Lexer lexer(reader);
-    Logger logger;
-    Parser parser(lexer, logger);
+    Parser parser(lexer);
     Context context;
 
     SECTION("simple call function")
@@ -845,8 +838,7 @@ TEST_CASE("Var declartion", "[parser]")
 {
     SourceReader reader;
     Lexer lexer(reader);
-    Logger logger;
-    Parser parser(lexer, logger);
+    Parser parser(lexer);
     Context context;
 
     SECTION("simple declare var")
@@ -892,8 +884,7 @@ TEST_CASE("assign", "[parser]")
 {
     SourceReader reader;
     Lexer lexer(reader);
-    Logger logger;
-    Parser parser(lexer, logger);
+    Parser parser(lexer);
     Context context;
 
     SECTION("simple assign")
@@ -967,8 +958,7 @@ TEST_CASE("declare class-type", "[parser]")
 {
     SourceReader reader;
     Lexer lexer(reader);
-    Logger logger;
-    Parser parser(lexer, logger);
+    Parser parser(lexer);
     Context context;
 
     SECTION("simple declare")
@@ -1116,8 +1106,7 @@ TEST_CASE("color var decl")
 {
     SourceReader reader;
     Lexer lexer(reader);
-    Logger logger;
-    Parser parser(lexer, logger);
+    Parser parser(lexer);
     Context context;
 
     SECTION("simple declare")
@@ -1163,8 +1152,7 @@ TEST_CASE("Block of instructions", "[parser]")
 {
     SourceReader reader;
     Lexer lexer(reader);
-    Logger logger;
-    Parser parser(lexer, logger);
+    Parser parser(lexer);
     Context context;
 
     SECTION("empty block")
@@ -1248,8 +1236,7 @@ test5 = "#654321";
 
     SourceReader reader;
     Lexer lexer(reader);
-    Logger logger;
-    Parser parser(lexer, logger);
+    Parser parser(lexer);
     Context context;
 
     reader.setSourceString(code);

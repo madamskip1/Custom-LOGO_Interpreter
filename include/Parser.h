@@ -25,13 +25,12 @@ class Parser
 {
 public:
 	Parser() = delete;
-	Parser(Lexer& lex, Logger& logger);
+    Parser(Lexer& lex);
 
 	std::unique_ptr<AST::ProgramRootNode> parse();
 
 private:
 	Lexer& lexer;
-	Logger& logger;
 	std::optional<Token> token;
 	
 	std::unique_ptr<AST::ProgramRootNode> parseProgram();
