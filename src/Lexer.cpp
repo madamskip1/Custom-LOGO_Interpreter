@@ -70,7 +70,7 @@ const bool Lexer::tryToMakeDigit()
 	if (val == 0)
     {
         char nextCharTemp = source.getNextCharacter();
-        if (nextCharTemp >= '0' || nextCharTemp <= '9')
+        if (nextCharTemp >= '0' && nextCharTemp <= '9')
 		{
 			source.getCharacter();
             curToken.type = TokenType::INVALID;

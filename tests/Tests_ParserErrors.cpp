@@ -30,11 +30,15 @@ TEST_CASE("If Statement", "[parserBad]")
         reader.setSourceString("if )");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 2);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingRoundBracketOpen);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingRoundBracketOpen);
+        }
     }
 	
     SECTION("Missing round bracket close")
@@ -42,10 +46,15 @@ TEST_CASE("If Statement", "[parserBad]")
         reader.setSourceString("if (true");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 1);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingRoundBracketClose);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingRoundBracketClose);
+        }
     }
 
     SECTION("No condition")
@@ -53,12 +62,15 @@ TEST_CASE("If Statement", "[parserBad]")
         reader.setSourceString("if () {}");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 3);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::BadCondition);
-        REQUIRE(logger->getLog(2)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
+        }
     }
 }
 
@@ -84,11 +96,15 @@ TEST_CASE("Repeat Statement", "[parserBad]")
         reader.setSourceString("repeat 20)");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 2);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingRoundBracketOpen);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingRoundBracketOpen);
+        }
     }
 
     SECTION("Missing round bracket close")
@@ -96,10 +112,15 @@ TEST_CASE("Repeat Statement", "[parserBad]")
         reader.setSourceString("repeat(20 ");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 1);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingRoundBracketClose);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingRoundBracketClose);
+        }
     }
 
     SECTION("No expression")
@@ -107,12 +128,15 @@ TEST_CASE("Repeat Statement", "[parserBad]")
         reader.setSourceString("repeat() {} ");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 3);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::BadCondition);
-        REQUIRE(logger->getLog(2)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
+        }
     }
 }
 
@@ -138,11 +162,15 @@ TEST_CASE("Repeat time Statement", "[parserBad]")
         reader.setSourceString("repeatTime 20)");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 2);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingRoundBracketOpen);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingRoundBracketOpen);
+        }
     }
 
     SECTION("Missing round bracket close")
@@ -150,10 +178,15 @@ TEST_CASE("Repeat time Statement", "[parserBad]")
         reader.setSourceString("repeatTime (20 ");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 1);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingRoundBracketClose);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingRoundBracketClose);
+        }
     }
 
     SECTION("Missing expression")
@@ -161,12 +194,15 @@ TEST_CASE("Repeat time Statement", "[parserBad]")
         reader.setSourceString("repeatTime () {} ");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 3);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::BadCondition);
-        REQUIRE(logger->getLog(2)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
+        }
     }
 
     SECTION("Missing second expression")
@@ -174,12 +210,15 @@ TEST_CASE("Repeat time Statement", "[parserBad]")
         reader.setSourceString("repeatTime (20, ) {} ");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 3);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::BadCondition);
-        REQUIRE(logger->getLog(2)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
+        }
     }
 
     SECTION("Missing comma")
@@ -187,11 +226,15 @@ TEST_CASE("Repeat time Statement", "[parserBad]")
         reader.setSourceString("repeatTime (20 20) {} ");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 2);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingRoundBracketClose);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingRoundBracketClose);
+        }
     }
 }
 
@@ -217,13 +260,15 @@ TEST_CASE("call Func", "[parserBad]")
         reader.setSourceString("callFunc1(;");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 4);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::BadCondition);
-        REQUIRE(logger->getLog(2)->getLogType() == LogType::MissingParameter);
-        REQUIRE(logger->getLog(3)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
+        }
     }
 
     SECTION("missing semicolon")
@@ -242,13 +287,15 @@ TEST_CASE("call Func", "[parserBad]")
         reader.setSourceString("callFunc1(20, )");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 4);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::BadCondition);
-        REQUIRE(logger->getLog(2)->getLogType() == LogType::MissingParameter);
-        REQUIRE(logger->getLog(3)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
+        }
     }
 
     SECTION("missing comma")
@@ -256,11 +303,15 @@ TEST_CASE("call Func", "[parserBad]")
         reader.setSourceString("callFunc1(20 20)");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 2);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingRoundBracketClose);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingRoundBracketClose);
+        }
     }
 }
 
@@ -285,11 +336,15 @@ TEST_CASE("var declaration", "[parserBad]")
         reader.setSourceString("Boolean test1; Integer ;");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 2);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingIdentifierOrFunctionKeyword);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingIdentifierOrFunctionKeyword);
+        }
     }
 
     SECTION("missing semicolown")
@@ -319,12 +374,15 @@ TEST_CASE("var declaration", "[parserBad]")
         reader.setSourceString("Integer test1 = ");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 3);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::BadCondition);
-        REQUIRE(logger->getLog(2)->getLogType() == LogType::UnknownAssignable);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
+        }
     }
 
     SECTION("var declare class missing parameter")
@@ -332,11 +390,15 @@ TEST_CASE("var declaration", "[parserBad]")
         reader.setSourceString("Turtle turtle();");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 2);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
+        }
     }
 
     SECTION("var declare class missing parameter after comma")
@@ -344,12 +406,15 @@ TEST_CASE("var declaration", "[parserBad]")
         reader.setSourceString("Turtle turtle(20, );");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 3);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::BadCondition);
-        REQUIRE(logger->getLog(2)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
+        }
     }
 
     SECTION("var declare class missingcomma")
@@ -357,11 +422,15 @@ TEST_CASE("var declaration", "[parserBad]")
         reader.setSourceString("Turtle turtle(20 20);");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 2);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingCurlyBracketClose);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingCurlyBracketClose);
+        }
     }
 }
 
@@ -386,11 +455,15 @@ TEST_CASE("def func", "[parserBad]")
         reader.setSourceString("function () {}");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 2);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingIdentifier);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingIdentifier);
+        }
     }
 
     SECTION("bad parameter syntax")
@@ -398,11 +471,15 @@ TEST_CASE("def func", "[parserBad]")
         reader.setSourceString("function test(test) {}");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 2);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::BadSyntaxParameter);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::BadSyntaxParameter);
+        }
     }
 
     SECTION("missing parameter identifier")
@@ -410,11 +487,15 @@ TEST_CASE("def func", "[parserBad]")
         reader.setSourceString("function test(Turtle) {}");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 2);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingIdentifier);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingIdentifier);
+        }
     }
 
     SECTION("missing parameter after comma")
@@ -422,11 +503,15 @@ TEST_CASE("def func", "[parserBad]")
         reader.setSourceString("function test(Turtle test1, ) {}");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 2);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::BadSyntaxParameter);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::BadSyntaxParameter);
+        }
     }
 
     SECTION("missing comma")
@@ -434,11 +519,15 @@ TEST_CASE("def func", "[parserBad]")
         reader.setSourceString("function test(Turtle test1 Point 2) {}");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 2);
-        REQUIRE(logger->hasAnyError() == true);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingRoundBracketClose);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingRoundBracketClose);
+        }
     }
 }
 
@@ -456,6 +545,7 @@ TEST_CASE("assignment", "[parserBad]")
         logger->clearLogs();
         parser.parse();
         REQUIRE(logger->getLogsSize() == 0);
+        REQUIRE(logger->hasAnyError() == false);
     }
 
     SECTION("missing assing after operator")
@@ -463,12 +553,15 @@ TEST_CASE("assignment", "[parserBad]")
         reader.setSourceString("test = ;");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 4);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::BadCondition);
-        REQUIRE(logger->getLog(2)->getLogType() == LogType::UnknownAssignable);
-        REQUIRE(logger->getLog(3)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::BadExpression);
+        }
     }
 
     SECTION("missing operator")
@@ -476,9 +569,15 @@ TEST_CASE("assignment", "[parserBad]")
         reader.setSourceString("test;");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 1);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::NotEndOfFile);
+        }
     }
 }
 
@@ -496,6 +595,7 @@ TEST_CASE("Instruction Block", "[parserBad]")
         logger->clearLogs();
         parser.parse();
         REQUIRE(logger->getLogsSize() == 0);
+        REQUIRE(logger->hasAnyError() == false);
     }
 
     SECTION("missing curly bracket open")
@@ -503,10 +603,15 @@ TEST_CASE("Instruction Block", "[parserBad]")
         reader.setSourceString("if(true) }");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 2);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingCurlyBracketOpen);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingCurlyBracketOpen);
+        }
     }
 
     SECTION("missing curly bracket close")
@@ -514,9 +619,15 @@ TEST_CASE("Instruction Block", "[parserBad]")
         reader.setSourceString("if(true) { ");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 1);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingCurlyBracketClose);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::MissingCurlyBracketClose);
+        }
     }
 
     SECTION("def func in instructions block")
@@ -524,10 +635,15 @@ TEST_CASE("Instruction Block", "[parserBad]")
         reader.setSourceString("if(true) { function test() {} } ");
 
         logger->clearLogs();
-        parser.parse();
-        REQUIRE(logger->getLogsSize() == 2);
-        REQUIRE(logger->getLog(0)->getLogType() == LogType::CantDefFuncInBlock);
-        REQUIRE(logger->getLog(1)->getLogType() == LogType::NotEndOfFile);
+        try {
+            parser.parse();
+        }
+        catch (const std::exception& e)
+        {
+            REQUIRE(logger->getLogsSize() == 1);
+            REQUIRE(logger->hasAnyError() == true);
+            REQUIRE(logger->getLog(0)->getLogType() == LogType::CantDefFuncInBlock);
+        }
     }
 }
 
@@ -546,5 +662,6 @@ TEST_CASE("return statement", "[parserBad]")
         logger->clearLogs();
         parser.parse();
         REQUIRE(logger->getLogsSize() == 0);
+        REQUIRE(logger->hasAnyError() == false);
     }
 }

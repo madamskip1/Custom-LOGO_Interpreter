@@ -45,7 +45,6 @@ void AST::VarDeclare::execute(Context* context)
     var = std::make_shared<Variable>();
     var->name = identifier;
     var->type = type;
-    var->token = this;
 
     context->addVariable(var);
 
