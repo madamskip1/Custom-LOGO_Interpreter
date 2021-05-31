@@ -12,7 +12,7 @@ public:
 
     static void addLog(const LogType& logType, const Token& token);
     static void addLog(const LogType& logType, const int& line, const int& firstCharPos, const std::streampos& streamPos, const TokenType& type = TokenType::UNKNOWN);
-    static void addError(LogType logType, Token token);
+    static void addErrorAndThrowException(LogType logType, Token token);
     static bool hasAnyError();
     static void clearLogs();
 

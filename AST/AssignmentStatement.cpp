@@ -18,8 +18,7 @@ void AST::AssignmentStatement::execute(Context* context)
     Variable* var = context->getVariable(identifiers[0]);
     if (var == nullptr)
     {
-        Logger::addError(LogType::VarNotDeclared, token);
-        throw std::runtime_error("Variable wasn't declared");
+        Logger::addErrorAndThrowException(LogType::VarNotDeclared, token);
     }
     std::vector<std::string> tempIdentifiers;
 

@@ -40,7 +40,7 @@ std::unique_ptr<AST::ProgramRootNode> Parser::parseProgram()
 
     if (!checkCurTokenType(TokenType::EndOfFile))
     {
-        Logger::addError(LogType::NotEndOfFile, getToken());
+        Logger::addErrorAndThrowException(LogType::NotEndOfFile, getToken());
     }
 
     return rootNode;
@@ -99,7 +99,7 @@ std::unique_ptr<AST::InstructionsBlock> Parser::parseInstructionsBlock()
     {
         if (node->getNodeType() == AST::NodeType::DefFuncStatement)
         {
-            Logger::addError(LogType::CantDefFuncInBlock, token);
+            Logger::addErrorAndThrowException(LogType::CantDefFuncInBlock, token);
             return nullptr;
         }
 
@@ -290,7 +290,7 @@ std::unique_ptr<AST::CallFuncStatement> Parser::parseCallFunctionStatement(std::
             std::unique_ptr<AST::Expression> arg = parseExpression();
             if (!arg)
             {
-                Logger::addError(LogType::MissingParameter, token);
+                Logger::addErrorAndThrowException(LogType::MissingParameter, token);
                 return nullptr;
             }
 
@@ -451,7 +451,7 @@ std::unique_ptr<AST::Assignable> Parser::parseAssignable()
         return assignable;
     }
 
-    Logger::addError(LogType::UnknownAssignable, token);
+    Logger::addErrorAndThrowException(LogType::UnknownAssignable, token);
     return nullptr;
 }
 
@@ -463,7 +463,7 @@ std::unique_ptr<AST::ClassAssignment> Parser::parseClassAssignment()
     
     if (checkCurTokenType(TokenType::RoundBracketClose))
     {
-        Logger::addError(LogType::BadExpression, getToken());
+        Logger::addErrorAndThrowException(LogType::BadExpression, getToken());
         return nullptr;
     }
 
@@ -493,7 +493,7 @@ std::unique_ptr<AST::Parameter> Parser::parseParameter()
     
     if (!consumeTokenIfType({ TokenType::ColorVar, TokenType::Integer, TokenType::Turtle, TokenType::Point, TokenType::Boolean }))
     {
-        Logger::addError(LogType::BadSyntaxParameter, getToken());
+        Logger::addErrorAndThrowException(LogType::BadSyntaxParameter, getToken());
         return nullptr;
     }
 
@@ -580,7 +580,7 @@ std::unique_ptr<AST::Expression> Parser::parseRelationConditionExpression()
     std::unique_ptr<AST::Expression> expression = parseArithmeticAddExpression();
     if (!expression)
     {
-        Logger::addError(LogType::BadCondition, token);
+        Logger::addErrorAndThrowException(LogType::BadCondition, token);
         return nullptr;
     }
 
@@ -727,7 +727,7 @@ std::unique_ptr<AST::Expression> Parser::parseFactorExpression()
         return color;
     }
 
-    Logger::addError(LogType::BadExpression, getToken());
+    Logger::addErrorAndThrowException(LogType::BadExpression, getToken());
     return nullptr;
 }
 
@@ -789,7 +789,7 @@ std::vector<std::string> Parser::parseIdentifiers()
         }
         else
         {
-            Logger::addError(LogType::MissingIdentifier, getToken());
+            Logger::addErrorAndThrowException(LogType::MissingIdentifier, getToken());
             return std::vector<std::string>();
         }
 
@@ -858,7 +858,7 @@ const bool Parser::consumeTokenIfType_Otherwise_AddError(const TokenType& tokenT
     if (consumeTokenIfType(tokenType))
         return true;
 
-    Logger::addError(logType, getToken());
+    Logger::addErrorAndThrowException(logType, getToken());
     return false;
 }
 

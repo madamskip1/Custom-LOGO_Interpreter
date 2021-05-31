@@ -45,6 +45,7 @@ void AST::VarDeclare::execute(Context* context)
     var = std::make_shared<Variable>();
     var->name = identifier;
     var->type = type;
+    var->token = this;
 
     context->addVariable(var);
 
@@ -89,8 +90,7 @@ std::shared_ptr<Variable> AST::VarDeclare::executeClassDeclaration(Context *cont
 
     if (classAssignment->getExpressionsSize() < 1 && classAssignment->getExpressionsSize() > 2)
     {
-        Logger::addError(LogType::WrongClassArgsNum, token);
-        throw std::runtime_error("wrong number of class arguments");
+        Logger::addErrorAndThrowException(LogType::WrongClassArgsNum, token);
     }
 
     std::optional<int> x, y;
@@ -101,8 +101,7 @@ std::shared_ptr<Variable> AST::VarDeclare::executeClassDeclaration(Context *cont
         Variable* evaluatedVar =  std::get<Variable*>(context->evaluateValue);
         if (evaluatedVar->type != TokenType::Point)
         {
-            Logger::addError(LogType::InitClassNotPointType, token);
-            throw std::runtime_error("class used to initalize class has to be Point type");
+            Logger::addErrorAndThrowException(LogType::InitClassNotPointType, token);
         }
         evaluatedVar->getSomeVal({"x"}, context);
         x = std::get<int>(context->evaluateValue);

@@ -19,10 +19,7 @@ BlockScope::~BlockScope()
 void BlockScope::addVariable(std::shared_ptr<Variable> var)
 {
 	std::string identifier = var->name;
-    if (hasVariable(identifier))
-	{
-        throw std::runtime_error("Variable already defined");
-	}
+
     variables[identifier] = var;
 }
 

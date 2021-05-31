@@ -19,7 +19,7 @@ void Logger::addLog(const LogType &logType, const int &line, const int &firstCha
     Logger::getInstance()->newLog(logType, line, firstCharPos, streamPos, type);
 }
 
-void Logger::addError(LogType logType, Token token)
+void Logger::addErrorAndThrowException(LogType logType, Token token)
 {
     Logger::getInstance()->newError(logType, token);
 }

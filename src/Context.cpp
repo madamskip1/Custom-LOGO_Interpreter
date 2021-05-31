@@ -58,13 +58,12 @@ void Context::addVariable(std::shared_ptr<Variable> variable)
 {
     if (args.find(variable->name) != args.cend())
     {
-        throw "cant declare var with same name as parameter";
+        throw std::runtime_error("cant declare var with same name as parameter");
     }
 
     if (hasVariable(variable->name))
     {
-        Logger::addError(LogType::VarAlreadyDeclared, Token());
-        throw std::runtime_error("Variable already defined");
+        Logger::addErrorAndThrowException(LogType::VarAlreadyDeclared, Token());
     }
 
     scopes.back().addVariable(variable);

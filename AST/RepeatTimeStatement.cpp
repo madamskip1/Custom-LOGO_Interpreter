@@ -8,6 +8,7 @@
 
 void runThread(std::unique_ptr<Context> context, std::unique_ptr<AST::InstructionsBlock> block, int period, int howManyTime) {
     auto func = [](std::unique_ptr<Context> insideContext, std::unique_ptr<AST::InstructionsBlock> insideBlock, int insidePeriod, int insideHowManyTime) {
+
         std::this_thread::sleep_for(std::chrono::milliseconds(insidePeriod));
         for (int i = 0; i < insideHowManyTime; i++)
         {

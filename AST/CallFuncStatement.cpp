@@ -18,8 +18,7 @@ void AST::CallFuncStatement::execute(Context* context)
         if (executeDefinedFunc(context))
             return;
 
-        Logger::addError(LogType::FuncNotDefined, token);
-        throw std::runtime_error("Function not defined");
+        Logger::addErrorAndThrowException(LogType::FuncNotDefined, token);
     }
     else if (identifiers.size() > 1)
     {
@@ -89,8 +88,7 @@ bool AST::CallFuncStatement::executeDefinedFunc(Context *context)
 
         if (argumentsSize != defFunc->getParametersSize())
         {
-            Logger::addError(LogType::NotEqualeNumArgs, token);
-            throw std::runtime_error("wrong number of arguments");
+            Logger::addErrorAndThrowException(LogType::NotEqualeNumArgs, token);
         }
         std::vector<std::unique_ptr<Variable>> tempVars;
 
@@ -112,8 +110,7 @@ bool AST::CallFuncStatement::executeDefinedFunc(Context *context)
                     Variable* var = context->getVariable(identifiers[0]);
                     if (var->type != param->getType())
                     {
-                        Logger::addError(LogType::ArgTypeNotEqualParameter, token);
-                        throw std::runtime_error("args type isn't equal to param type");
+                        Logger::addErrorAndThrowException(LogType::ArgTypeNotEqualParameter, token);
                     }
 
                     newContext.args.emplace(param->getName(), context->getVariable(identifiers[0]));

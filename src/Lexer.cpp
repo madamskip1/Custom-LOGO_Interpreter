@@ -75,7 +75,7 @@ const bool Lexer::tryToMakeDigit()
 			source.getCharacter();
             curToken.type = TokenType::INVALID;
 
-            Logger::addError(LogType::BadDigitZeros, curToken);
+            Logger::addErrorAndThrowException(LogType::BadDigitZeros, curToken);
 		}
 	}
 	else
@@ -92,7 +92,7 @@ const bool Lexer::tryToMakeDigit()
 			{
                 curToken.type = TokenType::INVALID;
 
-                Logger::addError(LogType::BadDigitTooLong, curToken);
+                Logger::addErrorAndThrowException(LogType::BadDigitTooLong, curToken);
 			}
 
             val = val * 10 + (digit - '0');
@@ -141,7 +141,7 @@ const bool Lexer::tryToMakeColor()
 	{
         curToken.type = TokenType::INVALID;
 
-        Logger::addError(LogType::ColorValNotTerminated, curToken);
+        Logger::addErrorAndThrowException(LogType::ColorValNotTerminated, curToken);
 	}
 
 	source.getCharacter();
@@ -152,26 +152,26 @@ const bool Lexer::tryToMakeColor()
 		{
             curToken.type = TokenType::INVALID;
 
-            Logger::addError(LogType::ColorValTooShort, curToken);
+            Logger::addErrorAndThrowException(LogType::ColorValTooShort, curToken);
 		}
 		else
 		{
             curToken.type = TokenType::INVALID;
 
-            Logger::addError(LogType::ColorValTooLong, curToken);
+            Logger::addErrorAndThrowException(LogType::ColorValTooLong, curToken);
 		}
 	}
 	else if (string.length() < 1 || string.at(0) != '#')
 	{
         curToken.type = TokenType::INVALID;
 
-        Logger::addError(LogType::ColorValMissHash, curToken);
+        Logger::addErrorAndThrowException(LogType::ColorValMissHash, curToken);
 	}
 	else if (badSyntax)
 	{
         curToken.type = TokenType::INVALID;
 
-        Logger::addError(LogType::ColorValBadSyntax, curToken);
+        Logger::addErrorAndThrowException(LogType::ColorValBadSyntax, curToken);
 	}
 	else
 	{
@@ -239,7 +239,7 @@ const bool Lexer::tryToMakeConditionOperator()
 	{
 		if (source.getNextCharacter() != '&')
 		{
-            Logger::addError(LogType::AndOperatorMissSecond, curToken);
+            Logger::addErrorAndThrowException(LogType::AndOperatorMissSecond, curToken);
 		}
 
 		source.getCharacter();
@@ -250,7 +250,7 @@ const bool Lexer::tryToMakeConditionOperator()
 	{
 		if (source.getNextCharacter() != '|')
 		{
-            Logger::addError(LogType::OrOperatorMissSecond, curToken);
+            Logger::addErrorAndThrowException(LogType::OrOperatorMissSecond, curToken);
 		}
 
 		source.getCharacter();
