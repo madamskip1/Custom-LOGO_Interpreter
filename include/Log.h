@@ -33,6 +33,17 @@ enum class LogType
     ArgTypeNotEqualParameter,
     WrongClassArgsNum,
     InitClassNotPointType,
+
+    // Lexer
+    BadDigitZeros,
+    BadDigitTooLong,
+    ColorValNotTerminated,
+    ColorValTooShort,
+    ColorValTooLong,
+    ColorValMissHash,
+    ColorValBadSyntax,
+    AndOperatorMissSecond,
+    OrOperatorMissSecond
 };
 
 class Log
@@ -84,6 +95,15 @@ private:
         { LogType::NotEqualeNumArgs, "Podano złą liczbę argumentów funkcji" },
         { LogType::ArgTypeNotEqualParameter, "Argument ma inny typ niż zdefiniowany parametr" },
         { LogType::WrongClassArgsNum, "Deklaracja klasy przyjmuje jeden lub dwa argumenty" },
-        { LogType::InitClassNotPointType, "Jedyną klasą, którą można inicjalizować inne klasy jest POINT" }
+        { LogType::InitClassNotPointType, "Jedyną klasą, którą można inicjalizować inne klasy jest POINT" },
+        { LogType::BadDigitZeros, "Zera poprzedzające liczbę" },
+        { LogType::BadDigitTooLong, "Liczba jest zbyt duża" },
+        { LogType::ColorValNotTerminated, "Brakuje zamkyjącego cudzysłowia w wartości koloru" },
+        { LogType::ColorValTooShort, "Wartość koloru jest zbyt krótka" },
+        { LogType::ColorValTooLong, "Wartość koloru jest zbyt długa" },
+        { LogType::ColorValMissHash, "Wartość koloru nie zaczyna się od \"#\" "},
+        { LogType::ColorValBadSyntax, "Kolor zawiera nieprawidłowe znaki" },
+        { LogType::AndOperatorMissSecond, "W operatorze koniunkcji AND brakuje drugiego znaku &" },
+        { LogType::OrOperatorMissSecond, "W operatorze alterantywy OR brakuje drugiego znaku |" }
     };
 };

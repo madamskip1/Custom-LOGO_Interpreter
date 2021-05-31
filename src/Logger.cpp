@@ -1,4 +1,5 @@
 #include "Logger.h"
+#include <stdexcept>
 
 Logger* Logger::instance = nullptr;
 
@@ -53,7 +54,11 @@ void Logger::newError(LogType logType, const Token& token)
 {
 	std::unique_ptr<Log> newLog = std::make_unique<Log>(logType, token.line, token.firstCharPos, token.tokenPos, token.type);
 	newLog->setIsError(true);
+    std::string stringToThrow = newLog->toString();
+
     logs.push_back(std::move(newLog));
+
+    throw std::runtime_error(stringToThrow);
 }
 
 Logger *Logger::getInstance()

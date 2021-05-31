@@ -65,20 +65,6 @@ enum class TokenType : unsigned int
 	Identifier,
 	EndOfFile,
 
-
-	// Errors token
-	BadDigitZeros,
-	BadDigitTooLong,
-
-	ColorValMissHash,
-	ColorValBadSyntax,
-	ColorValTooLong,
-	ColorValTooShort,
-	ColorValNotTerminated,
-
-	AndOperatorMissSecond,
-	OrOperatorMissSecond,
-
 	UNKNOWN,
 	INVALID
 };

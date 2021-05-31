@@ -52,27 +52,23 @@ void MainWindow::runScript(std::string scriptString, bool isFile)
         reader.setSourceString(scriptString);
     }
 
-    std::unique_ptr<AST::ProgramRootNode> program = parser.parse();
-
-    if (!Logger::hasAnyError())
+    try
     {
-        try
+        std::unique_ptr<AST::ProgramRootNode> program = parser.parse();
+
+        if (!mainContext)
         {
-            if (!mainContext)
-            {
-                mainContext = std::make_unique<Context>();
-                mainContext->setDrawingBoard(this->ui->drawingBoard);
-                mainContext->setTurtleBoard(this->ui->turtleBoard);
-            }
-            Interpreter interpreter(std::move(program), mainContext.get());
-            interpreter.run();
-            this->ui->drawingBoard->updateBoard();
-            this->ui->turtleBoard->updateBoard();
+            mainContext = std::make_unique<Context>();
+            mainContext->setDrawingBoard(this->ui->drawingBoard);
+            mainContext->setTurtleBoard(this->ui->turtleBoard);
         }
-        catch(const std::exception& e)
-        {
-            qDebug() << e.what();
-        }
+        Interpreter interpreter(std::move(program), mainContext.get());
+        interpreter.run();
+        this->ui->drawingBoard->updateBoard();
+        this->ui->turtleBoard->updateBoard();
+    }
+    catch(const std::exception& e)
+    {
     }
 
     QString output = QString::fromStdString(Logger::toString());

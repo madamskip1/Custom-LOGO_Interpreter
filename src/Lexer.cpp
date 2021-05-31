@@ -1,5 +1,8 @@
 #include "Lexer.h"
 #include <iostream>
+#include <stdexcept>
+#include "Logger.h"
+
 
 const std::unordered_map<std::string, int> Lexer::lexerConfig =
 {
@@ -65,16 +68,14 @@ const bool Lexer::tryToMakeDigit()
 	curToken.type = TokenType::Digit;
 
 	if (val == 0)
-	{
-		if ((source.getNextCharacter() - '0') == 0)
+    {
+        char nextCharTemp = source.getNextCharacter();
+        if (nextCharTemp >= '0' || nextCharTemp <= '9')
 		{
 			source.getCharacter();
-			curToken.type = TokenType::BadDigitZeros;
+            curToken.type = TokenType::INVALID;
 
-			while (std::isdigit(source.getNextCharacter()))
-				source.getCharacter();
-
-			return true;
+            Logger::addError(LogType::BadDigitZeros, curToken);
 		}
 	}
 	else
@@ -89,14 +90,12 @@ const bool Lexer::tryToMakeDigit()
 			
 			if (counter > Lexer::lexerConfig.at("maxNumOfDigits"))
 			{
-				curToken.type = TokenType::BadDigitTooLong;
-			}
-			else
-			{
-				val = val * 10 + (digit - '0');
+                curToken.type = TokenType::INVALID;
+
+                Logger::addError(LogType::BadDigitTooLong, curToken);
 			}
 
-
+            val = val * 10 + (digit - '0');
 		}
 	}
 
@@ -140,8 +139,9 @@ const bool Lexer::tryToMakeColor()
 
 	if (nextChar != '"')
 	{
-		curToken.type = TokenType::ColorValNotTerminated;
-		return true;
+        curToken.type = TokenType::INVALID;
+
+        Logger::addError(LogType::ColorValNotTerminated, curToken);
 	}
 
 	source.getCharacter();
@@ -150,20 +150,28 @@ const bool Lexer::tryToMakeColor()
 	{
 		if (counter < expectedSize)
 		{
-			curToken.type = TokenType::ColorValTooShort;
+            curToken.type = TokenType::INVALID;
+
+            Logger::addError(LogType::ColorValTooShort, curToken);
 		}
 		else
 		{
-			curToken.type = TokenType::ColorValTooLong;
+            curToken.type = TokenType::INVALID;
+
+            Logger::addError(LogType::ColorValTooLong, curToken);
 		}
 	}
 	else if (string.length() < 1 || string.at(0) != '#')
 	{
-		curToken.type = TokenType::ColorValMissHash;
+        curToken.type = TokenType::INVALID;
+
+        Logger::addError(LogType::ColorValMissHash, curToken);
 	}
 	else if (badSyntax)
 	{
-		curToken.type = TokenType::ColorValBadSyntax;
+        curToken.type = TokenType::INVALID;
+
+        Logger::addError(LogType::ColorValBadSyntax, curToken);
 	}
 	else
 	{
@@ -231,8 +239,7 @@ const bool Lexer::tryToMakeConditionOperator()
 	{
 		if (source.getNextCharacter() != '&')
 		{
-			curToken.type = TokenType::AndOperatorMissSecond;
-			return true;
+            Logger::addError(LogType::AndOperatorMissSecond, curToken);
 		}
 
 		source.getCharacter();
@@ -243,8 +250,7 @@ const bool Lexer::tryToMakeConditionOperator()
 	{
 		if (source.getNextCharacter() != '|')
 		{
-			curToken.type = TokenType::OrOperatorMissSecond;
-			return true;
+            Logger::addError(LogType::OrOperatorMissSecond, curToken);
 		}
 
 		source.getCharacter();
