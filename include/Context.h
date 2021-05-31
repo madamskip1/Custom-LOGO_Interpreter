@@ -32,6 +32,7 @@ public:
 
 	void addDefFunction(AST::DefFuncStatement* defFunction);
     AST::DefFuncStatement* getDefFunction(std::string name) const;
+    std::vector<AST::DefFuncStatement*> getAllDefFunction() const;
     std::function<void(Context*)> getStdLibFunction(std::string name) const;
 
     void addVariable(std::shared_ptr<Variable> variable);

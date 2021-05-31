@@ -80,6 +80,8 @@ void MainWindow::on_pushButton_3_clicked()
 {
     mainContext.reset();
     this->ui->drawingBoard->cleanBoard();
-    this->ui->drawingBoard->updateBoard();
     this->ui->turtleBoard->updateBoard();
+
+    this->ui->outputBox->setText("");
+    this->ui->inputBox->setText("");
 }

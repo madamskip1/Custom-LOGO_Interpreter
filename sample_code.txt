@@ -234,27 +234,20 @@ booleanReturnWithMathTurtle.go(60);
 booleanReturnWithMathTurtle.brush.enabled = true;
 booleanReturnWithMathTurtle.go(60);
 
-
-
-Turtle synchronizationInRepeatTimeTurtle(200, 500);
-synchronizationInRepeatTimeTurtle.brush.color = "#873600";
-Integer synchronizationInRepeatTimeCondition = 20;
-Integer synchronizationInRepeatTimeCounter = 0;
-
-repeatTime(1000, 7)
+Integer function fibonacciSum(Integer n)
 {
-	synchronizationInRepeatTimeCounter = synchronizationInRepeatTimeCounter + 1;
-	if (synchronizationInRepeatTimeCounter  >= 5)
+	if (n < 2)
 	{
-		synchronizationInRepeatTimeCondition = 10;
+		return n;
 	}
+	return fibonacciSum(n - 1) + fibonacciSum(n - 2);
 }
 
-repeatTime(2000, 10)
+Integer fibonacci9 = fibonacciSum(9)
+
+if (fibonacci9 == 34)
 {
-	repeatCondition (synchronizationInRepeatTimeCondition > 10)
-	{
-	}
-	synchronizationInRepeatTimeTurtle.go(30);
-	synchronizationInRepeatTimeTurtle.right(30);
+	Turtle fibonacciTurtle(50, 500);
+	fibonacciTurtle.direction = 90;
+	fibonacciTurtle.go(100);
 }

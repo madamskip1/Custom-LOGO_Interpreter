@@ -1,5 +1,6 @@
 #include "ArithmeticExpression.h"
 #include "../include/Context.h"
+#include "Logger.h"
 
 AST::ArithmeticExpression::ArithmeticExpression()
 {
@@ -38,7 +39,13 @@ void AST::ArithmeticExpression::evaluate(Context* context)
         else if (op == TokenType::Multiply)
             val *= val2;
         else if (op == TokenType::Divide)
+        {
+            if (val2 == 0)
+            {
+                Logger::addErrorAndThrowException(LogType::DivideByZero, token);
+            }
             val /= val2;
+        }
     }
 
     if (negativeOperator)

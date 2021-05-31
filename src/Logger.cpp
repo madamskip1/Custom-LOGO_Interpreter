@@ -58,7 +58,7 @@ void Logger::newError(LogType logType, const Token& token)
 
     logs.push_back(std::move(newLog));
 
-    throw std::runtime_error(stringToThrow.c_str());
+    throw std::runtime_error(stringToThrow);
 }
 
 Logger *Logger::getInstance()

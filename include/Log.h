@@ -33,6 +33,7 @@ enum class LogType
     ArgTypeNotEqualParameter,
     WrongClassArgsNum,
     InitClassNotPointType,
+    DivideByZero,
 
     // Lexer
     BadDigitZeros,
@@ -104,6 +105,7 @@ private:
         { LogType::ColorValMissHash, "Wartość koloru nie zaczyna się od \"#\" "},
         { LogType::ColorValBadSyntax, "Kolor zawiera nieprawidłowe znaki" },
         { LogType::AndOperatorMissSecond, "W operatorze koniunkcji AND brakuje drugiego znaku &" },
-        { LogType::OrOperatorMissSecond, "W operatorze alterantywy OR brakuje drugiego znaku |" }
+        { LogType::OrOperatorMissSecond, "W operatorze alterantywy OR brakuje drugiego znaku |" },
+        { LogType::DivideByZero, "Nie można dzielić przez zero." }
     };
 };

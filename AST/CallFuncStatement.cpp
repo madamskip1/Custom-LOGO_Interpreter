@@ -130,6 +130,12 @@ bool AST::CallFuncStatement::executeDefinedFunc(Context *context)
             }
         }
 
+        std::vector<AST::DefFuncStatement*> defFunctions = context->getAllDefFunction();
+        for (auto func : defFunctions)
+        {
+            newContext.addDefFunction(func);
+        }
+
         newContext.setDrawingBoard(context->getDrawingBoardPtr());
         newContext.setTurtleBoard(context->getTurtleBoardPtr());
         defFunc->executeFunction(&newContext);

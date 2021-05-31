@@ -61,6 +61,12 @@ void AST::RepeatTimeStatement::execute(Context *context)
         newContext->addVariable(var);
     }
 
+    std::vector<AST::DefFuncStatement*> defFunctions = context->getAllDefFunction();
+    for (auto func : defFunctions)
+    {
+        newContext->addDefFunction(func);
+    }
+
     runThread(std::move(newContext), std::move(instructionsBlock), period, howManyTime);
 }
 

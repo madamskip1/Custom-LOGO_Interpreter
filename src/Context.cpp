@@ -130,6 +130,17 @@ AST::DefFuncStatement* Context::getDefFunction(std::string name) const
     return defFunctions.at(name);
 }
 
+std::vector<AST::DefFuncStatement *> Context::getAllDefFunction() const
+{
+    std::vector<AST::DefFuncStatement*> tempVector;
+    for(auto func : defFunctions)
+    {
+        tempVector.push_back(func.second);
+    }
+
+    return tempVector;
+}
+
 std::function<void (Context *)> Context::getStdLibFunction(std::string name) const
 {
     return stdLibFunctions.at(name);
